@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flowframe.co.kr/schema/flowframe-meta.schema.json",
+  "title": "FlowFrame Wireframe Metadata",
+  "description": "Metadata schema for FlowFrame wireframe HTML files. Embedded in <script id=\"flowframe-meta\"> block.",
+  "type": "object",
+  "required": ["generator", "version", "screenId", "title", "purpose", "features"],
+  "properties": {
+    "generator": {
+      "type": "string",
+      "const": "flowframe-wireframe-skill",
+      "description": "Fixed value identifying the generator."
+    },
+    "version": {
+      "type": "string",
+      "description": "Skill version (e.g., \"1.0\")."
+    },
+    "screenId": {
+      "type": "string",
+      "description": "Screen identifier (e.g., LOGIN, DASHBOARD, CANVAS-001)."
+    },
+    "title": {
+      "type": "string",
+      "description": "Screen title."
+    },
+    "purpose": {
+      "type": "string",
+      "description": "One-sentence description of the screen's purpose."
+    },
+    "features": {
+      "type": "array",
+      "minItems": 1,
+      "description": "List of features on this screen.",
+      "items": {
+        "$ref": "#/$defs/Feature"
+      }
+    },
+    "author": {
+      "type": "string",
+      "description": "Author name (optional)."
+    },
+    "viewport": {
+      "type": "string",
+      "enum": ["pc", "mobile"],
+      "description": "Target viewport (optional)."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Feature": {
+      "type": "object",
+      "required": ["id", "type", "label", "description"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z0-9_-]+_FEATURE_[A-Z0-9_]+$",
+          "description": "Feature ID following {SCREEN_ID}_FEATURE_{NAME} pattern."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["input", "button", "link", "image", "text", "select", "checkbox", "radio", "table", "list"],
+          "description": "Feature UI type."
+        },
+        "label": {
+          "type": "string",
+          "description": "Feature label."
+        },
+        "description": {
+          "type": "string",
+          "description": "Feature description."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
