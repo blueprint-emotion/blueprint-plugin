@@ -48,13 +48,4 @@ usedIn:
 - 댓글 최대 1,000자, 초과 시 입력 차단 + 글자수 카운터 빨간색
 - 멘션된 사용자에게 알림 발송
 - 답글은 1단계만 허용 (답글의 답글 없음)
-
-## API (개발자용)
-
-| 메서드 | 엔드포인트 | 설명 |
-|--------|-----------|------|
-| GET | /api/comments?targetId={id}&page={n} | 댓글 목록 (20개씩 페이징) |
-| POST | /api/comments | 댓글 등록 (body: targetId, content, parentId?) |
-| DELETE | /api/comments/{commentId} | 댓글 삭제 (본인만) |
-| GET | /api/users/search?q={query} | 멘션 자동완성용 사용자 검색 |
 ```

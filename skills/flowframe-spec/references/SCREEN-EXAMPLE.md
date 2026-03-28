@@ -26,4 +26,56 @@ viewport: pc
 - Screen spec is **short** — just layout + feature references
 - No feature details here (those live in features/*.md)
 - `[@featureName](path)` syntax links to feature specs
+- Every screen must reference at least one feature
 - One feature can appear in multiple screens
+- **Fixed areas** (lines 1, 5): Areas without `[@feature]` links describe fixed UI chrome (menu bar, status bar). These render as plain HTML without `data-feature` and are not included in FlowFrame metadata.
+- **Multi-feature regions** (line 4): Multiple `[@feature]` references in one region — each gets its own `data-feature` container, stacked sequentially.
+
+## Single-feature screen example
+
+```markdown
+---
+screenId: LOGIN
+title: 로그인
+purpose: 사용자가 서비스에 로그인하는 화면
+viewport: [pc, mobile]
+---
+
+# 로그인
+
+## 레이아웃 (PC)
+
+1. 전체 화면 — [@auth](../features/auth.md)
+
+## 레이아웃 (Mobile)
+
+1. 전체 화면 — [@auth](../features/auth.md)
+```
+
+If the screen is effectively one feature, keep the screen spec this short instead of splitting it into micro-regions.
+
+## Multi-viewport example
+
+```markdown
+---
+screenId: LOGIN
+title: 로그인
+purpose: 사용자가 서비스에 로그인하는 화면
+viewport: [pc, mobile]
+---
+
+# 로그인
+
+## 레이아웃 (PC)
+
+1. 좌: 브랜딩 이미지 | 우: 인증 폼 — [@auth](../features/auth.md)
+
+## 레이아웃 (Mobile)
+
+1. 로고
+2. 인증 폼 — [@auth](../features/auth.md)
+3. 소셜 로그인 — [@auth](../features/auth.md)
+```
+
+Planners specify order + direction only. Visual details are the designer's domain.
+Multi-viewport screen specs generate **separate HTML files** per viewport (e.g., `LOGIN_PC.html`, `LOGIN_MOBILE.html`).

@@ -4,7 +4,7 @@
   "title": "FlowFrame Wireframe Metadata",
   "description": "Metadata schema for FlowFrame wireframe HTML files. Embedded in <script id=\"flowframe-meta\"> block.",
   "type": "object",
-  "required": ["generator", "version", "screenId", "title", "purpose", "features"],
+  "required": ["generator", "version", "screenId", "title", "purpose", "elements"],
   "properties": {
     "generator": {
       "type": "string",
@@ -27,12 +27,12 @@
       "type": "string",
       "description": "One-sentence description of the screen's purpose."
     },
-    "features": {
+    "elements": {
       "type": "array",
       "minItems": 1,
-      "description": "List of features on this screen.",
+      "description": "List of tracked wireframe elements on this screen.",
       "items": {
-        "$ref": "#/$defs/Feature"
+        "$ref": "#/$defs/Element"
       }
     },
     "author": {
@@ -47,27 +47,35 @@
   },
   "additionalProperties": false,
   "$defs": {
-    "Feature": {
+    "Element": {
       "type": "object",
-      "required": ["id", "type", "label", "description"],
+      "required": ["id", "featureId", "type", "label", "description", "spec"],
       "properties": {
         "id": {
           "type": "string",
-          "pattern": "^[A-Z0-9_-]+_FEATURE_[A-Z0-9_]+$",
-          "description": "Feature ID following {SCREEN_ID}_FEATURE_{NAME} pattern."
+          "pattern": "^FEATURE_[A-Z0-9_]+$",
+          "description": "Tracked wireframe element ID following FEATURE_{FEATURE_ID}_{ELEMENT_ID} pattern (e.g., FEATURE_AUTH_EMAIL)."
+        },
+        "featureId": {
+          "type": "string",
+          "pattern": "^[A-Z0-9_]+$",
+          "description": "Parent feature ID from the feature spec frontmatter (e.g., AUTH, COMMENTS)."
         },
         "type": {
           "type": "string",
-          "enum": ["input", "button", "link", "image", "text", "select", "checkbox", "radio", "table", "list"],
-          "description": "Feature UI type."
+          "description": "Wireframe element type (e.g., input, button, link, text, list, table)."
         },
         "label": {
           "type": "string",
-          "description": "Feature label."
+          "description": "Element label shown in the wireframe panel."
         },
         "description": {
           "type": "string",
-          "description": "Feature description."
+          "description": "Element-level description shown in the wireframe panel."
+        },
+        "spec": {
+          "type": "string",
+          "description": "Relative path to the parent feature spec markdown file (e.g., \"../features/auth.md\")."
         }
       },
       "additionalProperties": false
