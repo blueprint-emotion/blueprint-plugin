@@ -24,7 +24,7 @@ viewport: pc
 ## Key patterns
 
 - Screen spec is **short** — just layout + feature references
-- No feature details here (those live in features/*.md)
+- No feature details here (those live in docs/features/*.md)
 - `[@featureName](path)` syntax links to feature specs
 - Every screen must reference at least one feature
 - One feature can appear in multiple screens

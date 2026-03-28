@@ -3,7 +3,7 @@ featureId: PRODUCT_FILTERS
 label: 상품 필터
 type: section
 usedIn:
-  - screens/PRODUCT_LIST.md
+  - docs/screens/PRODUCT_LIST.md
 ---
 
 # 상품 필터

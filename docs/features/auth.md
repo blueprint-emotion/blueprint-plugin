@@ -3,7 +3,7 @@ featureId: AUTH
 label: 인증
 type: section
 usedIn:
-  - screens/SIGNUP.md
+  - docs/screens/SIGNUP.md
 ---
 
 # 인증

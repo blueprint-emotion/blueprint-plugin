@@ -12,7 +12,7 @@ Compare with [EXAMPLE.md](EXAMPLE.md) (single-feature, card-centered) and [LAYOU
 
 ## Step 1: Feature Specs
 
-### features/search-filter.md
+### docs/features/search-filter.md
 
 ```markdown
 ---
@@ -20,7 +20,7 @@ featureId: SEARCH_FILTER
 label: 검색/필터
 type: section
 usedIn:
-  - screens/PRODUCT_LIST.md
+  - docs/screens/PRODUCT_LIST.md
 ---
 
 # 검색/필터
@@ -48,7 +48,7 @@ usedIn:
 - 필터 초기화 클릭 → 모든 필터 해제 + 전체 상품 표시
 ```
 
-### features/product-list.md
+### docs/features/product-list.md
 
 ```markdown
 ---
@@ -56,7 +56,7 @@ featureId: PRODUCT_LIST
 label: 상품 목록
 type: section
 usedIn:
-  - screens/PRODUCT_LIST.md
+  - docs/screens/PRODUCT_LIST.md
 ---
 
 # 상품 목록
@@ -86,7 +86,7 @@ usedIn:
 
 ## Step 2: Screen Spec
 
-`screens/PRODUCT_LIST.md`
+`docs/screens/PRODUCT_LIST.md`
 
 ```markdown
 ---
@@ -107,7 +107,7 @@ viewport: pc
 
 ## Step 3: Generated Wireframe
 
-`wireframes/PRODUCT_LIST.html`
+`docs/wireframes/PRODUCT_LIST.html`
 
 ```html
 <!DOCTYPE html>
@@ -117,8 +117,6 @@ viewport: pc
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>상품 목록</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet"
-    href="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/css/wireframe-base.css" />
 
   <style type="text/tailwindcss">
     @custom-variant dark (&:where(.dark, .dark *));
@@ -192,10 +190,6 @@ viewport: pc
     ]
   }
   </script>
-
-  <script
-    src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/js/wireframe-base.js"
-    defer></script>
 </head>
 <body class="bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
   <div class="flex flex-col h-screen">

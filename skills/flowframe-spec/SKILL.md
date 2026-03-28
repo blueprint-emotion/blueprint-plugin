@@ -1,6 +1,6 @@
 ---
 name: flowframe-spec
-description: Helps planners write and manage feature specs (features/*.md) and screen specs (screens/*.md) for FlowFrame projects. Creates structured specifications with wireframe elements, states, interactions, and business logic. Triggers on "기획서", "기능명세", "화면 명세", "기능 추가", "화면 추가", "기획 도와줘", "spec", "feature spec", "screen spec", "기능 정의", "새 화면", "spec 삭제", "기능 삭제", "화면 삭제", "정합성 검증", "consistency check", or any request to create, edit, delete, or plan features and screens. Also use when the user describes a feature they want to build, asks about spec templates, wants to add/remove features from screens, or wants to verify spec consistency.
+description: Helps planners write and manage feature specs (docs/features/*.md) and screen specs (docs/screens/*.md) for FlowFrame projects. Creates structured specifications with wireframe elements, states, interactions, and business logic. Triggers on "기획서", "기능명세", "화면 명세", "기능 추가", "화면 추가", "기획 도와줘", "spec", "feature spec", "screen spec", "기능 정의", "새 화면", "spec 삭제", "기능 삭제", "화면 삭제", "정합성 검증", "consistency check", or any request to create, edit, delete, or plan features and screens. Also use when the user describes a feature they want to build, asks about spec templates, wants to add/remove features from screens, or wants to verify spec consistency.
 license: MIT
 metadata:
   author: flowframehq
@@ -16,21 +16,22 @@ Outputs are used by the `flowframe-wireframe` skill to generate HTML wireframes.
 
 ```
 project/
-├── features/              ← Feature specs (this skill creates/edits)
-│   ├── auth.md
-│   ├── comments.md
-│   └── file-upload.md
-└── screens/               ← Screen specs (this skill creates/edits)
-    ├── LOGIN.md
-    ├── DASHBOARD.md
-    └── EDITOR.md
+└── docs/
+    ├── features/              ← Feature specs (this skill creates/edits)
+    │   ├── auth.md
+    │   ├── comments.md
+    │   └── file-upload.md
+    └── screens/               ← Screen specs (this skill creates/edits)
+        ├── LOGIN.md
+        ├── DASHBOARD.md
+        └── EDITOR.md
 ```
 
 If these directories don't exist, create them.
 
 ---
 
-## Feature Spec (features/*.md)
+## Feature Spec (docs/features/*.md)
 
 A feature is a **business or content unit** — not a single UI element.
 
@@ -81,8 +82,8 @@ featureId: FEATURE_ID
 label: 기능 이름
 type: section
 usedIn:
-  - screens/SCREEN_A.md
-  - screens/SCREEN_B.md
+  - docs/screens/SCREEN_A.md
+  - docs/screens/SCREEN_B.md
 ---
 
 # 기능 이름
@@ -160,7 +161,7 @@ Use these for the `type` column in 와이어프레임 요소:
 
 ---
 
-## Screen Spec (screens/*.md)
+## Screen Spec (docs/screens/*.md)
 
 A screen defines **layout and feature placement** only. No feature details.
 Every screen must reference **at least one** feature.
@@ -240,7 +241,7 @@ This tells the wireframe skill which feature to render at that layout position.
 ### Creating a new feature
 
 1. Ask the user what the feature does (purpose, key functions)
-2. Create `features/{feature-name}.md` using the template
+2. Create `docs/features/{feature-name}.md` using the template
 3. Fill in 와이어프레임 요소 with the user
 4. Fill in 상태, 인터랙션, 비즈니스 로직 as the user provides details
 5. Set `usedIn` to empty list initially — update when screens reference it
@@ -248,7 +249,7 @@ This tells the wireframe skill which feature to render at that layout position.
 ### Creating a new screen
 
 1. Ask the user what the screen shows (purpose, which features)
-2. Create `screens/{SCREEN_NAME}.md` using the template
+2. Create `docs/screens/{SCREEN_NAME}.md` using the template
 3. Define layout with feature references
 4. Update each referenced feature's `usedIn` to include this screen
 5. If the screen would otherwise have zero features, create a coarse feature first
@@ -294,8 +295,8 @@ This tells the wireframe skill which feature to render at that layout position.
 3. Delete the screen md file
 4. Check whether the screen uses single or multi viewport output
 5. Ask to delete matching wireframes:
-   - single viewport: `wireframes/{SCREEN_ID}.html`
-   - multi viewport: `wireframes/{SCREEN_ID}_PC.html`, `wireframes/{SCREEN_ID}_MOBILE.html`
+   - single viewport: `docs/wireframes/{SCREEN_ID}.html`
+   - multi viewport: `docs/wireframes/{SCREEN_ID}_PC.html`, `docs/wireframes/{SCREEN_ID}_MOBILE.html`
 6. Delete selected wireframes if user confirms
 
 ### Consistency check
@@ -304,7 +305,7 @@ Trigger: "전체 정합성 확인해줘", "check consistency"
 
 Verify three types of consistency:
 
-1. **Feature reference check**: Every `[@feature]` in screens/*.md has a matching features/*.md file
+1. **Feature reference check**: Every `[@feature]` in docs/screens/*.md has a matching docs/features/*.md file
 2. **usedIn sync check**: Every feature's `usedIn` matches actual screen references, and vice versa
 3. **Wireframe sync check**: Every wireframe's `data-feature` IDs match the feature spec's 와이어프레임 요소
 
@@ -312,9 +313,9 @@ Report discrepancies as a table:
 
 | 유형 | 파일 | 문제 |
 |------|------|------|
-| 참조 누락 | screens/EDITOR.md | @file-tree 참조하지만 features/file-tree.md 없음 |
-| usedIn 불일치 | features/auth.md | usedIn에 EDITOR.md 있지만 실제 참조 없음 |
-| 와이어프레임 불일치 | wireframes/LOGIN.html | FEATURE_AUTH wrapper가 없거나 auth spec과 연결되지 않음 |
+| 참조 누락 | docs/screens/EDITOR.md | @file-tree 참조하지만 docs/features/file-tree.md 없음 |
+| usedIn 불일치 | docs/features/auth.md | usedIn에 EDITOR.md 있지만 실제 참조 없음 |
+| 와이어프레임 불일치 | docs/wireframes/LOGIN.html | FEATURE_AUTH wrapper가 없거나 auth spec과 연결되지 않음 |
 
 ---
 

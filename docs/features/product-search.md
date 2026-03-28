@@ -3,7 +3,7 @@ featureId: PRODUCT_SEARCH
 label: 상품 검색
 type: section
 usedIn:
-  - screens/PRODUCT_LIST.md
+  - docs/screens/PRODUCT_LIST.md
 ---
 
 # 상품 검색

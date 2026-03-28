@@ -17,7 +17,7 @@ featureId: AUTH
 label: 인증
 type: section
 usedIn:
-  - screens/LOGIN.md
+  - docs/screens/LOGIN.md
 ---
 
 # 인증
@@ -82,8 +82,6 @@ viewport: pc
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>로그인</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet"
-    href="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/css/wireframe-base.css" />
 
   <style type="text/tailwindcss">
     @custom-variant dark (&:where(.dark, .dark *));
@@ -157,10 +155,6 @@ viewport: pc
     ]
   }
   </script>
-
-  <script
-    src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/js/wireframe-base.js"
-    defer></script>
 </head>
 <body class="bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
   <div class="min-h-screen flex items-center justify-center p-6">

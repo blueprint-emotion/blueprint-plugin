@@ -6,8 +6,8 @@ featureId: COMMENTS
 label: 댓글
 type: section
 usedIn:
-  - screens/EDITOR.md
-  - screens/DASHBOARD.md
+  - docs/screens/EDITOR.md
+  - docs/screens/DASHBOARD.md
 ---
 
 # 댓글

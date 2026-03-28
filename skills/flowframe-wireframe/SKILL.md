@@ -1,6 +1,6 @@
 ---
 name: flowframe-wireframe
-description: Converts markdown screen and feature specifications into FlowFrame-compatible HTML wireframes. Reads screens/*.md for layout and features/*.md for UI elements, then generates or updates wireframes/*.html. Triggers on "wireframe", "와이어프레임", "화면 설계", "화면 그려줘", "HTML로 변환", "와이어프레임 업데이트", "wireframe update", "기획서로 화면 만들어줘", or any request to generate, regenerate, or update wireframes from specs. Also use when the user says something changed and wants wireframes refreshed, or asks to convert planning documents into visual screen layouts.
+description: Converts markdown screen and feature specifications into FlowFrame-compatible HTML wireframes. Reads docs/screens/*.md for layout and docs/features/*.md for UI elements, then generates or updates docs/wireframes/*.html. Triggers on "wireframe", "와이어프레임", "화면 설계", "화면 그려줘", "HTML로 변환", "와이어프레임 업데이트", "wireframe update", "기획서로 화면 만들어줘", or any request to generate, regenerate, or update wireframes from specs. Also use when the user says something changed and wants wireframes refreshed, or asks to convert planning documents into visual screen layouts.
 license: MIT
 metadata:
   author: flowframehq
@@ -18,25 +18,26 @@ This skill expects the following file layout in the user's project:
 
 ```
 project/
-├── features/              ← Feature specs (business function units)
-│   ├── auth.md
-│   ├── comments.md
-│   └── file-upload.md
-├── screens/               ← Screen specs (layout + feature references)
-│   ├── LOGIN.md
-│   ├── DASHBOARD.md
-│   └── EDITOR.md
-└── wireframes/            ← Generated wireframe HTML (one or more per screen)
-    ├── LOGIN.html
-    ├── DASHBOARD.html
-    └── EDITOR.html
+└── docs/
+    ├── features/              ← Feature specs (business function units)
+    │   ├── auth.md
+    │   ├── comments.md
+    │   └── file-upload.md
+    ├── screens/               ← Screen specs (layout + feature references)
+    │   ├── LOGIN.md
+    │   ├── DASHBOARD.md
+    │   └── EDITOR.md
+    └── wireframes/            ← Generated wireframe HTML (one or more per screen)
+        ├── LOGIN.html
+        ├── DASHBOARD.html
+        └── EDITOR.html
 ```
 
-If the `wireframes/` directory doesn't exist, create it. If `features/` or `screens/` don't exist, tell the user to create specs first (suggest the `flowframe-spec` skill).
+If the `docs/wireframes/` directory doesn't exist, create it. If `docs/features/` or `docs/screens/` don't exist, tell the user to create specs first (suggest the `flowframe-spec` skill).
 
 ## Input Files
 
-### Screen spec (screens/*.md)
+### Screen spec (docs/screens/*.md)
 
 Defines layout and references features. Frontmatter fields:
 
@@ -51,7 +52,7 @@ viewport: pc
 
 The body contains layout with feature references using `[@featureName](../features/feature.md)` links.
 
-### Feature spec (features/*.md)
+### Feature spec (docs/features/*.md)
 
 Defines a business or content unit. Frontmatter fields:
 
@@ -61,8 +62,8 @@ featureId: COMMENTS
 label: 댓글
 type: section
 usedIn:
-  - screens/EDITOR.md
-  - screens/DASHBOARD.md
+  - docs/screens/EDITOR.md
+  - docs/screens/DASHBOARD.md
 ---
 ```
 
@@ -131,8 +132,8 @@ and `spec` while using distinct `id` values such as `FEATURE_AUTH_EMAIL`, `FEATU
 
 When a screen spec has `viewport: [pc, mobile]`, generate **separate HTML files** per viewport:
 
-- `wireframes/{SCREEN_ID}_PC.html` — from `## 레이아웃 (PC)` section
-- `wireframes/{SCREEN_ID}_MOBILE.html` — from `## 레이아웃 (Mobile)` section
+- `docs/wireframes/{SCREEN_ID}_PC.html` — from `## 레이아웃 (PC)` section
+- `docs/wireframes/{SCREEN_ID}_MOBILE.html` — from `## 레이아웃 (Mobile)` section
 
 Each file has its own `viewport` field in metadata (`"pc"` or `"mobile"`). FlowFrame에서 각각 별도 업로드하고 뷰포트 토글로 전환하여 확인한다.
 
@@ -141,7 +142,7 @@ Each file has its own `viewport` field in metadata (`"pc"` or `"mobile"`). FlowF
 When the user says "전부 다시 만들어줘" or "regenerate all wireframes":
 
 ```
-1. List all screen mds in screens/
+1. List all screen mds in docs/screens/
 2. Show the list and ask for confirmation
 3. For each screen, run the initial generation (2-pass) workflow
 4. Overwrite existing wireframe HTMLs
@@ -192,10 +193,6 @@ The `featureId` and `spec` fields link each tracked element back to its parent f
   <!-- Tailwind CSS v4 (browser JIT — stripped on upload, re-injected by viewer) -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-  <!-- Base reset + font -->
-  <link rel="stylesheet"
-    href="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/css/wireframe-base.css" />
-
   <!-- FlowFrame dark mode config -->
   <style type="text/tailwindcss">
     @custom-variant dark (&:where(.dark, .dark *));
@@ -206,10 +203,6 @@ The `featureId` and `spec` fields link each tracked element back to its parent f
   { ... }
   </script>
 
-  <!-- Feature highlight + iframe communication (stripped on upload) -->
-  <script
-    src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/js/wireframe-base.js"
-    defer></script>
 </head>
 <body class="bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
   <div class="min-h-screen flex items-center justify-center p-6">
@@ -378,7 +371,6 @@ Before outputting HTML, verify:
 - [ ] Each `featureId` matches the referenced feature spec frontmatter
 - [ ] Each `spec` points to an existing feature md file and the correct parent feature
 - [ ] Tailwind CDN `<script>` tag included
-- [ ] Base CSS `<link>` included
 - [ ] `<style type="text/tailwindcss">` dark mode config present
 - [ ] `spec` field points to correct feature md path
 - [ ] All color classes include `dark:` variants

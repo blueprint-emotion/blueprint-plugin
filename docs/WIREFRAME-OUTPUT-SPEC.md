@@ -117,19 +117,13 @@ FlowFrame은 Tailwind CSS v4를 통해 와이어프레임 스타일링을 지원
 <!-- Tailwind CSS v4 (browser JIT — 업로드 시 제거, 뷰어가 재주입) -->
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-<!-- 기본 리셋 + 폰트 -->
-<link rel="stylesheet" href="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/css/wireframe-base.css" />
-
 <!-- 다크 모드 설정 (필수) -->
 <style type="text/tailwindcss">
   @custom-variant dark (&:where(.dark, .dark *));
 </style>
-
-<!-- Feature 하이라이트 + iframe 통신 (선택, 업로드 시 제거) -->
-<script src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/js/wireframe-base.js" defer></script>
 ```
 
-> **참고**: 업로드 시 모든 `<script>` 태그가 보안상 제거된다. FlowFrame 뷰어는 HTML을 srcdoc에 넣기 전에 Tailwind CDN 스크립트를 자동으로 재주입하며, iframe sandbox에 `allow-scripts`를 추가하여 Tailwind JIT 컴파일러가 실행될 수 있도록 한다. `wireframe-base.js`는 독립 브라우저에서 열었을 때의 편의 기능(hover 하이라이트)을 제공한다.
+> **참고**: 업로드 시 모든 `<script>` 태그가 보안상 제거된다. FlowFrame 뷰어는 HTML을 srcdoc에 넣기 전에 Tailwind CDN 스크립트를 자동으로 재주입하며, iframe sandbox에 `allow-scripts`를 추가하여 Tailwind JIT 컴파일러가 실행될 수 있도록 한다.
 
 ### 스타일링 규칙
 
@@ -227,7 +221,6 @@ FlowFrame에서 각각 별도 업로드하고, 뷰포트 토글로 전환하여 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>로그인</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet" href="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/css/wireframe-base.css" />
 
   <style type="text/tailwindcss">
     @custom-variant dark (&:where(.dark, .dark *));

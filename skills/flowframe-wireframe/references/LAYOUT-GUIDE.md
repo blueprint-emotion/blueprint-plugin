@@ -35,12 +35,12 @@ This example demonstrates a dashboard-style editor with five regions:
 
 ### Feature Specs Used
 
-- `features/file-tree.md` → 파일 탐색기 (featureId: FILE_TREE)
-- `features/editor.md` → 에디터 캔버스 (featureId: EDITOR_CANVAS)
-- `features/comments.md` → 댓글 (featureId: COMMENTS)
-- `features/version-control.md` → 버전 관리 (featureId: VERSION_CONTROL)
+- `docs/features/file-tree.md` → 파일 탐색기 (featureId: FILE_TREE)
+- `docs/features/editor.md` → 에디터 캔버스 (featureId: EDITOR_CANVAS)
+- `docs/features/comments.md` → 댓글 (featureId: COMMENTS)
+- `docs/features/version-control.md` → 버전 관리 (featureId: VERSION_CONTROL)
 
-### Screen Spec (screens/EDITOR.md)
+### Screen Spec (docs/screens/EDITOR.md)
 
 ```markdown
 ---
@@ -61,7 +61,7 @@ viewport: pc
 5. 하단 상태바 — 커서 위치, 단어 수, 언어 모드
 ```
 
-### Generated Wireframe (wireframes/EDITOR.html)
+### Generated Wireframe (docs/wireframes/EDITOR.html)
 
 ```html
 <!DOCTYPE html>
@@ -71,8 +71,6 @@ viewport: pc
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>에디터</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet"
-    href="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/css/wireframe-base.css" />
 
   <style type="text/tailwindcss">
     @custom-variant dark (&:where(.dark, .dark *));
@@ -130,10 +128,6 @@ viewport: pc
     ]
   }
   </script>
-
-  <script
-    src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/js/wireframe-base.js"
-    defer></script>
 </head>
 <body class="bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
   <div class="flex flex-col h-screen">

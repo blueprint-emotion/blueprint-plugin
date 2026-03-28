@@ -3,7 +3,7 @@ featureId: PRODUCT_GRID
 label: 상품 그리드
 type: section
 usedIn:
-  - screens/PRODUCT_LIST.md
+  - docs/screens/PRODUCT_LIST.md
 ---
 
 # 상품 그리드

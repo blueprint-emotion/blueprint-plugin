@@ -107,10 +107,6 @@ interface FlowFrameMetaFeature {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{화면 제목}</title>
 
-  <!-- 공용 Base CSS (필수) -->
-  <link rel="stylesheet"
-    href="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/css/wireframe-base.css" />
-
   <!-- FlowFrame 메타데이터 (필수) -->
   <script type="application/json" id="flowframe-meta">
   {
@@ -135,10 +131,6 @@ interface FlowFrameMetaFeature {
     /* base CSS에 없는 화면 고유 스타일만 */
   </style>
 
-  <!-- 공용 Base JS (필수, defer) -->
-  <script
-    src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/js/wireframe-base.js"
-    defer></script>
 </head>
 <body>
   <div class="wf-page">
@@ -235,8 +227,6 @@ SKILL.md 본문에는 에이전트가 따라야 할 규칙을 작성한다. 반�
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>로그인</title>
-  <link rel="stylesheet"
-    href="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/css/wireframe-base.css" />
 
   <script type="application/json" id="flowframe-meta">
   {
@@ -304,10 +294,6 @@ SKILL.md 본문에는 에이전트가 따라야 할 규칙을 작성한다. 반�
     .social-group { display: flex; gap: 12px; }
     .social-icon { width: 18px; height: 18px; }
   </style>
-
-  <script
-    src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframe-assets/js/wireframe-base.js"
-    defer></script>
 </head>
 <body>
   <div class="wf-page">
