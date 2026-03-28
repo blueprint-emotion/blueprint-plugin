@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>장바구니</title>
+
+  <!-- Tailwind CSS v4 (browser JIT — stripped on upload, re-injected by viewer) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- FlowFrame dark mode config -->
+  <style type="text/tailwindcss">
+    @custom-variant dark (&:where(.dark, .dark *));
+  </style>
+
+  <!-- FlowFrame Metadata (required) -->
+  <script type="application/json" id="flowframe-meta">
+  {
+    "generator": "flowframe-wireframe-skill",
+    "version": "1.0",
+    "screenId": "CART",
+    "title": "장바구니",
+    "viewport": "pc",
+    "purpose": "사용자가 담은 상품을 확인하고 수량을 조절한 뒤 결제로 진행하는 화면",
+    "elements": [
+      {
+        "id": "FEATURE_CART_ITEMS_SELECT_ALL",
+        "featureId": "CART_ITEMS",
+        "type": "checkbox",
+        "label": "전체 선택",
+        "description": "모든 상품 일괄 선택/해제 체크박스",
+        "spec": "../features/cart-items.md"
+      },
+      {
+        "id": "FEATURE_CART_ITEMS_LIST",
+        "featureId": "CART_ITEMS",
+        "type": "list",
+        "label": "장바구니 상품 목록",
+        "description": "상품 선택, 이미지, 상품명, 옵션, 수량 조절, 가격, 삭제를 포함하는 상품 카드 목록",
+        "spec": "../features/cart-items.md"
+      },
+      {
+        "id": "FEATURE_CART_ITEMS_BULK_DELETE",
+        "featureId": "CART_ITEMS",
+        "type": "button",
+        "label": "선택 삭제",
+        "description": "선택한 상품을 일괄 삭제하는 버튼",
+        "spec": "../features/cart-items.md"
+      },
+      {
+        "id": "FEATURE_ORDER_SUMMARY_BREAKDOWN",
+        "featureId": "ORDER_SUMMARY",
+        "type": "text",
+        "label": "주문 금액 내역",
+        "description": "선택 상품 수, 상품 금액, 할인 금액, 배송비, 총 결제금액을 표시하는 요약 영역",
+        "spec": "../features/order-summary.md"
+      },
+      {
+        "id": "FEATURE_ORDER_SUMMARY_SUBMIT",
+        "featureId": "ORDER_SUMMARY",
+        "type": "button",
+        "label": "결제하기",
+        "description": "결제 페이지로 이동하는 버튼",
+        "spec": "../features/order-summary.md"
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">
+  <div class="w-full max-w-[1200px] mx-auto p-6">
+
+    <!-- Fixed: 상단 — 페이지 제목, 전체 상품 수 (no data-feature) -->
+    <div class="flex items-baseline gap-2 mb-6">
+      <h1 class="text-xl font-semibold">장바구니</h1>
+      <span class="text-sm text-zinc-500 dark:text-zinc-400">총 3개</span>
+    </div>
+
+    <div class="flex gap-6">
+
+      <!-- 좌: 메인 영역 — cart-items -->
+      <main class="flex-1">
+        <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg">
+
+          <!-- 전체 선택 + 선택 삭제 -->
+          <div class="flex items-center justify-between px-4 py-3 border-b border-zinc-200 dark:border-zinc-700">
+            <div data-feature="FEATURE_CART_ITEMS_SELECT_ALL">
+              <label class="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" class="w-4 h-4" checked readonly />
+                <span>전체 선택 (2/3)</span>
+              </label>
+            </div>
+            <div data-feature="FEATURE_CART_ITEMS_BULK_DELETE">
+              <button class="text-sm text-zinc-500 dark:text-zinc-400 hover:underline">선택 삭제</button>
+            </div>
+          </div>
+
+          <!-- 상품 목록 -->
+          <div data-feature="FEATURE_CART_ITEMS_LIST" class="divide-y divide-zinc-200 dark:divide-zinc-700">
+
+            <!-- 상품 1 -->
+            <div class="flex items-center gap-4 px-4 py-4">
+              <input type="checkbox" class="w-4 h-4 shrink-0" checked readonly />
+              <div class="w-20 h-20 bg-zinc-200 dark:bg-zinc-700 rounded shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-semibold truncate">코튼 오버핏 티셔츠</div>
+                <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">블랙 / L</div>
+              </div>
+              <div class="flex items-center gap-1">
+                <button class="w-8 h-8 flex items-center justify-center border border-zinc-300 dark:border-zinc-600 rounded-md text-sm">−</button>
+                <span class="w-8 h-8 flex items-center justify-center text-sm">2</span>
+                <button class="w-8 h-8 flex items-center justify-center border border-zinc-300 dark:border-zinc-600 rounded-md text-sm">+</button>
+              </div>
+              <div class="text-sm font-semibold w-24 text-right">58,000원</div>
+              <button class="text-sm text-zinc-400 dark:text-zinc-500">✕</button>
+            </div>
+
+            <!-- 상품 2 -->
+            <div class="flex items-center gap-4 px-4 py-4">
+              <input type="checkbox" class="w-4 h-4 shrink-0" checked readonly />
+              <div class="w-20 h-20 bg-zinc-200 dark:bg-zinc-700 rounded shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-semibold truncate">슬림핏 데님 팬츠</div>
+                <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">인디고 / 32</div>
+              </div>
+              <div class="flex items-center gap-1">
+                <button class="w-8 h-8 flex items-center justify-center border border-zinc-300 dark:border-zinc-600 rounded-md text-sm">−</button>
+                <span class="w-8 h-8 flex items-center justify-center text-sm">1</span>
+                <button class="w-8 h-8 flex items-center justify-center border border-zinc-300 dark:border-zinc-600 rounded-md text-sm">+</button>
+              </div>
+              <div class="text-sm font-semibold w-24 text-right">45,000원</div>
+              <button class="text-sm text-zinc-400 dark:text-zinc-500">✕</button>
+            </div>
+
+            <!-- 상품 3 (품절) -->
+            <div class="flex items-center gap-4 px-4 py-4 opacity-50">
+              <input type="checkbox" class="w-4 h-4 shrink-0" disabled readonly />
+              <div class="w-20 h-20 bg-zinc-200 dark:bg-zinc-700 rounded shrink-0"></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-semibold truncate">캔버스 스니커즈</div>
+                <div class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">화이트 / 270</div>
+                <div class="text-xs text-red-500 mt-0.5">품절</div>
+              </div>
+              <div class="flex items-center gap-1">
+                <button class="w-8 h-8 flex items-center justify-center border border-zinc-300 dark:border-zinc-600 rounded-md text-sm" disabled>−</button>
+                <span class="w-8 h-8 flex items-center justify-center text-sm">1</span>
+                <button class="w-8 h-8 flex items-center justify-center border border-zinc-300 dark:border-zinc-600 rounded-md text-sm" disabled>+</button>
+              </div>
+              <div class="text-sm font-semibold w-24 text-right line-through">39,000원</div>
+              <button class="text-sm text-zinc-400 dark:text-zinc-500">✕</button>
+            </div>
+
+          </div>
+        </div>
+      </main>
+
+      <!-- 우: 사이드 영역 — order-summary -->
+      <aside class="w-80">
+        <div class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg sticky top-6">
+          <div class="p-4 border-b border-zinc-200 dark:border-zinc-700">
+            <span class="text-lg font-semibold">주문 요약</span>
+          </div>
+
+          <!-- 금액 내역 -->
+          <div data-feature="FEATURE_ORDER_SUMMARY_BREAKDOWN" class="p-4 flex flex-col gap-3">
+            <div class="flex justify-between text-sm">
+              <span class="text-zinc-500 dark:text-zinc-400">선택 상품</span>
+              <span>2개</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-zinc-500 dark:text-zinc-400">상품 금액</span>
+              <span>103,000원</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-zinc-500 dark:text-zinc-400">할인 금액</span>
+              <span>-5,000원</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-zinc-500 dark:text-zinc-400">배송비</span>
+              <span>무료</span>
+            </div>
+            <div class="h-px bg-zinc-200 dark:bg-zinc-700"></div>
+            <div class="flex justify-between">
+              <span class="text-sm font-semibold">총 결제금액</span>
+              <span class="text-lg font-semibold">98,000원</span>
+            </div>
+          </div>
+
+          <!-- 결제하기 버튼 -->
+          <div data-feature="FEATURE_ORDER_SUMMARY_SUBMIT" class="p-4 pt-0">
+            <button class="w-full h-12 text-sm font-semibold bg-zinc-800 text-white dark:bg-zinc-200 dark:text-zinc-900 rounded-md">결제하기 (2개)</button>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</body>
+</html>

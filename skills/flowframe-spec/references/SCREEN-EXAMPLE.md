@@ -78,4 +78,4 @@ viewport: [pc, mobile]
 ```
 
 Planners specify order + direction only. Visual details are the designer's domain.
-Multi-viewport screen specs generate **separate HTML files** per viewport (e.g., `LOGIN_PC.html`, `LOGIN_MOBILE.html`).
+Multi-viewport screen specs generate **separate HTML files** per viewport. Use a file naming rule that stays consistent within the project instead of assuming one fixed suffix pattern.

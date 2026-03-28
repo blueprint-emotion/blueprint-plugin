@@ -155,7 +155,7 @@ Sections can be added/removed per project needs (e.g., QA checklist, accessibili
 
 ### Element types
 
-Use these for the `type` column in 와이어프레임 요소:
+Use these values in the `type` column of the `## 와이어프레임 요소` table:
 
 `input`, `button`, `link`, `image`, `text`, `select`, `checkbox`, `radio`, `table`, `list`
 
@@ -189,7 +189,7 @@ viewport: pc
 3. 영역 이름 — 고정 요소 설명 (feature 없는 영역)
 ```
 
-Multi-viewport (한 화면에서 PC/모바일 분기):
+Multi-viewport (split one screen into PC and mobile layouts):
 
 ```markdown
 ---
@@ -212,17 +212,17 @@ viewport: [pc, mobile]
 2. 하단 탭 — [@feature-a](../features/feature-a.md)
 ```
 
-Planners specify **order + direction** (좌/우, 상/하) only. Visual details (spacing, sizing) are the designer's domain.
+Planners specify **order + direction** only (for example, left/right or top/bottom). Visual details (spacing, sizing) are the designer's domain.
 If a screen is effectively one feature, the layout can be as short as `1. 전체 화면 — [@feature](...)`.
 
 ### Frontmatter fields
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `screenId` | Yes | Unique ID, uppercase (e.g., `LOGIN`, `DASHBOARD`, `CANVAS_001`) |
+| `screenId` | Yes | Unique screen ID using the project's established uppercase naming (e.g., `LOGIN`, `DASHBOARD`, `PRODUCT_LIST`) |
 | `title` | Yes | Screen title in Korean |
 | `purpose` | Yes | One sentence describing the screen's purpose |
-| `viewport` | No | `pc`, `mobile`, or `[pc, mobile]` for multi-viewport |
+| `viewport` | Yes | `pc`, `mobile`, or `[pc, mobile]`. Ask the user to choose one of: PC / 모바일 / 둘 다 |
 
 ### Feature reference syntax
 
@@ -242,17 +242,18 @@ This tells the wireframe skill which feature to render at that layout position.
 
 1. Ask the user what the feature does (purpose, key functions)
 2. Create `docs/features/{feature-name}.md` using the template
-3. Fill in 와이어프레임 요소 with the user
-4. Fill in 상태, 인터랙션, 비즈니스 로직 as the user provides details
+3. Fill in the `## 와이어프레임 요소` section with the user
+4. Fill in sections such as `## 상태`, `## 인터랙션`, and `## 비즈니스 로직` as the user provides details
 5. Set `usedIn` to empty list initially — update when screens reference it
 
 ### Creating a new screen
 
 1. Ask the user what the screen shows (purpose, which features)
-2. Create `docs/screens/{SCREEN_NAME}.md` using the template
-3. Define layout with feature references
-4. Update each referenced feature's `usedIn` to include this screen
-5. If the screen would otherwise have zero features, create a coarse feature first
+2. Ask the user to choose a viewport: **PC / 모바일 / 둘 다** — do not skip this step
+3. Create `docs/screens/{SCREEN_NAME}.md` using the template
+4. Define layout with feature references (if "둘 다", write separate `## 레이아웃 (PC)` and `## 레이아웃 (Mobile)` sections)
+5. Update each referenced feature's `usedIn` to include this screen
+6. If the screen would otherwise have zero features, create a coarse feature first
    (e.g., `AUTH`, `COMPANY_OVERVIEW`) rather than putting all meaning directly into the screen spec
 
 ### Modifying a feature
@@ -295,8 +296,8 @@ This tells the wireframe skill which feature to render at that layout position.
 3. Delete the screen md file
 4. Check whether the screen uses single or multi viewport output
 5. Ask to delete matching wireframes:
-   - single viewport: `docs/wireframes/{SCREEN_ID}.html`
-   - multi viewport: `docs/wireframes/{SCREEN_ID}_PC.html`, `docs/wireframes/{SCREEN_ID}_MOBILE.html`
+   - single viewport: the matching HTML file under `docs/wireframes/`
+   - multi viewport: the matching viewport-specific HTML files for that screen under `docs/wireframes/`
 6. Delete selected wireframes if user confirms
 
 ### Consistency check
@@ -349,7 +350,7 @@ When the user's request is vague, ask these to fill gaps:
 **For screens:**
 - 이 화면의 목적이 뭔가요?
 - 어떤 기능들이 들어가나요?
-- PC용인가요 모바일용인가요?
+- PC용인가요, 모바일용인가요, 둘 다인가요?
 - 화면의 대략적인 영역 구분이 있나요? (상단/좌측/메인 등)
 
 ## Example

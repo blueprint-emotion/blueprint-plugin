@@ -212,7 +212,7 @@ viewport: pc
 
 ## Key Patterns
 
-1. **Feature spec → metadata elements**: Each row in 와이어프레임 요소 becomes one tracked metadata element linked back to the same parent feature spec
+1. **Feature spec → metadata elements**: Each row in the `## 와이어프레임 요소` table becomes one tracked metadata element linked back to the same parent feature spec
 2. **Screen spec → layout**: The layout section determines where features are placed in HTML
 3. **ID generation**: `FEATURE_{featureId}_{element}` — e.g., `FEATURE_AUTH_EMAIL`
 4. **Parent linkage**: Multiple tracked elements can share the same `featureId` and `spec` (e.g., all auth elements point to `AUTH` and `../features/auth.md`)

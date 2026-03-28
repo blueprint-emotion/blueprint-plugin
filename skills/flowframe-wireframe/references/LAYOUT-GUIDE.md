@@ -40,28 +40,36 @@ This example demonstrates a dashboard-style editor with five regions:
 - `docs/features/comments.md` → 댓글 (featureId: COMMENTS)
 - `docs/features/version-control.md` → 버전 관리 (featureId: VERSION_CONTROL)
 
-### Screen Spec (docs/screens/EDITOR.md)
+### Screen Spec (`docs/screens/EDITOR.md`)
+
+Use project-root paths in examples. If a screen supports multiple viewports, keep them in one screen spec and split the layout sections by viewport.
 
 ```markdown
 ---
 screenId: EDITOR
 title: 에디터
 purpose: 문서를 편집하고 팀원과 댓글로 소통하는 주요 작업 화면
-viewport: pc
+viewport: [pc, mobile]
 ---
 
 # 에디터
 
-## 레이아웃
+## 레이아웃 (PC)
 
 1. 상단 메뉴바 — 파일명, 저장 상태, 공유 버튼
 2. 좌측 사이드바 — [@file-tree](../features/file-tree.md)
 3. 중앙 편집 영역 — [@editor](../features/editor.md)
 4. 우측 패널 — [@comments](../features/comments.md), [@version-control](../features/version-control.md)
 5. 하단 상태바 — 커서 위치, 단어 수, 언어 모드
+
+## 레이아웃 (Mobile)
+
+1. 상단 앱 바 — 문서 제목, 저장 상태
+2. 본문 편집 영역 — [@editor](../features/editor.md)
+3. 하단 탭 또는 접이식 패널 — [@comments](../features/comments.md), [@version-control](../features/version-control.md)
 ```
 
-### Generated Wireframe (docs/wireframes/EDITOR.html)
+### Generated Wireframe (`docs/wireframes/EDITOR.html`, PC example)
 
 ```html
 <!DOCTYPE html>

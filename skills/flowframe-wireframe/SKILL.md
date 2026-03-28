@@ -67,7 +67,7 @@ usedIn:
 ---
 ```
 
-The **와이어프레임 요소** section in the body lists UI elements to render inside that feature block:
+The `## 와이어프레임 요소` section in the body lists the UI elements to render inside that feature block:
 
 ```markdown
 ## 와이어프레임 요소
@@ -79,7 +79,7 @@ The **와이어프레임 요소** section in the body lists UI elements to rende
 | 등록 버튼 | button | 댓글 등록 |
 ```
 
-Other sections (상태, 인터랙션, 비즈니스 로직, API) are for designer/developer reference only — do NOT read them for wireframe rendering.
+Other sections such as `## 상태`, `## 인터랙션`, `## 비즈니스 로직`, and `API` are for designer/developer reference only — do NOT read them for wireframe rendering.
 Every screen must contain at least one referenced feature. Even simple screens like login or company introduction still use one coarse feature block.
 
 ### Missing `## 와이어프레임 요소` section
@@ -94,13 +94,35 @@ If a referenced feature md does not contain a `## 와이어프레임 요소` sec
 
 ## Wireframe Generation
 
-### Initial generation (2-pass)
+### Initial generation (2-pass, incremental)
+
+Generation MUST proceed incrementally — do NOT read all feature mds at once and write the full HTML in a single pass.
 
 ```
-Pass 1: Read screen md → determine layout and feature positions
-Pass 2: Read each feature md's "와이어프레임 요소" section one by one
-  → Render each feature's UI elements in the designated layout position
+Pass 1 — Layout skeleton:
+  1. Read screen md → identify layout regions and feature positions
+  2. Read design guide + layout guide (parallel OK)
+  3. Write HTML file with:
+     - Full <head> (Tailwind, dark mode config, metadata with empty elements array)
+     - Body layout structure with region containers
+     - Fixed areas (header, footer, etc.) fully rendered
+     - Feature positions marked with empty placeholder containers:
+       <!-- Feature: FEATURE_ID (cart-items.md) -->
+       <div data-feature="FEATURE_{ID}_PLACEHOLDER" class="p-4">
+         <span class="text-sm text-zinc-400">Loading feature...</span>
+       </div>
+
+Pass 2 — Fill features one by one:
+  For each referenced feature (in layout order):
+    1. Read ONE feature md → extract only the `## 와이어프레임 요소` table
+    2. If section is missing or empty → stop and ask the user (do NOT continue)
+    3. Edit the HTML:
+       - Replace the placeholder container with rendered UI elements
+       - Add matching entries to the metadata elements array
+    4. Move to the next feature
 ```
+
+**Why incremental**: Reading all features at once risks missing elements when feature count grows. Processing one by one ensures each feature gets full attention, and incomplete specs are caught immediately before wasting work on later features.
 
 ### Update (user-triggered)
 
@@ -108,7 +130,7 @@ When the user says something like "댓글이랑 인증 수정했어, 와이어�
 
 ```
 1. Find the mentioned feature md files
-2. Read ONLY the "와이어프레임 요소" section from each
+2. Read ONLY the `## 와이어프레임 요소` section from each
 3. Check the usedIn field in frontmatter for affected screens
 4. Show the user which wireframes will be affected and ask for confirmation:
 
@@ -122,7 +144,7 @@ When the user says something like "댓글이랑 인증 수정했어, 와이어�
    (Do NOT re-read screen md or other feature mds)
 ```
 
-**Adding new elements**: If a feature spec gained new rows in 와이어프레임 요소, append the new rendered UI and
+**Adding new elements**: If a feature spec gained new rows in the `## 와이어프레임 요소` table, append the new rendered UI and
 add matching entries to the metadata `elements` array. Inner tracked elements may share the same parent `featureId`
 and `spec` while using distinct `id` values such as `FEATURE_AUTH_EMAIL`, `FEATURE_AUTH_SUBMIT`.
 
@@ -132,10 +154,11 @@ and `spec` while using distinct `id` values such as `FEATURE_AUTH_EMAIL`, `FEATU
 
 When a screen spec has `viewport: [pc, mobile]`, generate **separate HTML files** per viewport:
 
-- `docs/wireframes/{SCREEN_ID}_PC.html` — from `## 레이아웃 (PC)` section
-- `docs/wireframes/{SCREEN_ID}_MOBILE.html` — from `## 레이아웃 (Mobile)` section
+- Generate one PC wireframe HTML in `docs/wireframes/` from the `## 레이아웃 (PC)` section
+- Generate one mobile wireframe HTML in `docs/wireframes/` from the `## 레이아웃 (Mobile)` section
 
-Each file has its own `viewport` field in metadata (`"pc"` or `"mobile"`). FlowFrame에서 각각 별도 업로드하고 뷰포트 토글로 전환하여 확인한다.
+Keep the file naming rule consistent within the project rather than assuming one fixed suffix convention.
+Each file sets its own metadata `viewport` field to `"pc"` or `"mobile"`. Upload them to FlowFrame separately and switch between them with the viewport toggle.
 
 ### Full regeneration
 
@@ -354,7 +377,7 @@ Use [references/WIREFRAME-DESIGN-GUIDE.md](references/WIREFRAME-DESIGN-GUIDE.md)
 | 4 | `<script id="flowframe-meta">` exists | Blocked |
 | 5 | JSON parseable | Blocked |
 | 6 | `generator` === `"flowframe-wireframe-skill"` | Blocked |
-| 7 | Required fields: `screenId`, `title`, `purpose`, `elements` | Blocked |
+| 7 | Required fields: `version`, `screenId`, `title`, `purpose`, `elements` | Blocked |
 | 8 | `elements` is array with 1+ items | Blocked |
 | 9 | `screenId` matches screen slug | Warning only |
 
