@@ -1,26 +1,74 @@
-# Example: Login Screen Wireframe
+# Example: End-to-End Wireframe Generation
 
-This is a complete working example that passes FlowFrame upload validation.
+This example shows the full flow: feature spec + screen spec → wireframe HTML.
 
-## Source Spec (Summary)
+## Step 1: Feature Spec (features/auth.md)
 
-- **Screen ID**: `LOGIN`
-- **Title**: 로그인
-- **Purpose**: 사용자가 이메일과 비밀번호로 서비스에 로그인하는 화면
+```markdown
+---
+featureId: AUTH
+label: 인증
+type: section
+usedIn:
+  - screens/LOGIN.md
+---
 
-### Features
+# 인증
 
-| ID | Type | Label |
-|----|------|-------|
-| `LOGIN_FEATURE_LOGO` | image | 서비스 로고 |
-| `LOGIN_FEATURE_EMAIL` | input | 이메일 |
-| `LOGIN_FEATURE_PASSWORD` | input | 비밀번호 |
-| `LOGIN_FEATURE_SUBMIT` | button | 로그인 |
-| `LOGIN_FEATURE_FORGOT` | link | 비밀번호 찾기 |
-| `LOGIN_FEATURE_SIGNUP` | link | 회원가입 |
-| `LOGIN_FEATURE_SOCIAL` | button | 소셜 로그인 |
+## 와이어프레임 요소
 
-## Output HTML
+| 요소 | type | 설명 |
+|------|------|------|
+| 서비스 로고 | image | 상단 브랜드 로고 |
+| 이메일 | input | 이메일 주소 입력 필드 |
+| 비밀번호 | input | 비밀번호 입력 필드 (마스킹) |
+| 로그인 버튼 | button | 인증 요청 주요 액션 버튼 |
+| 비밀번호 찾기 | link | 비밀번호 재설정 화면 이동 |
+| 회원가입 | link | 신규 계정 생성 화면 이동 |
+| 소셜 로그인 | button | Google/GitHub OAuth 버튼 그룹 |
+
+## 상태
+
+| 상태 | 설명 |
+|------|------|
+| 기본 | 폼 비어있음, 로그인 버튼 활성 |
+| 에러 | "이메일 또는 비밀번호가 올바르지 않습니다" 메시지 |
+| 로딩 | 로그인 버튼 비활성 + 스피너 |
+
+## 인터랙션
+
+- 로그인 버튼 클릭 → 인증 API 호출 → 성공 시 대시보드로 이동
+- 비밀번호 찾기 클릭 → 비밀번호 재설정 화면으로 이동
+- 회원가입 클릭 → 회원가입 화면으로 이동
+- 소셜 로그인 클릭 → OAuth 팝업
+
+## 비즈니스 로직
+
+- 5회 로그인 실패 시 30분 잠금
+- 비밀번호 최소 8자, 영문+숫자
+```
+
+## Step 2: Screen Spec (screens/LOGIN.md)
+
+```markdown
+---
+screenId: LOGIN
+title: 로그인
+purpose: 사용자가 이메일과 비밀번호로 서비스에 로그인하는 화면
+viewport: pc
+---
+
+# 로그인
+
+## 레이아웃
+
+1. 로고 영역
+2. 인증 폼 — [@auth](../features/auth.md)
+3. 보조 링크 (비밀번호 찾기, 회원가입)
+4. 소셜 로그인 — [@auth](../features/auth.md)
+```
+
+## Step 3: Generated Wireframe (wireframes/LOGIN.html)
 
 ```html
 <!DOCTYPE html>
@@ -38,7 +86,6 @@ This is a complete working example that passes FlowFrame upload validation.
     "version": "1.0",
     "screenId": "LOGIN",
     "title": "로그인",
-    "author": "jay",
     "viewport": "pc",
     "purpose": "사용자가 이메일과 비밀번호로 서비스에 로그인하는 화면",
     "features": [
@@ -46,50 +93,56 @@ This is a complete working example that passes FlowFrame upload validation.
         "id": "LOGIN_FEATURE_LOGO",
         "type": "image",
         "label": "서비스 로고",
-        "description": "상단에 위치한 서비스 브랜드 로고"
+        "description": "상단 브랜드 로고",
+        "spec": "../features/auth.md"
       },
       {
         "id": "LOGIN_FEATURE_EMAIL",
         "type": "input",
         "label": "이메일",
-        "description": "사용자 이메일 주소를 입력하는 텍스트 필드"
+        "description": "이메일 주소 입력 필드",
+        "spec": "../features/auth.md"
       },
       {
         "id": "LOGIN_FEATURE_PASSWORD",
         "type": "input",
         "label": "비밀번호",
-        "description": "비밀번호를 입력하는 필드. 기본적으로 마스킹 처리"
+        "description": "비밀번호 입력 필드 (마스킹)",
+        "spec": "../features/auth.md"
       },
       {
         "id": "LOGIN_FEATURE_SUBMIT",
         "type": "button",
-        "label": "로그인",
-        "description": "입력한 자격 증명으로 인증 요청을 보내는 주요 액션 버튼"
+        "label": "로그인 버튼",
+        "description": "인증 요청 주요 액션 버튼",
+        "spec": "../features/auth.md"
       },
       {
         "id": "LOGIN_FEATURE_FORGOT",
         "type": "link",
         "label": "비밀번호 찾기",
-        "description": "비밀번호 재설정 화면으로 이동하는 보조 링크"
+        "description": "비밀번호 재설정 화면 이동",
+        "spec": "../features/auth.md"
       },
       {
         "id": "LOGIN_FEATURE_SIGNUP",
         "type": "link",
         "label": "회원가입",
-        "description": "신규 계정 생성 화면으로 이동하는 보조 링크"
+        "description": "신규 계정 생성 화면 이동",
+        "spec": "../features/auth.md"
       },
       {
         "id": "LOGIN_FEATURE_SOCIAL",
         "type": "button",
         "label": "소셜 로그인",
-        "description": "Google/GitHub 등 외부 OAuth 로그인 버튼 그룹"
+        "description": "Google/GitHub OAuth 버튼 그룹",
+        "spec": "../features/auth.md"
       }
     ]
   }
   </script>
 
   <style>
-    /* Screen-specific styles — only what base CSS doesn't cover */
     .logo { display: flex; flex-direction: column; align-items: center; gap: 8px; }
     .logo-placeholder { width: 48px; height: 48px; }
     .logo-text { font-size: 20px; font-weight: 700; color: var(--wf-text); }
@@ -108,14 +161,14 @@ This is a complete working example that passes FlowFrame upload validation.
   <div class="wf-page">
     <div class="wf-card">
 
-      <!-- Logo -->
+      <!-- 로고 -->
       <div class="logo" data-feature="LOGIN_FEATURE_LOGO">
         <div class="logo-placeholder wf-placeholder" style="border-radius:10px"></div>
         <span class="logo-text">FlowFrame</span>
         <span class="logo-sub">계정에 로그인하세요</span>
       </div>
 
-      <!-- Form fields -->
+      <!-- 인증 폼 -->
       <div class="form-group">
         <div class="wf-field" data-feature="LOGIN_FEATURE_EMAIL">
           <label class="wf-label">이메일</label>
@@ -127,19 +180,19 @@ This is a complete working example that passes FlowFrame upload validation.
         </div>
       </div>
 
-      <!-- Submit button -->
+      <!-- 로그인 버튼 -->
       <button class="wf-btn wf-btn-primary" style="width:100%"
         data-feature="LOGIN_FEATURE_SUBMIT">
         로그인
       </button>
 
-      <!-- Secondary links -->
+      <!-- 보조 링크 -->
       <div class="links">
         <a href="#" class="wf-link" data-feature="LOGIN_FEATURE_FORGOT">비밀번호 찾기</a>
         <a href="#" class="wf-link" data-feature="LOGIN_FEATURE_SIGNUP">계정이 없으신가요? 회원가입</a>
       </div>
 
-      <!-- Social login -->
+      <!-- 소셜 로그인 -->
       <div class="wf-divider">또는</div>
       <div class="social-group" data-feature="LOGIN_FEATURE_SOCIAL">
         <button class="wf-btn wf-btn-secondary" style="flex:1">
@@ -158,10 +211,10 @@ This is a complete working example that passes FlowFrame upload validation.
 </html>
 ```
 
-## Key Patterns to Note
+## Key Patterns
 
-1. **Metadata ↔ HTML alignment**: Every `features[].id` has a matching `data-feature` attribute
-2. **CSS variables**: Custom styles use `var(--wf-text)`, `var(--wf-text-muted)` for dark mode
-3. **Base CSS classes**: `wf-page`, `wf-card`, `wf-field`, `wf-input`, `wf-btn`, `wf-placeholder`
-4. **Readonly inputs**: Form inputs use `readonly` since this is a wireframe, not a functional form
-5. **Placeholder pattern**: Images/icons use `wf-placeholder` class for gray box rendering
+1. **Feature spec → metadata features**: Each row in 와이어프레임 요소 becomes a feature entry with `spec` pointing back to the source
+2. **Screen spec → layout**: The layout section determines where features are placed in HTML
+3. **ID generation**: `{screenId}_FEATURE_{element name}` — e.g., `LOGIN_FEATURE_EMAIL`
+4. **data-feature matching**: Every metadata feature ID has a corresponding `data-feature` attribute in HTML
+5. **spec field**: Each feature links to `../features/auth.md` for the full specification

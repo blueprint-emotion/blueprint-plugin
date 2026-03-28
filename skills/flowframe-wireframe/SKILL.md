@@ -1,6 +1,6 @@
 ---
 name: flowframe-wireframe
-description: Converts markdown screen and feature specifications into FlowFrame-compatible HTML wireframes. Reads screens/*.md for layout and features/*.md for UI elements, then generates or updates wireframes/*.html. Use when the user mentions "wireframe", "와이어프레임", "화면 설계", "wireframe update", "와이어프레임 업데이트", or asks to generate/update wireframes from specs.
+description: Converts markdown screen and feature specifications into FlowFrame-compatible HTML wireframes. Reads screens/*.md for layout and features/*.md for UI elements, then generates or updates wireframes/*.html. Triggers on "wireframe", "와이어프레임", "화면 설계", "화면 그려줘", "HTML로 변환", "와이어프레임 업데이트", "wireframe update", "기획서로 화면 만들어줘", or any request to generate, regenerate, or update wireframes from specs. Also use when the user says something changed and wants wireframes refreshed, or asks to convert planning documents into visual screen layouts.
 license: MIT
 metadata:
   author: flowframehq
@@ -37,6 +37,8 @@ project/
     ├── DASHBOARD.html
     └── EDITOR.html
 ```
+
+If the `wireframes/` directory doesn't exist, create it. If `features/` or `screens/` don't exist, tell the user to create specs first (suggest the `flowframe-spec` skill).
 
 ## Input Files
 
@@ -115,6 +117,17 @@ When the user says something like "댓글이랑 인증 수정했어, 와이어�
 ```
 
 **Important**: Always confirm with the user before updating. The user may exclude specific wireframes.
+
+### Full regeneration
+
+When the user says "전부 다시 만들어줘" or "regenerate all wireframes":
+
+```
+1. List all screen mds in screens/
+2. Show the list and ask for confirmation
+3. For each screen, run the initial generation (2-pass) workflow
+4. Overwrite existing wireframe HTMLs
+```
 
 ## Output: HTML Structure
 

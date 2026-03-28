@@ -1,6 +1,6 @@
 ---
 name: flowframe-spec
-description: Helps planners write and manage screen specs (screens/*.md) and feature specs (features/*.md) for FlowFrame projects. Creates structured specifications following the features + screens convention. Use when the user mentions "기획서", "기능명세", "화면 명세", "spec", "feature spec", "screen spec", or asks to create/edit planning documents.
+description: Helps planners write and manage feature specs (features/*.md) and screen specs (screens/*.md) for FlowFrame projects. Creates structured specifications with wireframe elements, states, interactions, business logic, and API definitions. Triggers on "기획서", "기능명세", "화면 명세", "기능 추가", "화면 추가", "기획 도와줘", "spec", "feature spec", "screen spec", "기능 정의", "새 화면", or any request to create, edit, or plan features and screens. Also use when the user describes a feature they want to build, asks about spec templates, or wants to add/remove features from screens.
 license: MIT
 metadata:
   author: flowframehq
@@ -226,6 +226,28 @@ This tells the wireframe skill which feature to render at that layout position.
 - Feature specs should be self-contained — readable without the screen context
 - Always maintain `usedIn` consistency: if a screen references a feature, the feature's `usedIn` must include that screen
 - When the user's description is vague, ask clarifying questions before writing
+- Not all sections need to be filled from the start — 와이어프레임 요소 is the minimum. Other sections can be added incrementally
+
+### File naming
+
+- Feature files: **kebab-case** in English (e.g., `auth.md`, `file-upload.md`, `version-control.md`)
+- Screen files: **UPPERCASE** screen ID (e.g., `LOGIN.md`, `DASHBOARD.md`, `EDITOR.md`)
+
+### Clarifying questions guide
+
+When the user's request is vague, ask these to fill gaps:
+
+**For features:**
+- 이 기능의 핵심 동작이 뭔가요? (주요 액션)
+- 누가 이 기능을 사용하나요? (권한/역할)
+- 어떤 화면에서 이 기능이 필요한가요? (usedIn)
+- 에러나 빈 상태일 때 어떻게 보여야 하나요?
+
+**For screens:**
+- 이 화면의 목적이 뭔가요?
+- 어떤 기능들이 들어가나요?
+- PC용인가요 모바일용인가요?
+- 화면의 대략적인 영역 구분이 있나요? (상단/좌측/메인 등)
 
 ## Example
 
