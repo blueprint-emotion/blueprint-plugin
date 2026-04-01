@@ -1,57 +1,50 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
-FlowFrame Wireframe Plugin — Claude plugin marketplace 배포를 목표로 하는 Claude Code 플러그인 패키지. 기획자가 기능명세/화면명세를 작성하고, FlowFrame에 업로드 가능한 HTML 와이어프레임을 생성한다.
+FlowFrame — Claude plugin marketplace 배포를 목표로 하는 Claude Code 플러그인.
+기획자가 기능명세/화면명세를 작성하고, HTML 와이어프레임을 생성한다.
 
-배포 대상: Claude plugin marketplace
+- **배포 대상**: Claude plugin marketplace
+- **사용자**: 한국어 사용자, IT 서비스 기획자. 개발 경험이 없을 수 있음
+- **언어 원칙**: 스킬의 안내·출력·에러 메시지는 한국어, 기획 용어 중심으로 소통
 
 ## Architecture
 
-4-layer 구조로 기능 재사용, 화면 단위 기획, 화면 간 흐름 정의, 와이어프레임 생성을 지원:
+플랫 파일 2-layer 구조:
 
 ```
-docs/features/*/index.md       → 비즈니스 기능 단위 명세 (폴더 기반, 재귀 구조. 상세: guides/FEATURE-FOLDER-SPEC.md)
-docs/screens/*/index.md        → 화면 기획 문서 (폴더 기반. 레이아웃 + feature 참조 + 화면 연계 AC)
-docs/screens/*/wireframe*.html → 생성된 HTML 와이어프레임 (FlowFrame 업로드용)
-docs/flows/*.md                → 화면 간 사용자 흐름과 인수조건
+docs/
+├── features/                ← 도메인 단위 기능 명세 (플랫 파일)
+│   ├── CLAUDE.md            ← feature 파일 포맷 규칙
+│   ├── INDEX.md             ← 전체 기능 목록 인덱스
+│   ├── AUTH.md
+│   └── PAYMENT.md
+├── screens/                 ← 화면 단위 통합 문서 + 와이어프레임
+│   ├── CLAUDE.md            ← screen 파일 포맷 규칙
+│   ├── LOGIN-001.md         ← Screen + Requirement + UserStory 통합
+│   ├── LOGIN-001.html       ← 생성된 와이어프레임
+│   └── CHECKOUT-001-pc.html ← 다중 뷰포트 시 접미사
 ```
 
-플러그인 안에는 두 개의 번들 skill이 포함된다:
-- **flowframe-spec** (`skills/flowframe-spec/SKILL.md`) — 기능명세·화면명세·플로우 명세 작성 도우미
-- **flowframe-wireframe** (`skills/flowframe-wireframe/SKILL.md`) — 명세 → HTML 와이어프레임 생성
+플러그인은 skill과 agent를 번들로 포함하며, 계속 추가될 수 있다.
 
-## Key Design Decisions
+현재 skill:
+- `skills/flowframe-spec/` — 기능명세·화면명세 작성
+- `skills/flowframe-wireframe/` — 명세 → HTML 와이어프레임 생성
 
-상위 설계 결정은 `guides/ARCHITECTURE-DECISIONS.md`를 참조한다.
+## ID Rules
 
-## Policy Reference
+**featureId** — TOC 경로에서 파생, `__`로 깊이 구분:
+- `AUTH`, `AUTH__LOGIN`, `AUTH__LOGIN__EMAIL_LOGIN`
+- DOM 속성: `data-feature="AUTH__LOGIN"`
 
-스킬의 실제 운영 정책, 생성/업데이트/삭제/정합성 규칙, 언어 원칙은 `guides/SKILL-POLICY-SUMMARY.md`를 우선 참조한다.
+**elementId** — feature 스코프 내 짧은 영문 키:
+- `EMAIL`, `SUBMIT`, `CODE`
+- DOM 속성: `data-el="EMAIL"`
+- 와이어프레임 내에서 같은 `data-feature` 안에서만 유니크하면 됨
 
-## Wireframe Output Rules
+## Plugin Conventions
 
-출력 형식과 검증 규칙은 `guides/WIREFRAME-OUTPUT-SPEC.md`를 참조한다.
-JSON 스키마는 `schema/flowframe-meta.schema.json`에 있다.
-
-## Claude Plugin Conventions
-
-- SKILL.md 이름은 소문자+하이픈, 부모 디렉토리명과 일치
-- SKILL.md 본문 500줄 이하, 참조 자료는 `references/` 하위에만 (1단계 깊이)
-- description: 3인칭, what + when 포함
-- skill은 Claude plugin 내부의 번들 skill로 관리한다
-- 배포 시 plugin 메타데이터와 함께 검토한다
-
-상세: `guides/SKILLS-SPEC-REFERENCE.md`
-
-## Reference Files
-
-| 용도 | 경로 |
-|------|------|
-| 와이어프레임 전체 예제 | `skills/flowframe-wireframe/references/EXAMPLE.md` |
-| 복잡 레이아웃 패턴 | `skills/flowframe-wireframe/references/LAYOUT-GUIDE.md` |
-| 기능명세 예제 | `skills/flowframe-spec/references/FEATURE-EXAMPLE.md` |
-| 화면명세 예제 | `skills/flowframe-spec/references/SCREEN-EXAMPLE.md` |
-| Feature 폴더 구조 명세 | `guides/FEATURE-FOLDER-SPEC.md` |
+- SKILL.md는 소문자+하이픈, 부모 디렉토리명과 일치
+- SKILL.md 본문 500줄 이하, 참조는 `references/` 하위에만
