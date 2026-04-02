@@ -176,6 +176,22 @@ features: [AUTH]
 
 `features` 배열에 참조하는 도메인이 모두 포함되어야 한다.
 
+### 모달 레이아웃 문법
+
+화면에 종속된 모달은 레이아웃에 `모달:` 접두사로 기재한다. wireframer가 이 접두사를 인식하여 별도 HTML 파일로 분리 생성한다.
+
+```markdown
+### 레이아웃
+1. 편집 영역 — @FLOW/EDITOR
+2. 속성 패널 — @FLOW/PROPERTIES
+모달: 플로우 업로드 [upload] — @FLOW/UPLOAD
+모달: 저장 버전 선택 [save-version] — @FLOW/SAVE_VERSION
+```
+
+- `모달:` 항목은 번호를 붙이지 않는다
+- `[slug]`는 planner가 확정하는 파일명 슬러그. 영문 소문자+하이픈만 사용. wireframer와 하네스는 이 slug을 그대로 사용하여 `{screenId 소문자}_modal-{slug}.html`을 생성/검사한다
+- 여러 화면에서 공통으로 사용되는 모달은 레이아웃에 포함하지 않고 별도 화면으로 기획한다
+
 ### 와이어프레임 출력 위치
 
 같은 화면 폴더 안에 생성:
@@ -197,7 +213,7 @@ features: [AUTH]
 | 6 | 와이어프레임의 `data-feature`가 현재 기능 구조와 일치 |
 | 7 | Requirement·UserStory의 H3 헤딩에 `— @DOMAIN/PATH` 연결 표식이 있고, 레이아웃 참조 기능마다 대응 그룹 존재 |
 | 8 | Requirement의 Given/When/Then에 "적절한", "빠르게" 등 모호한 표현이 없음 |
-| 9 | 화면 intake의 필수 섹션(화면 목적, 핵심 행동, 화면 구성, 모달, 특수 인터랙션, viewport, 제약사항)이 화면 명세에 반영됨. intake 부재 시 fail |
+| 9 | intake 결정적 필드 3개(화면 목적 → purpose, viewport → viewport, 모달 → 레이아웃 모달 항목)를 자동 대조. 나머지 4개(핵심 행동, 화면 구성, 특수 인터랙션, 제약사항)는 수동 체크리스트에서 사용자 판단. intake 부재 시 fail |
 | 10 | `viewport: [pc, mobile]`이면 `### 레이아웃 (PC)`과 `### 레이아웃 (Mobile)` 헤딩이 모두 존재 |
 
 ---

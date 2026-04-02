@@ -36,9 +36,9 @@
 </div>
 ```
 
-## 플랫폼 스크립트 (flowframe.js)
+## 플랫폼 스크립트 (ff-platform.js)
 
-`platform/flowframe.js`가 호버 하이라이트와 상태 탭을 자동 처리한다.
+`ff-platform.js`가 호버 하이라이트와 상태 탭을 자동 처리한다.
 
 - 호버: `data-feature`, `data-el`에 인디고 outline 자동 주입
 - 상태 탭: `data-state` 직접 자식이 2개 이상이면 탭 자동 생성

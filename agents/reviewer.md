@@ -27,7 +27,9 @@ skills:
 
 트리거: "명세 리뷰해줘", "spec review", 또는 planner 완료 후 자동 실행
 
-대상: `docs/features/*.md`, `docs/screens/*/*_screen.md`, `docs/features/INDEX.md`
+대상: 호출자가 파일 목록을 명시하면 해당 파일만, 명시하지 않으면 `docs/features/*.md`, `docs/screens/*/*_screen.md`, `docs/features/INDEX.md` 전체.
+
+하네스(planning-workflow)에서 호출할 때는 현재 워크플로우 대상 화면의 screen spec, 관련 feature 파일, INDEX.md만 전달한다.
 
 `*_intake.md`는 spec-review 대상이 아니다. intake는 S11에서 참조 소스로만 사용한다.
 
@@ -45,21 +47,23 @@ skills:
 | S8 | featureId 형식 | `DOMAIN__PATH` 형식, `__`로 깊이 구분, 대문자+밑줄만 사용 |
 | S9 | Requirement 커버리지 | Requirement·UserStory의 H3 헤딩에 `— @DOMAIN/PATH` 연결 표식이 있어야 하고, 레이아웃에서 참조한 모든 기능에 대응하는 Requirement 그룹이 최소 1개 존재 |
 | S10 | 인수조건 형식 | Requirement의 각 항목이 Given/When/Then 형식을 따르고, "적절한", "빠르게", "충분한" 등 모호한 표현이 없음 |
-| S11 | 수집 정보 반영 | 화면 intake의 필수 섹션(화면 목적, 핵심 행동, 화면 구성, 모달, 특수 인터랙션, viewport, 제약사항)이 화면 명세(레이아웃·Requirement·frontmatter)에 반영되어 있는지 확인. intake가 없으면 `fail` (워크플로우가 항상 intake를 생성하므로 부재는 누락) |
+| S11 | 수집 정보 반영 | intake의 결정적 필드 3개를 화면 명세와 대조한다: (1) `## 화면 목적` → frontmatter `purpose`와 의미 일치, (2) `## viewport` → frontmatter `viewport`와 값 일치, (3) `## 모달` → 레이아웃 `모달:` 항목과 대조 (intake `## 모달`에 기록된 화면 종속 모달이 레이아웃에 `모달:` 항목으로 존재하는지. "없음"이면 건너뜀). intake가 없으면 `fail`. 나머지 필드(핵심 행동, 화면 구성, 특수 인터랙션, 제약사항)는 자동 검증 대상이 아니며 5단계 수동 체크리스트에서 사용자가 판단한다 |
 | S12 | 뷰포트별 레이아웃 | frontmatter `viewport`가 `[pc, mobile]`이면 `### 레이아웃 (PC)`과 `### 레이아웃 (Mobile)` 헤딩이 모두 존재해야 함. 단일 뷰포트면 `skip` |
 
 ### 2. 와이어프레임 리뷰 (wireframe-review)
 
 트리거: "와이어프레임 리뷰해줘", "wireframe review", 또는 wireframer 완료 후 자동 실행
 
-대상: `docs/screens/*/*.html` (메인 와이어프레임 + 모달 파일 포함)
+대상: 호출자가 파일 목록을 명시하면 해당 파일만, 명시하지 않으면 `docs/screens/*/*.html` 전체 (메인 와이어프레임 + 모달 파일 포함).
+
+하네스(planning-workflow)에서 호출할 때는 현재 워크플로우에서 생성된 와이어프레임 파일만 전달한다.
 
 #### 검증 항목
 
 | # | 항목 | 기준 |
 |---|------|------|
 | W1 | 메타데이터 존재 | `<script type="application/json" id="flowframe-meta">` 존재하고 JSON 파싱 가능 |
-| W2 | 메타데이터 필수 필드 | `screenId`, `title`, `purpose`, `version`("2.0"), `generator`("flowframe-wireframe-skill"), `features` |
+| W2 | 메타데이터 필수 필드 | `screenId`, `title`, `purpose`, `version`("2.0"), `generator`("flowframe-wireframe-skill"), `features`. 모달 파일(`*_modal-*.html`)이면 `modalId`도 필수 |
 | W3 | feature 래퍼 존재 | 메타데이터 `features[]`의 모든 항목에 대응하는 `[data-feature]` DOM 요소 존재 |
 | W4 | feature-명세 일치 | `data-feature` 값이 기능명세 TOC에서 파생한 featureId와 일치 |
 | W5 | element 매핑 | 메타데이터 `elements[].id`에 대응하는 `[data-el]` DOM 요소가 해당 `[data-feature]` 안에 존재 |
@@ -68,6 +72,7 @@ skills:
 | W8 | data-label 존재 | 모든 `[data-feature]`에 `data-label` 속성 존재 |
 | W9 | data-state 배치 | `[data-state]` 요소가 `[data-feature]`의 직접 자식인지 확인. 중간 래퍼가 있으면 상태 탭이 작동하지 않음 |
 | W10 | HTML 유효성 | `[data-feature]` 래퍼가 block-level 요소(`<div>`, `<section>` 등)인지 확인. `<span>` 등 inline 요소 안에 block 요소가 중첩되면 fail |
+| W11 | feature 범위 일치 | 와이어프레임의 feature 목록이 화면 명세의 레이아웃 참조와 일치 (모달 파일의 feature도 포함). 화면 명세가 참조하는 기능이 와이어프레임에 없거나, 와이어프레임에 화면 명세에 없는 기능이 있으면 fail |
 
 ### 3. 전체 정합성 리뷰 (full-review)
 
@@ -80,6 +85,14 @@ skills:
 | F1 | 화면-와이어프레임 쌍 | 모든 화면 명세(`*_screen.md`)에 대응하는 와이어프레임이 같은 폴더에 존재. 단일 뷰포트면 `*_wireframe.html`, 다중 뷰포트(`viewport: [pc, mobile]`)면 `*_wireframe-pc.html` + `*_wireframe-mobile.html` (이 경우 단일 `*_wireframe.html`은 없어도 정상). 아직 미생성이면 `skip` |
 | F2 | 와이어프레임 feature 범위 | 와이어프레임의 feature 목록이 화면 명세의 레이아웃 참조와 일치 (모달 파일의 feature도 포함) |
 | F3 | 뷰포트 파일 매칭 | `viewport: [pc, mobile]`이면 `{screenId 소문자}_wireframe-pc.html`과 `{screenId 소문자}_wireframe-mobile.html` 둘 다 존재 |
+
+#### full-review skip 해석
+
+| 항목 | skip 조건 | 해석 |
+|------|-----------|------|
+| F1 | 와이어프레임 미생성 | 정상 skip (아직 미생성) |
+| F2 | F1이 skip이면 자동 skip | 정상 skip |
+| F3 | 단일 뷰포트 | 정상 skip. 다중 뷰포트인데 skip이면 fail로 처리 |
 
 ---
 

@@ -105,9 +105,9 @@ feature 컨테이너는 **중첩**한다 (상위가 하위를 감쌈).
 
 ---
 
-## 플랫폼 스크립트 (flowframe.js)
+## 플랫폼 스크립트 (ff-platform.js)
 
-`platform/flowframe.js`를 `<script>` 태그로 포함한다. 다음을 자동 처리:
+`ff-platform.js`를 `<script>` 태그로 포함한다. 다음을 자동 처리:
 
 1. **호버 하이라이트** — `data-feature`, `data-el` 요소에 인디고 outline 자동 주입
 2. **상태 탭** — `data-state` 기반 상태 전환 탭 자동 생성
@@ -311,7 +311,7 @@ Tailwind CSS v4: `<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser
 
 `{screenId 소문자}_modal-{name}.html`
 
-- `{name}`: 레이아웃의 모달 항목명을 소문자+하이픈으로 정규화한 슬러그 (예: "저장 버전 선택" → `save-version`, "업로드 확인" → `upload-confirm`)
+- `{name}`: 레이아웃의 `모달:` 항목에 planner가 `[slug]` 형식으로 확정한 값을 그대로 사용한다 (예: `모달: 저장 버전 선택 [save-version]` → `save-version`). wireframer는 slug을 자동 생성하지 않는다
 - 예: `flow-editor_modal-upload.html`, `flow-editor_modal-save.html`
 
 ### 메타데이터
