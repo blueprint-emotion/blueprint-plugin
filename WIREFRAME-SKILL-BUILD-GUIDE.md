@@ -90,7 +90,7 @@ interface FlowFrameMetaFeature {
 
 ### ID 규칙
 
-- `screenId`: 사용자가 정의 (예: `LOGIN`, `DASHBOARD`, `CANVAS-001`)
+- `screenId`: 사용자가 정의 (예: `LOGIN`, `DASHBOARD`, `PRODUCT-LIST`)
 - `features[].id`: `FEATURE_{이름}` (예: `FEATURE_EMAIL`, `FEATURE_SUBMIT`)
 
 ---

@@ -1,0 +1,12 @@
+{
+  "name": "flowframe",
+  "version": "3.0.0",
+  "description": "IT 서비스 기획자를 위한 기능명세/화면명세 작성 및 HTML 와이어프레임 생성 플러그인",
+  "author": {
+    "name": "flowframehq"
+  },
+  "license": "MIT",
+  "keywords": ["wireframe", "planning", "design", "ui-design", "flowframe", "기획"],
+  "skills": "./skills/",
+  "agents": "./agents/"
+}

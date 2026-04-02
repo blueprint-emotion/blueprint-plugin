@@ -14,6 +14,11 @@
 | `data-label` | feature 컨테이너 | 한국어 표시명 (코멘트 UI용) |
 | `data-el` | 개별 UI 요소 | ELEMENT_ID 짧은 키. 부모 `data-feature` 스코프 내 유니크. 플랫폼이 `closest('[data-feature]')` + `data-el`로 전체 ID 조합 |
 
+### `data-el` 래핑 규칙
+
+레이블이 있는 요소는 **래퍼 `<div data-el>`로 레이블과 입력을 함께 감싼다.**
+레이블 없이 단독인 버튼·링크는 요소 자체에 `data-el`.
+
 ```html
 <!-- 중첩 DOM 예시 -->
 <div data-feature="AUTH" data-label="인증">
@@ -31,23 +36,13 @@
 </div>
 ```
 
-## 호버 CSS
+## 플랫폼 스크립트 (flowframe.js)
 
-```css
-/* 가장 깊은 호버 feature만 강조 — 버블업 차단 */
-[data-feature]:hover:not(:has([data-feature]:hover)) {
-  outline: 2px solid rgba(59, 130, 246, 0.6);
-  outline-offset: 2px;
-}
+`platform/flowframe.js`가 호버 하이라이트와 리뷰 탭을 자동 처리한다.
 
-/* 요소 하이라이트 */
-[data-el]:hover {
-  outline: 1px solid rgba(59, 130, 246, 0.8);
-  background-color: rgba(59, 130, 246, 0.12);
-}
-```
-
-이 두 규칙을 `<style type="text/tailwindcss">` 블록에 포함한다. JS 없음, CDN 불필요.
+- 호버: `data-feature`, `data-el`에 인디고 outline 자동 주입
+- 리뷰 탭: `data-state` 직접 자식이 2개 이상이면 탭 자동 생성
+- `<style>` 블록에 호버 CSS나 `:has()` 규칙 불필요 — 다크모드 설정만 포함
 
 ## 메타데이터 (`flowframe-meta`)
 
@@ -57,7 +52,7 @@
 {
   "generator": "flowframe-wireframe-skill",
   "version": "2.0",
-  "screenId": "LOGIN-001",
+  "screenId": "LOGIN",
   "title": "로그인",
   "viewport": "pc",
   "purpose": "화면 목적 설명",
@@ -65,12 +60,10 @@
     {
       "featureId": "AUTH",
       "label": "인증",
-      "spec": "../features/AUTH.md",
       "features": [
         {
           "featureId": "AUTH__LOGIN",
           "label": "로그인",
-          "spec": "../features/AUTH.md",
           "elements": [
             { "id": "EMAIL", "type": "input", "label": "이메일", "description": "역할 설명" }
           ],
@@ -85,7 +78,6 @@
 - `features[]`는 재귀 (하위 feature 중첩)
 - 각 feature에 `elements` 또는 `features` 중 최소 하나
 - `elements[].id`는 ELEMENT_ID (featureId 접두사 없이 짧은 키)
-- `spec`은 와이어프레임에서 feature 파일까지 상대 경로
 
 ## 고정 영역
 

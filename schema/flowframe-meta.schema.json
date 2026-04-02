@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.com/schema/flowframe-meta.schema.json",
   "title": "FlowFrame Wireframe Metadata",
-  "description": "FlowFrame 와이어프레임 HTML 파일의 메타데이터 스키마. <script id=\"flowframe-meta\"> 블록에 삽입된다.",
+  "description": "FlowFrame 와이어프레임 HTML 파일의 메타데이터 스키마. <script type=\"application/json\" data-flowframe-meta> 블록에 삽입된다.",
   "type": "object",
   "required": ["generator", "version", "screenId", "title", "purpose", "features"],
   "properties": {
@@ -13,11 +13,13 @@
     },
     "version": {
       "type": "string",
-      "description": "메타데이터 버전 (예: \"1.2\")."
+      "const": "2.0",
+      "description": "메타데이터 버전."
     },
     "screenId": {
       "type": "string",
-      "description": "화면 식별자 (예: LOGIN, DASHBOARD, ORDER_MANAGEMENT)."
+      "pattern": "^[A-Z][A-Z0-9-]*$",
+      "description": "화면 식별자 (예: LOGIN, CHECKOUT, PRODUCT-LIST)."
     },
     "title": {
       "type": "string",
@@ -49,7 +51,7 @@
   "$defs": {
     "Feature": {
       "type": "object",
-      "required": ["featureId", "label", "spec"],
+      "required": ["featureId", "label"],
       "anyOf": [
         { "required": ["elements"] },
         { "required": ["features"] }
@@ -57,21 +59,17 @@
       "properties": {
         "featureId": {
           "type": "string",
-          "pattern": "^[A-Z0-9_]+$",
-          "description": "폴더 경로에서 파생한 피처 ID (예: AUTH__LOGIN_FORM). 단일 밑줄은 단어 연결, 이중 밑줄은 깊이 구분."
+          "pattern": "^[A-Z][A-Z0-9_]*(__[A-Z][A-Z0-9_]*)*$",
+          "description": "TOC 경로에서 파생한 피처 ID. 이중 밑줄(__) 로 깊이 구분 (예: AUTH__LOGIN__EMAIL_LOGIN)."
         },
         "label": {
           "type": "string",
-          "description": "피처 표시명 (한국어, frontmatter label 값)."
-        },
-        "spec": {
-          "type": "string",
-          "description": "피처 명세 index.md의 상대 경로 (예: \"../../features/auth/login-form/index.md\")."
+          "description": "피처 표시명 (한국어, data-label 값)."
         },
         "elements": {
           "type": "array",
           "minItems": 1,
-          "description": "이 피처에 속하는 추적 와이어프레임 요소.",
+          "description": "이 피처에 속하는 와이어프레임 요소.",
           "items": {
             "$ref": "#/$defs/Element"
           }
@@ -93,8 +91,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "pattern": "^FEATURE_[A-Z0-9_]+$",
-          "description": "추적 요소 ID. FEATURE_{FEATURE_ID}_{ELEMENT_ID} 패턴 (예: FEATURE_AUTH__LOGIN_FORM_EMAIL)."
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "description": "요소 ID. 부모 data-feature 스코프 내 유니크한 짧은 키 (예: EMAIL, SUBMIT, CODE). DOM에서 data-el 속성값과 일치."
         },
         "type": {
           "type": "string",

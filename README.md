@@ -1,13 +1,22 @@
 # FlowFrame Wireframe Plugin
 
-기획자를 위한 Claude Code 플러그인 패키지입니다. 번들 skill을 통해 기능명세와 화면명세를 작성하고, FlowFrame에 업로드 가능한 HTML 와이어프레임을 생성합니다.
+기획자를 위한 Claude Code 플러그인 패키지입니다. 번들 skill과 agent를 통해 기능명세와 화면명세를 작성하고, FlowFrame에 업로드 가능한 HTML 와이어프레임을 생성합니다.
+
+## 포함된 에이전트
+
+| 에이전트 | 역할 |
+|---------|------|
+| **planner** | 사용자와 대화하며 기능명세·화면명세 작성 |
+| **wireframer** | 명세를 읽어 HTML 와이어프레임 생성/업데이트 |
+| **reviewer** | 명세·와이어프레임 정합성 검증 (읽기 전용, pass/fail) |
 
 ## 포함된 스킬
 
 | 스킬 | 역할 |
 |------|------|
-| **flowframe-spec** | 기능명세(`docs/features/*/index.md`)와 화면명세(`docs/screens/*/index.md`) 작성 도우미 |
-| **flowframe-wireframe** | 명세를 읽고 FlowFrame 규격 HTML 와이어프레임 생성/업데이트 |
+| **planning-workflow** | intake → planner → reviewer → wireframer 오케스트레이션 |
+| **flowframe-spec** | 기능명세·화면명세 포맷 지식 (planner가 참조) |
+| **flowframe-wireframe** | 와이어프레임 DOM 구조·디자인 원칙 (wireframer가 참조) |
 
 ## 배포 대상
 
@@ -21,7 +30,7 @@ Claude plugin marketplace
 댓글 기능 기획해줘. 작성, 수정, 삭제, 멘션 기능이 필요해
 ```
 
-→ `docs/features/comments/index.md` 생성 (와이어프레임 요소, 상태, 인터랙션, 비즈니스 로직, API)
+→ `docs/features/COMMENT.md` 생성 (와이어프레임 요소, 상태, 인터랙션, 비즈니스 로직)
 
 ### 2. 화면명세 작성
 
@@ -29,7 +38,7 @@ Claude plugin marketplace
 에디터 화면 만들어줘. 댓글이랑 버전관리 기능이 들어가
 ```
 
-→ `docs/screens/EDITOR/index.md` 생성 (레이아웃 + 기능 참조)
+→ `docs/screens/EDITOR/editor-screen.md` 생성 (레이아웃 + 기능 참조)
 
 ### 3. 와이어프레임 생성
 
@@ -37,7 +46,7 @@ Claude plugin marketplace
 와이어프레임 만들어줘
 ```
 
-→ `docs/screens/EDITOR/wireframe.html` 생성 (FlowFrame 업로드 가능)
+→ `docs/screens/EDITOR/editor-wireframe.html` 생성 (FlowFrame 업로드 가능)
 
 ### 4. 와이어프레임 업데이트
 
@@ -50,31 +59,19 @@ Claude plugin marketplace
 ## 프로젝트 구조
 
 ```
-project/
-└── docs/
-    ├── features/          ← 기능 단위 명세 (폴더 기반, 재귀 구조)
-    │   ├── auth/
-    │   │   ├── index.md       ← branch (공통 컨텍스트)
-    │   │   ├── login-form/
-    │   │   │   └── index.md   ← leaf (와이어프레임 요소)
-    │   │   └── social-login/
-    │   │       └── index.md   ← leaf
-    │   ├── comments/
-    │   │   └── index.md       ← leaf (단독 기능)
-    │   └── file-upload/
-    │       └── index.md       ← leaf
-    ├── screens/           ← 화면 정의 + 화면별 와이어프레임
-    │   ├── LOGIN/
-    │   │   ├── index.md
-    │   │   └── wireframe.html
-    │   ├── DASHBOARD/
-    │   │   ├── index.md
-    │   │   └── wireframe.html
-    │   └── EDITOR/
-    │       ├── index.md
-    │       ├── wireframe-pc.html
-    │       └── wireframe-mobile.html
-    └── flows/             ← 화면 간 사용자 흐름과 인수조건
+docs/
+├── features/              ← 도메인 단위 기능 명세 (플랫 파일)
+│   ├── INDEX.md
+│   ├── AUTH.md
+│   └── COMMENT.md
+├── screens/               ← 화면 단위 폴더
+│   ├── LOGIN/
+│   │   ├── login-screen.md
+│   │   └── login-wireframe.html
+│   └── EDITOR/
+│       ├── editor-screen.md
+│       ├── editor-wireframe-pc.html
+│       └── editor-wireframe-mobile.html
 ```
 
 ## 특징
