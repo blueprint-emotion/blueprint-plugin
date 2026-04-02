@@ -1,6 +1,6 @@
 # 예제: 다중 feature 화면 — 상품 목록
 
-사이드바(필터) + 메인(목록) 두 영역 레이아웃. 고정 영역(헤더/푸터)과 빈 상태 리뷰 탭을 포함한다.
+사이드바(필터) + 메인(목록) 두 영역 레이아웃. 고정 영역(헤더/푸터)과 빈 상태 상태 탭을 포함한다.
 
 ---
 
@@ -73,7 +73,7 @@ toc:
 
 ## 입력 2: 화면 명세
 
-`docs/screens/PRODUCT-LIST/product-list-screen.md`
+`docs/screens/PRODUCT-LIST/product-list_screen.md`
 
 ```markdown
 ---
@@ -95,20 +95,20 @@ features: [PRODUCT]
 
 ## Requirement
 
-### 검색 및 필터
+### 검색 및 필터 — @PRODUCT/SEARCH_FILTER
 - Given 카테고리와 가격 범위를 선택 When 필터 적용 버튼 클릭 Then 조건이 상품 목록에 반영된다
 - Given 필터가 적용된 상태 When 필터 초기화 클릭 Then 기본 목록으로 돌아간다
 
-### 상품 목록 탐색
+### 상품 목록 탐색 — @PRODUCT/LIST
 - Given 상품 목록이 존재 When 사용자가 정렬 기준을 변경 Then 동일한 결과 집합이 새 순서로 다시 표시된다
 - Given 조건에 맞는 상품이 없음 When 목록 조회 완료 Then 상품 카드 대신 빈 상태 안내가 표시된다
 
 ## UserStory
 
-### 검색 및 필터
+### 검색 및 필터 — @PRODUCT/SEARCH_FILTER
 - 사용자로서 카테고리와 가격 조건으로 상품을 좁혀 보고 싶다, 원하는 상품만 빠르게 찾기 위해
 
-### 상품 목록 탐색
+### 상품 목록 탐색 — @PRODUCT/LIST
 - 사용자로서 정렬 기준을 바꾸며 상품을 비교하고 싶다, 내 기준에 맞는 상품을 고르기 위해
 - 사용자로서 검색 결과가 없을 때 현재 조건이 너무 좁은지 바로 파악하고 싶다, 조건을 다시 조정하기 위해
 ```
@@ -117,7 +117,7 @@ features: [PRODUCT]
 
 ## 출력: 와이어프레임 HTML
 
-`docs/screens/PRODUCT-LIST/product-list-wireframe.html`
+`docs/screens/PRODUCT-LIST/product-list_wireframe.html`
 
 ```html
 <!DOCTYPE html>
@@ -208,7 +208,7 @@ features: [PRODUCT]
         </div>
       </aside>
 
-      <!-- PRODUCT__LIST: data-state로 리뷰 탭 자동 생성 -->
+      <!-- PRODUCT__LIST: data-state로 상태 탭 자동 생성 -->
       <main class="flex-1 p-5">
         <div data-feature="PRODUCT__LIST" data-label="상품 목록">
 
@@ -345,9 +345,9 @@ features: [PRODUCT]
 | 두 영역 레이아웃 | 사이드바(`SEARCH_FILTER`) + 메인(`LIST`). 메인이 시각적 중심 |
 | 캔버스 프레임 | `bg-zinc-100 p-8` + `rounded-xl border shadow-sm` 컨테이너 |
 | 고정 영역 | 헤더/푸터에 `data-feature` 없음. 기본 라벨만 표시 |
-| 리뷰 탭 (data-state) | `LIST`에 `data-state="기본"`, `data-state="결과 없음"` — flowframe.js가 자동 탭 생성 |
+| 상태 탭 (data-state) | `LIST`에 `data-state="기본"`, `data-state="결과 없음"` — flowframe.js가 자동 탭 생성 |
 | element는 짧은 키 | `data-el="CATEGORY"`, `data-el="SORT"` — 각각 부모 feature 스코프 내 유니크 |
 | 상태 패널 내 data-el 재사용 | `SORT`, `CARDS`가 두 패널에 존재 — 상호배타이므로 허용 |
 | description은 비즈니스 의미 | "사용자가 관심 상품 카테고리만 남기도록…" — 단순 라벨이 아닌 역할 설명 |
-| flowframe.js | 호버 하이라이트 + 리뷰 탭 자동 처리. `<style>`에는 다크모드만 |
+| flowframe.js | 호버 하이라이트 + 상태 탭 자동 처리. `<style>`에는 다크모드만 |
 | 화면 참조 문법 | `@PRODUCT/SEARCH_FILTER`, `@PRODUCT/LIST` |

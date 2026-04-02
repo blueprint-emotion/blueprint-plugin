@@ -30,6 +30,7 @@ skills:
 5. 사용자 입력에 따라 `상태`, `인터랙션`을 채운다
 6. 필요하면 `비즈니스 로직`을 채운다
 7. INDEX.md를 갱신한다
+   - **단, 하네스(planning-workflow)에서 병렬 호출된 경우 INDEX.md를 갱신하지 않는다.** 하네스가 최종 합산한다
 
 ## 워크플로우: 새 화면 만들기
 
@@ -37,8 +38,8 @@ skills:
 
 ### 1단계 — 책임 단위 분해
 
-1. 사용자에게 이 화면이 무엇을 보여주는지 묻는다 (목적, 핵심 행동)
-2. viewport를 **PC / 모바일 / 둘 다** 중에서 고르게 한다
+1. 화면의 intake 파일(`docs/screens/{SCREEN_ID}/{screenId 소문자}_intake.md`)이 있으면 읽고 화면 목적, 핵심 행동, 화면 구성, 모달, 특수 인터랙션, viewport, 제약사항을 명세에 반영한다. intake가 없으면 사용자에게 직접 묻는다
+2. viewport를 확인한다 (intake에 있으면 그대로 사용, 없으면 **PC / 모바일 / 둘 다** 중 선택)
 3. 책임 단위 분해를 수행한다:
 
 **분해 질문** (명세 작성 전에 모두 답해야 한다):
@@ -117,7 +118,7 @@ skills:
 - 변경 파일:
   - `docs/features/AUTH.md` (LOGIN 섹션)
 - 영향받는 화면:
-  - `docs/screens/LOGIN/login-screen.md`
+  - `docs/screens/LOGIN/login_screen.md`
 - 권장 와이어프레임 액션: `partial-update` | `screen-regenerate` | `full-regenerate`
 - 추천 다음 프롬프트:
   - `LOGIN 와이어프레임 업데이트해줘`
@@ -147,8 +148,8 @@ skills:
 
 | 유형 | 파일 | 이슈 |
 |------|------|------|
-| 참조 누락 | LOGIN/login-screen.md | `@AUTH/MFA`가 참조되지만 AUTH.md TOC에 MFA가 없다 |
-| features 누락 | CHECKOUT/checkout-screen.md | 레이아웃에서 PAYMENT를 참조하지만 features 배열에 없다 |
+| 참조 누락 | LOGIN/login_screen.md | `@AUTH/MFA`가 참조되지만 AUTH.md TOC에 MFA가 없다 |
+| features 누락 | CHECKOUT/checkout_screen.md | 레이아웃에서 PAYMENT를 참조하지만 features 배열에 없다 |
 | TOC 불일치 | AUTH.md | TOC에 SOCIAL_LOGIN이 있지만 본문에 대응 헤딩이 없다 |
 
 ---

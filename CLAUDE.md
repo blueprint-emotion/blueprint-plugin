@@ -28,11 +28,12 @@ docs/
 │   └── PAYMENT.md
 ├── screens/                 ← 화면 단위 폴더
 │   └── LOGIN/               ← 화면 ID = 폴더명 (UPPER_KEBAB, 번호 없음)
-│       ├── login-intake.md        ← 화면 단위 intake (선택)
-│       ├── login-screen.md        ← Screen + Requirement + UserStory 통합
-│       ├── login-wireframe.html   ← 와이어프레임 (단일 뷰포트)
-│       ├── login-wireframe-pc.html    ← 다중 뷰포트 시
-│       └── login-wireframe-mobile.html
+│       ├── login_intake.md        ← 화면 단위 intake (선택)
+│       ├── login_screen.md        ← Screen + Requirement + UserStory 통합
+│       ├── login_wireframe.html   ← 와이어프레임 (단일 뷰포트)
+│       ├── login_wireframe-pc.html    ← 다중 뷰포트 시
+│       ├── login_wireframe-mobile.html
+│       └── login_modal-{name}.html    ← 모달 (개별 파일)
 ```
 
 플러그인은 agent와 skill을 번들로 포함하며, 계속 추가될 수 있다.

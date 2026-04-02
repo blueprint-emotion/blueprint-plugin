@@ -38,11 +38,11 @@
 
 ## 플랫폼 스크립트 (flowframe.js)
 
-`platform/flowframe.js`가 호버 하이라이트와 리뷰 탭을 자동 처리한다.
+`platform/flowframe.js`가 호버 하이라이트와 상태 탭을 자동 처리한다.
 
 - 호버: `data-feature`, `data-el`에 인디고 outline 자동 주입
-- 리뷰 탭: `data-state` 직접 자식이 2개 이상이면 탭 자동 생성
-- `<style>` 블록에 호버 CSS나 `:has()` 규칙 불필요 — 다크모드 설정만 포함
+- 상태 탭: `data-state` 직접 자식이 2개 이상이면 탭 자동 생성
+- `<style>` 블록에 호버 CSS나 `:has()` 규칙 불필요 — 다크모드 설정 + Tailwind로 표현 불가한 최소 커스텀 CSS만 포함
 
 ## 메타데이터 (`flowframe-meta`)
 

@@ -14,7 +14,7 @@ metadata:
 
 ## 입력 파일
 
-### 화면 명세 (docs/screens/{SCREEN_ID}/{screenId 소문자}-screen.md)
+### 화면 명세 (docs/screens/{SCREEN_ID}/{screenId 소문자}_screen.md)
 
 frontmatter에서 기본 정보를, `## Screen` > `### 레이아웃`에서 기능 배치를 읽는다.
 
@@ -26,7 +26,7 @@ frontmatter TOC에서 기능 계층을 읽고, 본문의 `와이어프레임 요
 
 읽는 콘텐츠 섹션:
 - `와이어프레임 요소` — 렌더링 소스
-- `상태` — 리뷰 탭 표현 후보
+- `상태` — 상태 탭 표현 후보
 - `인터랙션` — 리뷰 케이스 파악용
 - `비즈니스 로직` — 와이어프레임에 직접 반영하지 않음
 
@@ -61,6 +61,28 @@ feature 컨테이너는 **중첩**한다 (상위가 하위를 감쌈).
 | `data-label` | feature 컨테이너 | 한국어 표시명 (코멘트 UI용) |
 | `data-el` | 개별 UI 요소 | 짧은 ELEMENT_ID. 부모 `data-feature` 스코프 내 유니크 |
 
+### HTML 유효성 규칙
+
+`data-feature` 래퍼는 반드시 **block-level 요소**(`<div>`, `<section>`, `<aside>`, `<nav>`, `<main>`)를 사용한다.
+
+`<span>` 등 inline 요소를 `data-feature` 래퍼로 사용하면 안 된다. inline 요소 안에 block 요소(`<div>`)가 들어가면 브라우저가 DOM을 자동 보정하여 의도한 중첩 구조가 깨진다.
+
+```html
+<!-- ✅ 올바름: div로 감싸기 -->
+<div data-feature="HISTORY" data-label="버전 히스토리">
+  <div data-feature="HISTORY__RESET" data-label="초기화">
+    <button data-el="RESET_BTN">초기화</button>
+  </div>
+</div>
+
+<!-- ❌ 잘못됨: span이 div를 감쌈 — 브라우저가 DOM 보정 -->
+<span data-feature="HISTORY" data-label="버전 히스토리">
+  <div data-feature="HISTORY__RESET" data-label="초기화">
+    <button data-el="RESET_BTN">초기화</button>
+  </div>
+</span>
+```
+
 ### `data-el` 래핑 규칙
 
 레이블이 있는 요소는 **가능하면 래퍼 `<div data-el>`로 레이블과 입력을 함께 감싼다.**
@@ -88,13 +110,13 @@ feature 컨테이너는 **중첩**한다 (상위가 하위를 감쌈).
 `platform/flowframe.js`를 `<script>` 태그로 포함한다. 다음을 자동 처리:
 
 1. **호버 하이라이트** — `data-feature`, `data-el` 요소에 인디고 outline 자동 주입
-2. **리뷰 탭** — `data-state` 기반 상태 전환 탭 자동 생성
+2. **상태 탭** — `data-state` 기반 상태 전환 탭 자동 생성
 
 ```html
 <script src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframes/shared/ff-platform.js"></script>
 ```
 
-`<style>` 블록에는 다크모드 설정만 포함한다:
+`<style>` 블록에는 다크모드 설정과 Tailwind로 표현할 수 없는 최소한의 커스텀 CSS만 포함한다:
 
 ```html
 <style type="text/tailwindcss">
@@ -104,21 +126,32 @@ feature 컨테이너는 **중첩**한다 (상위가 하위를 감쌈).
 
 ---
 
-## 리뷰 탭
+## 상태 탭
 
 같은 기능의 2~4개 상호배타 형제 상태를 비교할 때 사용한다.
 리뷰 컨트롤이지, 제품 UI가 아니다.
 
-`data-feature` 직접 자식에 `data-state` 속성을 붙이면 flowframe.js가 자동으로 탭을 생성한다.
+`data-feature` **직접 자식**에 `data-state` 속성을 붙이면 flowframe.js가 자동으로 탭을 생성한다.
+
+**중요**: `data-state`와 `data-feature` 사이에 래퍼 div가 있으면 상태 탭이 작동하지 않는다.
 
 ```html
+<!-- ✅ 올바름: data-state가 data-feature 직접 자식 -->
 <div data-feature="AUTH__LOGIN" data-label="로그인">
   <div data-state="기본"><!-- 기본 상태 UI --></div>
   <div data-state="에러"><!-- 에러 상태 UI --></div>
 </div>
+
+<!-- ❌ 잘못됨: 중간 래퍼로 인해 탭 미작동 -->
+<div data-feature="AUTH__LOGIN" data-label="로그인">
+  <div class="some-wrapper">
+    <div data-state="기본">...</div>
+    <div data-state="에러">...</div>
+  </div>
+</div>
 ```
 
-- `data-state`가 2개 이상이면 자동으로 리뷰 탭 생성
+- `data-state`가 2개 이상이면 자동으로 상태 탭 생성
 - 첫 번째 `data-state`가 기본 표시 상태
 - hover 시 탭이 드러나고, 클릭으로 상태 전환
 - 라디오 input, `:has()` 규칙, group 클래스 불필요
@@ -180,7 +213,7 @@ feature 컨테이너는 **중첩**한다 (상위가 하위를 감쌈).
 | `id` | Yes | 짧은 ELEMENT_ID (부모 feature 스코프 내 유니크) |
 | `type` | Yes | input, button, text, select, table, list 등 |
 | `label` | Yes | 한국어 표시명 |
-| `description` | Yes | 리뷰어를 위한 기능적 역할 설명 |
+| `description` | Yes | 기능적 역할 설명. 액션 요소(button, link 등)는 클릭 시 결과도 포함 (예: "클릭 시 인증 요청. 성공: 메인 화면 이동, 실패: 에러 메시지 표시") |
 
 ---
 
@@ -267,6 +300,40 @@ Tailwind CSS v4: `<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser
 - 타이트 그룹: `gap-2`, 카드 그리드: `gap-3`, 섹션 간: `gap-5`
 
 레이아웃 예시: [references/MULTI-FEATURE.md](references/MULTI-FEATURE.md) (두 영역 레이아웃)
+
+---
+
+## 모달 파일
+
+모달(다이얼로그, 확인 팝업 포함)은 메인 와이어프레임에 포함하지 않고 **별도 HTML 파일**로 분리한다.
+
+### 파일명 규칙
+
+`{screenId 소문자}_modal-{name}.html`
+
+- `{name}`: 레이아웃의 모달 항목명을 소문자+하이픈으로 정규화한 슬러그 (예: "저장 버전 선택" → `save-version`, "업로드 확인" → `upload-confirm`)
+- 예: `flow-editor_modal-upload.html`, `flow-editor_modal-save.html`
+
+### 메타데이터
+
+메인 와이어프레임과 동일한 구조에 `modalId` 필드를 추가한다:
+
+```json
+{
+  "generator": "flowframe-wireframe-skill",
+  "version": "2.0",
+  "screenId": "FLOW-EDITOR",
+  "modalId": "upload",
+  "title": "플로우 업로드",
+  "viewport": "pc",
+  "purpose": "MD 파일을 선택하고 형식 검증 후 캔버스에 반영하는 모달",
+  "features": [...]
+}
+```
+
+### 모달 내 상태
+
+모달의 상태 변형은 `data-state` 상태 탭으로 표현한다. `data-state`는 `data-feature`의 **직접 자식**이어야 한다.
 
 ---
 

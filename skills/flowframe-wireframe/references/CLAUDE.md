@@ -6,12 +6,12 @@
 
 | 예제 | 파일 | 사용 시점 |
 |------|------|----------|
-| 단일 feature | [SINGLE-FEATURE.md](SINGLE-FEATURE.md) | 로그인 같은 단일 폼 화면. 리뷰 탭(기본/에러) 패턴 포함 |
-| 다중 feature | [MULTI-FEATURE.md](MULTI-FEATURE.md) | 사이드바+메인 같은 복합 레이아웃. 빈 상태 리뷰 탭, 고정 영역(헤더) 포함 |
+| 단일 feature | [SINGLE-FEATURE.md](SINGLE-FEATURE.md) | 로그인 같은 단일 폼 화면. 상태 탭(기본/에러) 패턴 포함 |
+| 다중 feature | [MULTI-FEATURE.md](MULTI-FEATURE.md) | 사이드바+메인 같은 복합 레이아웃. 빈 상태 상태 탭, 고정 영역(헤더) 포함 |
 
-## 리뷰 탭 레시피 요약
+## 상태 탭 레시피 요약
 
-두 예제 모두 리뷰 탭을 사용한다. `flowframe.js`가 자동 처리하므로 마크업만 필요:
+두 예제 모두 상태 탭을 사용한다. `flowframe.js`가 자동 처리하므로 마크업만 필요:
 
 1. `data-feature` 직접 자식에 `data-state="상태명"` 속성 부여
 2. `data-state`가 2개 이상이면 자동으로 탭 생성

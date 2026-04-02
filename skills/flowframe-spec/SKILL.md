@@ -22,9 +22,9 @@ docs/
 │   └── PAYMENT.md
 ├── screens/                 ← 화면 단위 폴더
 │   └── LOGIN/               ← 화면 ID = 폴더명
-│       ├── login-intake.md        ← 화면 단위 intake (선택)
-│       ├── login-screen.md        ← Screen + Requirement + UserStory 통합
-│       └── login-wireframe.html   ← 생성된 와이어프레임
+│       ├── login_intake.md        ← 화면 단위 intake (워크플로우가 생성)
+│       ├── login_screen.md        ← Screen + Requirement + UserStory 통합
+│       └── login_wireframe.html   ← 생성된 와이어프레임
 ```
 
 ---
@@ -87,12 +87,12 @@ toc:
 | 요소 | type | 설명 |
 |------|------|------|
 | 이메일 | input | 이메일 주소 입력 필드 |
-| 로그인 버튼 | button | 인증 요청 주요 액션 |
+| 로그인 버튼 | button | 클릭 시 인증 요청. 성공: 메인 화면 이동, 실패: "이메일 또는 비밀번호가 올바르지 않습니다" 에러 표시 |
 ```
 
 - `요소`: 한국어 표시명
 - `type`: `input`, `button`, `text`, `select`, `checkbox`, `radio`, `table`, `list`, `link`, `image`
-- `설명`: 리뷰어가 명세를 열지 않고도 역할을 이해할 수 있는 수준
+- `설명`: 리뷰어가 명세를 열지 않고도 역할을 이해할 수 있는 수준. 액션 요소(button, link 등)는 클릭 시 성공/실패 결과를 포함
 
 ### 상태 테이블
 
@@ -127,7 +127,7 @@ TOC 경로에서 파생. 도메인 ID와 TOC `id`를 `__`로 연결:
 
 ---
 
-## 화면 명세 (docs/screens/{SCREEN_ID}/{screenId 소문자}-screen.md)
+## 화면 명세 (docs/screens/{SCREEN_ID}/{screenId 소문자}_screen.md)
 
 ### Frontmatter
 
@@ -180,8 +180,8 @@ features: [AUTH]
 
 같은 화면 폴더 안에 생성:
 
-- 단일 뷰포트: `docs/screens/{SCREEN_ID}/{screenId 소문자}-wireframe.html`
-- 다중 뷰포트: `{screenId 소문자}-wireframe-pc.html`, `{screenId 소문자}-wireframe-mobile.html`
+- 단일 뷰포트: `docs/screens/{SCREEN_ID}/{screenId 소문자}_wireframe.html`
+- 다중 뷰포트: `{screenId 소문자}_wireframe-pc.html`, `{screenId 소문자}_wireframe-mobile.html`
 
 ---
 
@@ -197,6 +197,8 @@ features: [AUTH]
 | 6 | 와이어프레임의 `data-feature`가 현재 기능 구조와 일치 |
 | 7 | Requirement·UserStory의 H3 헤딩에 `— @DOMAIN/PATH` 연결 표식이 있고, 레이아웃 참조 기능마다 대응 그룹 존재 |
 | 8 | Requirement의 Given/When/Then에 "적절한", "빠르게" 등 모호한 표현이 없음 |
+| 9 | 화면 intake의 필수 섹션(화면 목적, 핵심 행동, 화면 구성, 모달, 특수 인터랙션, viewport, 제약사항)이 화면 명세에 반영됨. intake 부재 시 fail |
+| 10 | `viewport: [pc, mobile]`이면 `### 레이아웃 (PC)`과 `### 레이아웃 (Mobile)` 헤딩이 모두 존재 |
 
 ---
 

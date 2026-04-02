@@ -50,7 +50,7 @@ toc:
 
 ## 입력 2: 화면 명세
 
-`docs/screens/LOGIN/login-screen.md`
+`docs/screens/LOGIN/login_screen.md`
 
 ```markdown
 ---
@@ -69,14 +69,14 @@ features: [AUTH]
 
 ## Requirement
 
-### 인증
+### 인증 — @AUTH/LOGIN
 - Given 이메일과 비밀번호 입력 완료 When 로그인 버튼 클릭 Then 인증 요청 후 메인 화면 이동
 - Given 이메일 형식 오류 When 로그인 버튼 클릭 Then 이메일 형식 에러 메시지 표시
 - Given 5회 연속 로그인 실패 When 6번째 시도 Then 계정 잠금 안내 메시지 표시
 
 ## UserStory
 
-### 인증
+### 인증 — @AUTH/LOGIN
 - 사용자로서 이메일과 비밀번호로 로그인하고 싶다, 내 계정에 접근하기 위해
 - 사용자로서 로그인 실패 시 원인을 알고 싶다, 올바른 정보를 다시 입력하기 위해
 ```
@@ -85,7 +85,7 @@ features: [AUTH]
 
 ## 출력: 와이어프레임 HTML
 
-`docs/screens/LOGIN/login-wireframe.html`
+`docs/screens/LOGIN/login_wireframe.html`
 
 ```html
 <!DOCTYPE html>
@@ -135,7 +135,7 @@ features: [AUTH]
     <!-- AUTH: 그루핑 래퍼 (elements 없음, features만) -->
     <div data-feature="AUTH" data-label="인증">
 
-      <!-- AUTH__LOGIN: data-state로 리뷰 탭 자동 생성 -->
+      <!-- AUTH__LOGIN: data-state로 상태 탭 자동 생성 -->
       <div data-feature="AUTH__LOGIN" data-label="로그인"
            class="w-full max-w-md flex flex-col gap-6 rounded-lg border border-zinc-200 p-8 dark:border-zinc-700">
 
@@ -193,9 +193,9 @@ features: [AUTH]
 | 그루핑 feature | `AUTH`는 `elements` 없이 `features`만 보유 |
 | DOM 중첩 | `data-feature="AUTH"` > `data-feature="AUTH__LOGIN"` |
 | element는 짧은 키 | `data-el="EMAIL"`, `data-el="SUBMIT"` — 부모 feature 스코프 내 유니크 |
-| 리뷰 탭 (data-state) | `data-state="기본"`, `data-state="에러"` — flowframe.js가 자동 탭 생성 |
+| 상태 탭 (data-state) | `data-state="기본"`, `data-state="에러"` — flowframe.js가 자동 탭 생성 |
 | 상태 패널 내 data-el 재사용 | 같은 `data-el="EMAIL"`이 두 패널에 존재 — 상호배타이므로 허용 |
 | 캔버스 프레임 | `bg-zinc-100 p-8` + `rounded-xl border shadow-sm` 컨테이너 |
 | 단일 포커스 레이아웃 | 캔버스 내 중앙 카드, 고정 영역 없음 |
-| flowframe.js | 호버 하이라이트 + 리뷰 탭 자동 처리. `<style>`에는 다크모드만 |
+| flowframe.js | 호버 하이라이트 + 상태 탭 자동 처리. `<style>`에는 다크모드만 |
 | 화면 참조 문법 | `@AUTH/LOGIN` — 도메인/TOC_ID |
