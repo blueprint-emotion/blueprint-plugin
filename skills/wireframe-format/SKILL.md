@@ -1,14 +1,14 @@
 ---
 name: wireframe-format
-description: FlowFrame 호환 HTML 와이어프레임의 DOM 구조, 속성 규칙, 메타데이터 포맷, 디자인 원칙을 정의한다. wireframer 에이전트가 와이어프레임을 생성할 때 참조하며, 사용자가 "와이어프레임 포맷", "DOM 규칙" 등을 확인할 때도 사용한다.
+description: Blueprint 호환 HTML 와이어프레임의 DOM 구조, 속성 규칙, 메타데이터 포맷, 디자인 원칙을 정의한다. wireframer 에이전트가 와이어프레임을 생성할 때 참조하며, 사용자가 "와이어프레임 포맷", "DOM 규칙" 등을 확인할 때도 사용한다.
 user-invocable: false
 license: MIT
 metadata:
-  author: flowframehq
+  author: blueprint-emotion
   version: "4.0.0"
 ---
 
-# FlowFrame 와이어프레임 포맷
+# Blueprint 와이어프레임 포맷
 
 와이어프레임 HTML의 DOM 구조, 속성 규칙, 메타데이터 포맷, 디자인 원칙을 정의한다.
 이 스킬은 `wireframer` 에이전트가 와이어프레임을 생성할 때 참조하는 포맷 지식이다.
@@ -106,15 +106,15 @@ feature 컨테이너는 **중첩**한다 (상위가 하위를 감쌈).
 
 ---
 
-## 플랫폼 스크립트 (ff-platform.js)
+## 플랫폼 스크립트 (bp-platform.js)
 
-`ff-platform.js`를 `<script>` 태그로 포함한다. 다음을 자동 처리:
+`bp-platform.js`를 `<script>` 태그로 포함한다. 다음을 자동 처리:
 
 1. **호버 하이라이트** — `data-feature`, `data-el` 요소에 인디고 outline 자동 주입
 2. **상태 탭** — `data-state` 기반 상태 전환 탭 자동 생성
 
 ```html
-<script src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframes/shared/ff-platform.js"></script>
+<script src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframes/shared/bp-platform.js"></script>
 ```
 
 `<style>` 블록에는 다크모드 설정과 Tailwind로 표현할 수 없는 최소한의 커스텀 CSS만 포함한다:
@@ -132,7 +132,7 @@ feature 컨테이너는 **중첩**한다 (상위가 하위를 감쌈).
 같은 기능의 2~4개 상호배타 형제 상태를 비교할 때 사용한다.
 리뷰 컨트롤이지, 제품 UI가 아니다.
 
-`data-feature` **직접 자식**에 `data-state` 속성을 붙이면 ff-platform.js가 자동으로 탭을 생성한다.
+`data-feature` **직접 자식**에 `data-state` 속성을 붙이면 bp-platform.js가 자동으로 탭을 생성한다.
 
 **중요**: `data-state`와 `data-feature` 사이에 래퍼 div가 있으면 상태 탭이 작동하지 않는다.
 
@@ -161,14 +161,14 @@ feature 컨테이너는 **중첩**한다 (상위가 하위를 감쌈).
 
 ---
 
-## 메타데이터 (`flowframe-meta`)
+## 메타데이터 (`blueprint-meta`)
 
-`<head>` 내 `<!-- @META -->` ~ `<!-- @END:META -->` 마커 안에 `<script type="application/json" id="flowframe-meta">`로 배치. partial-update 시 @META 블록 전체가 교체 단위.
-> 기계 판독 가능한 메타데이터 스키마: [`schema/flowframe-meta.schema.json`](../../schema/flowframe-meta.schema.json)
+`<head>` 내 `<!-- @META -->` ~ `<!-- @END:META -->` 마커 안에 `<script type="application/json" id="blueprint-meta">`로 배치. partial-update 시 @META 블록 전체가 교체 단위.
+> 기계 판독 가능한 메타데이터 스키마: [`schema/blueprint-meta.schema.json`](../../schema/blueprint-meta.schema.json)
 
 ```json
 {
-  "generator": "flowframe-wireframe-skill",
+  "generator": "blueprint-wireframe-skill",
   "version": "2.0",
   "type": "screen",
   "screenId": "LOGIN",
@@ -195,7 +195,7 @@ feature 컨테이너는 **중첩**한다 (상위가 하위를 감쌈).
 
 ### 필수 최상위 필드
 
-`generator` (고정 `"flowframe-wireframe-skill"`), `version` (`"2.0"`), `type` (`"screen"` | `"modal"`), `screenId`, `title`, `purpose`, `features` (1개 이상).
+`generator` (고정 `"blueprint-wireframe-skill"`), `version` (`"2.0"`), `type` (`"screen"` | `"modal"`), `screenId`, `title`, `purpose`, `features` (1개 이상).
 
 `type`이 `"modal"`이면 `modalId`도 필수.
 
@@ -334,7 +334,7 @@ Tailwind CSS v4: `<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser
 
 ```json
 {
-  "generator": "flowframe-wireframe-skill",
+  "generator": "blueprint-wireframe-skill",
   "version": "2.0",
   "type": "modal",
   "screenId": "FLOW-EDITOR",
@@ -352,15 +352,15 @@ Tailwind CSS v4: `<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser
 
 ---
 
-## FlowFrame 업로드 검증
+## Blueprint 업로드 검증
 
 | # | 검사 항목 | 실패 시 |
 |---|----------|---------|
 | 1 | `.html` 확장자 | 차단 |
 | 2 | ≤ 2MB | 차단 |
 | 3 | HTML 파싱 가능 | 차단 |
-| 4 | `<script id="flowframe-meta">` 존재 | 차단 |
+| 4 | `<script id="blueprint-meta">` 존재 | 차단 |
 | 5 | JSON 파싱 가능 | 차단 |
-| 6 | `generator` = `"flowframe-wireframe-skill"` | 차단 |
+| 6 | `generator` = `"blueprint-wireframe-skill"` | 차단 |
 | 7 | 필수 필드 존재 | 차단 |
 | 8 | `features` 1개 이상, 각 feature에 `elements` 또는 `features` | 차단 |

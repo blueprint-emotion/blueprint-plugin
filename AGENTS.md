@@ -3,7 +3,7 @@
 This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## Project Overview
-FlowFrame — Claude plugin marketplace 배포를 목표로 하는 Claude Code 플러그인.
+Blueprint — Claude plugin marketplace 배포를 목표로 하는 Claude Code 플러그인.
 기획자가 기능명세/화면명세를 작성하고, HTML 와이어프레임을 생성한다.
 
 - **배포 대상**: Claude plugin marketplace

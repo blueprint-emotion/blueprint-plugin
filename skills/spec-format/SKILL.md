@@ -1,14 +1,14 @@
 ---
 name: spec-format
-description: FlowFrame 프로젝트의 기능 명세(docs/features/)와 화면 명세(docs/screens/)의 포맷 지식과 검증 규칙을 제공한다. 기획자 에이전트(planner)가 명세를 작성할 때 참조하며, 사용자가 직접 "명세 포맷", "템플릿", "정합성 규칙" 등을 확인할 때도 사용한다.
+description: Blueprint 프로젝트의 기능 명세(docs/features/)와 화면 명세(docs/screens/)의 포맷 지식과 검증 규칙을 제공한다. 기획자 에이전트(planner)가 명세를 작성할 때 참조하며, 사용자가 직접 "명세 포맷", "템플릿", "정합성 규칙" 등을 확인할 때도 사용한다.
 user-invocable: false
 license: MIT
 metadata:
-  author: flowframehq
+  author: blueprint-emotion
   version: "4.0.0"
 ---
 
-# FlowFrame 명세 포맷
+# Blueprint 명세 포맷
 
 기능명세와 화면명세의 포맷 규칙, 템플릿, 검증 기준을 정의한다.
 이 스킬의 산출물이 `wireframe` 스킬의 입력이 된다.

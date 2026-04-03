@@ -170,16 +170,16 @@ features: [PRODUCT]
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>상품 목록</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <script src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframes/shared/ff-platform.js"></script>
+  <script src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframes/shared/bp-platform.js"></script>
 
   <style type="text/tailwindcss">
     @custom-variant dark (&:where(.dark, .dark *));
   </style>
 
   <!-- @META -->
-  <script type="application/json" id="flowframe-meta">
+  <script type="application/json" id="blueprint-meta">
   {
-    "generator": "flowframe-wireframe-skill",
+    "generator": "blueprint-wireframe-skill",
     "version": "2.0",
     "type": "screen",
     "screenId": "PRODUCT-LIST",
@@ -406,9 +406,9 @@ features: [PRODUCT]
 | 두 영역 레이아웃 | 사이드바(`SEARCH_FILTER`) + 메인(`LIST`). 메인이 시각적 중심 |
 | 캔버스 프레임 | `bg-zinc-100 p-8` + `rounded-xl border shadow-sm` 컨테이너 |
 | 고정 영역 | 헤더/푸터에 `data-feature` 없음. 기본 라벨만 표시 |
-| 상태 탭 (data-state) | `LIST`에 `data-state="기본"`, `data-state="결과 없음"` — ff-platform.js가 자동 탭 생성 |
+| 상태 탭 (data-state) | `LIST`에 `data-state="기본"`, `data-state="결과 없음"` — bp-platform.js가 자동 탭 생성 |
 | element는 짧은 키 | `data-el="CATEGORY"`, `data-el="SORT"` — 각각 부모 feature 스코프 내 유니크 |
 | 상태 패널 내 data-el 재사용 | `SORT`, `CARDS`가 두 패널에 존재 — 상호배타이므로 허용 |
 | description은 비즈니스 의미 | "사용자가 관심 상품 카테고리만 남기도록…" — 단순 라벨이 아닌 역할 설명 |
-| ff-platform.js | 호버 하이라이트 + 상태 탭 자동 처리. `<style>`에는 다크모드만 |
+| bp-platform.js | 호버 하이라이트 + 상태 탭 자동 처리. `<style>`에는 다크모드만 |
 | 화면 참조 문법 | `@PRODUCT/SEARCH_FILTER`, `@PRODUCT/LIST` |

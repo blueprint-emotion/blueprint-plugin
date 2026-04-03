@@ -3,7 +3,7 @@
 ## DOM 구조
 
 - feature 컨테이너는 **중첩**한다 (상위가 하위를 감쌈)
-- 호버는 ff-platform.js가 가장 깊은 feature만 강조 — 별도 CSS 불필요
+- 호버는 bp-platform.js가 가장 깊은 feature만 강조 — 별도 CSS 불필요
 - 메타데이터 JSON의 계층 구조와 DOM 중첩이 1:1 대응
 
 ## 속성 규칙
@@ -36,21 +36,21 @@
 </div>
 ```
 
-## 플랫폼 스크립트 (ff-platform.js)
+## 플랫폼 스크립트 (bp-platform.js)
 
-`ff-platform.js`가 호버 하이라이트와 상태 탭을 자동 처리한다.
+`bp-platform.js`가 호버 하이라이트와 상태 탭을 자동 처리한다.
 
 - 호버: `data-feature`, `data-el`에 인디고 outline 자동 주입
 - 상태 탭: `data-state` 직접 자식이 2개 이상이면 탭 자동 생성
 - `<style>` 블록에 호버 CSS나 `:has()` 규칙 불필요 — 다크모드 설정 + Tailwind로 표현 불가한 최소 커스텀 CSS만 포함
 
-## 메타데이터 (`flowframe-meta`)
+## 메타데이터 (`blueprint-meta`)
 
-`<head>` 내 `<!-- @META -->` ~ `<!-- @END:META -->` 마커 안에 `<script type="application/json" id="flowframe-meta">`로 배치.
+`<head>` 내 `<!-- @META -->` ~ `<!-- @END:META -->` 마커 안에 `<script type="application/json" id="blueprint-meta">`로 배치.
 
 ```json
 {
-  "generator": "flowframe-wireframe-skill",
+  "generator": "blueprint-wireframe-skill",
   "version": "2.0",
   "type": "screen",
   "screenId": "LOGIN",

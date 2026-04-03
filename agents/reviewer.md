@@ -65,13 +65,13 @@ skills:
 
 | # | 항목 | 기준 |
 |---|------|------|
-| W1 | 메타데이터 존재 | `<script type="application/json" id="flowframe-meta">` 존재하고 JSON 파싱 가능 |
-| W2 | 메타데이터 필수 필드 | `generator`("flowframe-wireframe-skill"), `version`("2.0"), `type`("screen" \| "modal"), `screenId`, `title`, `purpose`, `features`. `type`이 `"modal"`이면 `modalId`도 필수이며, `modalId` 값이 파일명의 slug와 일치해야 함 (예: `*_modal-upload.html` → `modalId: "upload"`) |
+| W1 | 메타데이터 존재 | `<script type="application/json" id="blueprint-meta">` 존재하고 JSON 파싱 가능 |
+| W2 | 메타데이터 필수 필드 | `generator`("blueprint-wireframe-skill"), `version`("2.0"), `type`("screen" \| "modal"), `screenId`, `title`, `purpose`, `features`. `type`이 `"modal"`이면 `modalId`도 필수이며, `modalId` 값이 파일명의 slug와 일치해야 함 (예: `*_modal-upload.html` → `modalId: "upload"`) |
 | W3 | feature 래퍼 존재 | 메타데이터 `features[]`의 모든 항목에 대응하는 `[data-feature]` DOM 요소 존재 |
 | W4 | feature-명세 일치 | 모든 `data-feature` 값이 기능명세 TOC에서 파생한 featureId와 일치 |
 | W5 | element 매핑 | 메타데이터 `elements[].id`에 대응하는 `[data-el]` DOM 요소가 해당 `[data-feature]` 안에 존재 |
 | W6 | DOM 중첩 구조 | 하위 feature의 `[data-feature]`가 부모 `[data-feature]` 안에 위치 |
-| W7 | Tailwind + 플랫폼 스크립트 + 다크모드 | Tailwind CDN 포함, `ff-platform.js` 스크립트 포함, `<style>`에 다크모드 규칙, 모든 색상에 `dark:` 변형 |
+| W7 | Tailwind + 플랫폼 스크립트 + 다크모드 | Tailwind CDN 포함, `bp-platform.js` 스크립트 포함, `<style>`에 다크모드 규칙, 모든 색상에 `dark:` 변형 |
 | W8 | data-label 존재 | 모든 `[data-feature]`에 `data-label` 속성 존재 |
 | W9 | data-state 배치 | `[data-state]` 요소가 `[data-feature]`의 직접 자식인지 확인. 중간 래퍼가 있으면 상태 탭이 작동하지 않음 |
 | W10 | HTML 유효성 | `[data-feature]` 래퍼가 block-level 요소(`<div>`, `<section>` 등)인지 확인. `<span>` 등 inline 요소 안에 block 요소가 중첩되면 fail |

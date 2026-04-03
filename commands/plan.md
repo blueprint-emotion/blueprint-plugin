@@ -3,6 +3,6 @@ description: 기획 워크플로우 시작 — 요구사항 수집부터 명세 
 argument-hint: '[요구사항]'
 ---
 
-Use the Skill tool to invoke `ff:plan-harness` with the following arguments:
+Use the Skill tool to invoke `bp:plan-harness` with the following arguments:
 
 $ARGUMENTS

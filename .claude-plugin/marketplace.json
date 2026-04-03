@@ -1,22 +1,22 @@
 {
-  "name": "flowframe",
+  "name": "blueprint",
   "owner": {
-    "name": "flowframehq"
+    "name": "blueprint-emotion"
   },
   "metadata": {
-    "description": "FlowFrame 플러그인 마켓플레이스"
+    "description": "Blueprint 플러그인 마켓플레이스"
   },
   "plugins": [
     {
-      "name": "ff",
+      "name": "bp",
       "version": "4.0.0",
       "description": "IT 서비스 기획자를 위한 기능명세/화면명세 작성 및 HTML 와이어프레임 생성 플러그인",
       "author": {
-        "name": "flowframehq"
+        "name": "blueprint-emotion"
       },
       "source": {
         "source": "github",
-        "repo": "flowframehq/wireframe-skill"
+        "repo": "blueprint-emotion/blueprint-plugin"
       }
     }
   ]

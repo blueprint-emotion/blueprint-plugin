@@ -1,14 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://flowframe.dev/schema/flowframe-meta.schema.json",
-  "title": "FlowFrame Wireframe Metadata",
-  "description": "FlowFrame 와이어프레임 HTML 파일의 메타데이터 스키마. <script type=\"application/json\" id=\"flowframe-meta\"> 블록에 삽입된다.",
+  "$id": "https://blueprint-emotion.dev/schema/blueprint-meta.schema.json",
+  "title": "Blueprint Wireframe Metadata",
+  "description": "Blueprint 와이어프레임 HTML 파일의 메타데이터 스키마. <script type=\"application/json\" id=\"blueprint-meta\"> 블록에 삽입된다.",
   "type": "object",
   "required": ["generator", "version", "type", "screenId", "title", "purpose", "features"],
   "properties": {
     "generator": {
       "type": "string",
-      "const": "flowframe-wireframe-skill",
+      "const": "blueprint-wireframe-skill",
       "description": "생성기 식별 고정값."
     },
     "version": {
