@@ -5,12 +5,28 @@ IT 서비스 기획자를 위한 Claude Code 플러그인.
 
 ## 설치
 
-```bash
-# 1. 마켓플레이스 등록
-claude plugin marketplace add blueprint-emotion/blueprint-plugin
+마켓플레이스 등록:
 
-# 2. 플러그인 설치
-claude plugin install bp
+```
+/plugin marketplace add blueprint-emotion/blueprint-plugin
+```
+
+플러그인 설치:
+
+```
+/plugin install bp
+```
+
+플러그인 리로드:
+
+```
+/reload-plugins
+```
+
+사용 시작:
+
+```
+/bp:plan
 ```
 
 ## 업데이트
