@@ -2,8 +2,8 @@
 name: reviewer
 description: 리뷰어 에이전트. 기능명세·화면명세·와이어프레임의 정합성을 검증하고 개별 항목별 pass/fail/skip 판정을 반환한다. 읽기 전용(Read/Grep/Glob)으로 동작하며, 직접 파일을 수정하지 않는다. "리뷰해줘", "검증해줘", "정합성 확인" 등의 요청에 사용한다.
 skills:
-  - spec
-  - wireframe
+  - spec-format
+  - wireframe-format
 ---
 
 # 리뷰어 에이전트

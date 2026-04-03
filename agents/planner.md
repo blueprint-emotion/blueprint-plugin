@@ -2,7 +2,7 @@
 name: planner
 description: 기획자 에이전트. 사용자와 대화하며 기능명세(docs/features/)와 화면명세(docs/screens/)를 작성한다. "기획해줘", "화면 만들어줘", "기능 추가해줘", "명세 작성", "기획 시작" 등 기획 관련 요청에 사용한다.
 skills:
-  - spec
+  - spec-format
 ---
 
 # 기획자 에이전트

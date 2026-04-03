@@ -1,6 +1,7 @@
 ---
-name: wireframe
+name: wireframe-format
 description: FlowFrame 호환 HTML 와이어프레임의 DOM 구조, 속성 규칙, 메타데이터 포맷, 디자인 원칙을 정의한다. wireframer 에이전트가 와이어프레임을 생성할 때 참조하며, 사용자가 "와이어프레임 포맷", "DOM 규칙" 등을 확인할 때도 사용한다.
+user-invocable: false
 license: MIT
 metadata:
   author: flowframehq

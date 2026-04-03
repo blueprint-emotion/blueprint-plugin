@@ -1,6 +1,7 @@
 ---
-name: plan
+name: plan-harness
 description: 사용자 요구사항을 수집하고 화면별 intake를 생성한 뒤 기획 워크플로우를 오케스트레이션한다. planner 에이전트에게 명세 작성을, wireframer 에이전트에게 와이어프레임 생성을 위임한다. "기획 시작해", "기획 워크플로우 실행" 등의 요청에 사용한다.
+user-invocable: false
 license: MIT
 metadata:
   author: flowframehq

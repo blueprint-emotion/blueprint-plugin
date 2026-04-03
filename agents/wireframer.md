@@ -2,7 +2,7 @@
 name: wireframer
 description: 와이어프레임 에이전트. 화면 명세와 기능 명세를 읽어 FlowFrame 호환 HTML 와이어프레임을 생성하고 업데이트한다. "와이어프레임 만들어줘", "화면 그려줘", "wireframe", "와이어프레임 업데이트" 등의 요청에 사용한다.
 skills:
-  - wireframe
+  - wireframe-format
 ---
 
 # 와이어프레임 에이전트

@@ -1,6 +1,7 @@
 ---
-name: spec
+name: spec-format
 description: FlowFrame 프로젝트의 기능 명세(docs/features/)와 화면 명세(docs/screens/)의 포맷 지식과 검증 규칙을 제공한다. 기획자 에이전트(planner)가 명세를 작성할 때 참조하며, 사용자가 직접 "명세 포맷", "템플릿", "정합성 규칙" 등을 확인할 때도 사용한다.
+user-invocable: false
 license: MIT
 metadata:
   author: flowframehq
