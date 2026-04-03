@@ -7,5 +7,6 @@
   },
   "license": "MIT",
   "keywords": ["wireframe", "planning", "design", "ui-design", "flowframe", "기획"],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "agents": "./agents/"
 }
