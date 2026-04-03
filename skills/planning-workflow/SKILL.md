@@ -73,7 +73,7 @@ intake는 화면 단위로 존재한다: `docs/screens/{SCREEN_ID}/{screenId 소
 3. 화면별로 intake 파일을 생성한다: `docs/screens/{SCREEN_ID}/{screenId 소문자}_intake.md`
 4. 이미 intake 파일이 있는 화면은 기존 파일을 사용하되, 1단계 수집 결과와 달라진 섹션이 있으면 갱신한다
 
-빈 프로젝트에서는 `docs/features/INDEX.md`가 없을 수 있다. 첫 번째 기능 명세 생성 시 planner가 자동으로 생성한다.
+빈 프로젝트에서는 `docs/features/INDEX.md`가 없을 수 있다. 첫 번째 기능 명세 생성 시 planner가 **먼저 INDEX.md를 생성한 뒤** 도메인 파일 작성과 동기화를 진행한다.
 
 사용자 명령 예시:
 - `기획 시작해` → 요구사항을 묻고 intake 생성부터 시작
@@ -155,20 +155,27 @@ intake 필수 섹션 (S11 검증의 입력 스키마):
 
 ### 4단계. Spec 작성 (planner 에이전트 위임)
 
-planner 에이전트에게 화면별로 명세 작성을 위임한다.
+planner 에이전트에게 명세 작성을 위임한다.
 
 순서: 공유 도메인 기능 먼저 → 화면별 고유 기능 → 화면 명세
+
+병렬 실행 안전 규칙:
+- 같은 `docs/features/{DOMAIN}.md` 파일에는 **동시에 한 planner만** 쓴다
+- 여러 화면이 같은 도메인을 공유하면, 하네스가 먼저 **공유 도메인 단계**를 단일 writer로 직렬 실행해 TOC와 본문을 확정한다
+- 그 다음 화면별 planner는 자기 화면의 `*_screen.md`와 **자기에게 소유권이 할당된 feature 파일만** 수정한다
+- 하네스가 도메인 소유권을 명시하지 않은 병렬 planner는 공유 도메인 파일을 수정하지 않는다. 필요한 변경은 공유 도메인 단계로 되돌린다
 
 공유 도메인 파일(여러 화면이 참조하는 feature 파일)을 수정한 경우, 하네스는 경고를 출력한다: "이번 검사는 현재 워크플로우 범위만 보장합니다. 같은 도메인을 참조하는 다른 화면({화면 목록})의 영향은 미검증입니다. 필요하면 full-review를 실행하세요."
 
 각 화면에 대해 planner가:
 1. 책임 단위 분해
-2. 기능 명세 작성 (도메인 파일에 추가)
+2. 기능 명세 작성 (하네스가 할당한 도메인 파일에만 추가)
 3. 화면 명세 작성 (Screen + Requirement + UserStory)
 
 INDEX.md 갱신 책임:
 - **단독 실행** (planner 1개) → planner가 직접 INDEX.md 갱신
 - **병렬 실행** (planner 여러 개) → 각 planner는 INDEX.md를 갱신하지 않는다. 모든 planner 완료 후 **하네스가 INDEX.md를 최종 합산**한다: `docs/features/*.md`(INDEX.md, CLAUDE.md 제외)의 frontmatter에서 `domain`과 `label`을 읽어 `- **{DOMAIN}** — {label}` 형식으로 알파벳 정렬하여 재생성
+- **첫 실행** → `INDEX.md`가 없으면 planner가 빈 인덱스를 먼저 생성한다. reviewer 호출 전까지 현재 워크플로우 대상 도메인이 모두 인덱스에 반영되어 있어야 한다
 
 ### 5단계. 마무리 요약 + 사용자 승인
 

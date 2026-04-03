@@ -96,8 +96,6 @@ docs/
 - **Tailwind CSS** — `@tailwindcss/browser@4` CDN
 - **ff-platform.js** — FlowFrame 플랫폼 스크립트 (호버 하이라이트, 상태 탭 자동 생성)
 
-오프라인 환경에서는 와이어프레임이 스타일 없이 렌더링됩니다.
-
 ## 부분 업데이트 (partial-update)
 
 와이어프레임의 특정 영역만 교체하려면 HTML 내의 슬롯 마커가 보존되어야 합니다:

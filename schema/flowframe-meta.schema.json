@@ -23,8 +23,8 @@
     },
     "screenId": {
       "type": "string",
-      "pattern": "^[A-Z][A-Z0-9-]*$",
-      "description": "화면 식별자 (예: LOGIN, CHECKOUT, PRODUCT-LIST). 순차 번호(001, 002 등) 금지 — reviewer S7이 검증."
+      "pattern": "^(?!.*(?:^|-)\\d{3,}(?:-|$))[A-Z][A-Z0-9-]*$",
+      "description": "화면 식별자 (예: LOGIN, CHECKOUT, PRODUCT-LIST). 하이픈으로 분리된 순차 번호 세그먼트(001, 002 등)는 허용하지 않는다."
     },
     "title": {
       "type": "string",
@@ -113,7 +113,8 @@
         },
         "type": {
           "type": "string",
-          "description": "와이어프레임 요소 타입. 일반적인 값: input, button, text, select, checkbox, radio, table, list, link, image, textarea, toggle."
+          "enum": ["input", "textarea", "button", "text", "select", "checkbox", "radio", "table", "list", "link", "image", "toggle"],
+          "description": "와이어프레임 요소 타입. 명세와 메타데이터가 동일한 허용값 집합을 사용한다."
         },
         "label": {
           "type": "string",

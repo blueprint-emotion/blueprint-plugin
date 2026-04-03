@@ -91,7 +91,7 @@ toc:
 ```
 
 - `요소`: 한국어 표시명
-- `type`: `input`, `button`, `text`, `select`, `checkbox`, `radio`, `table`, `list`, `link`, `image`
+- `type`: `input`, `textarea`, `button`, `text`, `select`, `checkbox`, `radio`, `table`, `list`, `link`, `image`, `toggle`
 - `설명`: 리뷰어가 명세를 열지 않고도 역할을 이해할 수 있는 수준. 액션 요소(button, link 등)는 클릭 시 성공/실패 결과를 포함
 
 ### 상태 테이블

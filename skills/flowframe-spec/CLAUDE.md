@@ -33,7 +33,7 @@
 ```
 
 - `요소`: 한국어 표시명 (wireframe에서 `data-label`로 사용)
-- `type`: input, button, text, select, table, list 등
+- `type`: input, textarea, button, text, select, checkbox, radio, table, list, link, image, toggle 중 하나
 - `설명`: 리뷰어가 명세를 열지 않고도 역할을 이해할 수 있는 수준
 
 ## 콘텐츠 섹션 예약명

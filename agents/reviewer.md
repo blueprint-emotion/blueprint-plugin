@@ -42,7 +42,7 @@ skills:
 | S3 | 와이어프레임 요소 테이블 | 리프 기능에 `와이어프레임 요소` 테이블이 존재 (하위 기능이 있으면 생략 가능) |
 | S4 | 화면 레이아웃 참조 | 화면의 모든 `@DOMAIN/PATH` 참조에 대응하는 기능이 해당 도메인 파일에 존재 |
 | S5 | features 배열 동기화 | frontmatter `features` 배열이 레이아웃에서 참조하는 모든 도메인을 포함 |
-| S6 | INDEX.md 동기화 | 모든 도메인 파일이 INDEX.md에 등록됨 |
+| S6 | INDEX.md 동기화 | 리뷰 대상 도메인 파일이 INDEX.md에 모두 등록됨. 전역 도메인 정합성은 full-review에서 별도로 확인 |
 | S7 | screenId 형식 | `UPPER-KEBAB` 형식 준수 (순차 번호 금지 (001, 002 등). V2 같은 의미 있는 숫자는 허용) |
 | S8 | featureId 형식 | `DOMAIN__PATH` 형식, `__`로 깊이 구분, 대문자+밑줄만 사용 |
 | S9 | Requirement 커버리지 | Requirement·UserStory의 H3 헤딩에 `— @DOMAIN/PATH` 연결 표식이 있어야 하고, 레이아웃에서 참조한 모든 기능에 대응하는 Requirement 그룹이 최소 1개 존재 |
@@ -139,7 +139,7 @@ skills:
 
 ## 보고 규칙
 
-각 검증 항목에 대해 `pass`, `fail`, `skip` 중 하나를 반환한다. `skip`은 검증 대상 파일이 아직 없거나 해당 조건이 적용되지 않는 경우(예: 단일 뷰포트에서 S12는 `skip`).
+각 검증 항목에 대해 `pass`, `fail`, `skip` 중 하나를 반환한다. `skip`은 검증 대상 파일이 아직 없거나 해당 조건이 적용되지 않는 경우(예: 단일 뷰포트에서 S13은 `skip`).
 
 reviewer는 **개별 항목의 판정과 이슈 목록만 반환**한다. 최종 PASS/FAIL 판정, skip의 해석(block vs 경고), 다음 단계 진행 여부는 모두 하네스(planning-workflow)가 결정한다. reviewer는 보고서 상단에 최종 판정을 기재하지 않는다.
 
