@@ -1881,19 +1881,19 @@ var BpDialog = class extends HTMLElement {
     const description = attr(this, "description");
     const body = html(this);
     const headerHtml = title || description ? `<div data-slot="dialog-header" class="flex flex-col gap-1">
-            ${title ? `<div data-slot="dialog-title" class="font-heading text-sm font-medium">${title}</div>` : ""}
-            ${description ? `<div data-slot="dialog-description" class="text-xs/relaxed text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground">${description}</div>` : ""}
+            ${title ? `<div data-slot="dialog-title" class="text-sm font-medium">${title}</div>` : ""}
+            ${description ? `<div data-slot="dialog-description" class="text-xs text-muted-foreground">${description}</div>` : ""}
           </div>` : "";
     const contentHtml = body ? `<div data-slot="dialog-body">${body}</div>` : "";
-    const footerSlot = attr(this, "footer");
-    const footerHtml = footerSlot ? `<div data-slot="dialog-footer" class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">${footerSlot}</div>` : "";
     this.innerHTML = `
-      <div data-slot="dialog-content" class="${cn(
-      "grid w-full max-w-[calc(100%-2rem)] gap-4 rounded-xl bg-popover p-4 text-xs/relaxed text-popover-foreground ring-1 ring-foreground/10 sm:max-w-sm"
-    )}">
-        ${headerHtml}
-        ${contentHtml}
-        ${footerHtml}
+      <div class="relative rounded-xl bg-muted/40 border border-dashed border-border p-8" style="min-height:200px">
+        <span class="absolute top-2 left-3 text-[10px] text-muted-foreground/60 uppercase tracking-wider">Dialog</span>
+        <div class="flex items-center justify-center h-full">
+          <div data-slot="dialog-content" class="w-full max-w-sm rounded-xl bg-popover p-4 ring-1 ring-foreground/10 shadow-lg grid gap-4 text-xs">
+            ${headerHtml}
+            ${contentHtml}
+          </div>
+        </div>
       </div>`;
   }
 };
@@ -1904,38 +1904,33 @@ var BpAlertDialog = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const description = attr(this, "description");
-    const confirmLabel = attr(this, "confirm-label", "Continue");
-    const cancelLabel = attr(this, "cancel-label", "Cancel");
+    const confirmLabel = attr(this, "confirm-label", "\uD655\uC778");
+    const cancelLabel = attr(this, "cancel-label", "\uCDE8\uC18C");
     const body = html(this);
-    const headerHtml = title || description ? `<div data-slot="alert-dialog-header" class="grid grid-rows-[auto_1fr] place-items-center gap-1 text-center has-data-[slot=alert-dialog-media]:grid-rows-[auto_auto_1fr] has-data-[slot=alert-dialog-media]:gap-x-4 sm:place-items-start sm:text-left sm:has-data-[slot=alert-dialog-media]:grid-rows-[auto_1fr]">
-            ${title ? `<div data-slot="alert-dialog-title" class="font-heading text-sm font-medium">${title}</div>` : ""}
-            ${description ? `<div data-slot="alert-dialog-description" class="text-xs/relaxed text-balance text-muted-foreground md:text-pretty *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground">${description}</div>` : ""}
+    const headerHtml = title || description ? `<div data-slot="alert-dialog-header" class="grid gap-1">
+            ${title ? `<div data-slot="alert-dialog-title" class="text-sm font-medium">${title}</div>` : ""}
+            ${description ? `<div data-slot="alert-dialog-description" class="text-xs text-muted-foreground">${description}</div>` : ""}
           </div>` : "";
     const contentHtml = body ? `<div data-slot="alert-dialog-body">${body}</div>` : "";
-    const footerHtml = `
-      <div data-slot="alert-dialog-footer" class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <button data-slot="alert-dialog-cancel" class="inline-flex shrink-0 items-center justify-center rounded-md border border-border bg-clip-padding text-xs font-medium whitespace-nowrap transition-all outline-none select-none h-7 gap-1 px-2 hover:bg-input/50 hover:text-foreground dark:bg-input/30">${cancelLabel}</button>
-        <button data-slot="alert-dialog-action" class="inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-xs font-medium whitespace-nowrap transition-all outline-none select-none h-7 gap-1 px-2 bg-primary text-primary-foreground hover:bg-primary/80">${confirmLabel}</button>
-      </div>`;
     this.innerHTML = `
-      <div data-slot="alert-dialog-content" class="${cn(
-      "group/alert-dialog-content grid w-full gap-3 rounded-xl bg-popover p-4 text-popover-foreground ring-1 ring-foreground/10 data-[size=default]:max-w-xs data-[size=sm]:max-w-64 data-[size=default]:sm:max-w-sm"
-    )}" data-size="default">
-        ${headerHtml}
-        ${contentHtml}
-        ${footerHtml}
+      <div class="relative rounded-xl bg-muted/40 border border-dashed border-border p-8" style="min-height:180px">
+        <span class="absolute top-2 left-3 text-[10px] text-muted-foreground/60 uppercase tracking-wider">Alert Dialog</span>
+        <div class="flex items-center justify-center h-full">
+          <div data-slot="alert-dialog-content" class="w-full max-w-sm rounded-xl bg-popover p-4 ring-1 ring-foreground/10 shadow-lg grid gap-3 text-xs">
+            ${headerHtml}
+            ${contentHtml}
+            <div data-slot="alert-dialog-footer" class="flex justify-end gap-2">
+              <button class="inline-flex items-center justify-center rounded-md border border-border h-7 px-2 text-xs font-medium hover:bg-input/50 dark:bg-input/30">${cancelLabel}</button>
+              <button class="inline-flex items-center justify-center rounded-md border border-transparent h-7 px-2 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/80">${confirmLabel}</button>
+            </div>
+          </div>
+        </div>
       </div>`;
   }
 };
 define("bp-alert-dialog", BpAlertDialog);
 
 // components/bp-drawer.ts
-var sideStyles = {
-  bottom: "inset-x-0 bottom-0 mt-24 max-h-[80vh]",
-  top: "inset-x-0 top-0 mb-24 max-h-[80vh]",
-  left: "inset-y-0 left-0 w-3/4 sm:max-w-sm",
-  right: "inset-y-0 right-0 w-3/4 sm:max-w-sm"
-};
 var BpDrawer = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
@@ -1943,60 +1938,60 @@ var BpDrawer = class extends HTMLElement {
     const side = attr(this, "side", "bottom");
     const body = html(this);
     const isVertical = side === "bottom" || side === "top";
-    const handleHtml = side === "bottom" ? `<div class="mx-auto mt-4 h-1.5 w-[100px] shrink-0 rounded-full bg-muted"></div>` : "";
-    const headerHtml = title || description ? `<div data-slot="drawer-header" class="${cn(
-      "flex flex-col gap-1 p-4",
-      isVertical && "text-center",
-      "md:text-left"
-    )}">
-            ${title ? `<div data-slot="drawer-title" class="font-heading text-sm font-medium text-foreground">${title}</div>` : ""}
-            ${description ? `<div data-slot="drawer-description" class="text-xs/relaxed text-muted-foreground">${description}</div>` : ""}
+    const handleHtml = side === "bottom" ? `<div class="mx-auto mt-2 h-1.5 w-[100px] shrink-0 rounded-full bg-muted"></div>` : "";
+    const headerHtml = title || description ? `<div data-slot="drawer-header" class="${cn("flex flex-col gap-1 p-4", isVertical && "text-center")}">
+            ${title ? `<div data-slot="drawer-title" class="text-sm font-medium">${title}</div>` : ""}
+            ${description ? `<div data-slot="drawer-description" class="text-xs text-muted-foreground">${description}</div>` : ""}
           </div>` : "";
     const contentHtml = body ? `<div data-slot="drawer-body" class="p-4">${body}</div>` : "";
-    const footerSlot = attr(this, "footer");
-    const footerHtml = footerSlot ? `<div data-slot="drawer-footer" class="mt-auto flex flex-col gap-2 p-4">${footerSlot}</div>` : "";
+    const panelClasses = cn(
+      "flex flex-col bg-popover text-xs text-popover-foreground rounded-t-xl border-t border-border",
+      isVertical ? "w-full" : "w-64 h-full border-l border-border rounded-none"
+    );
+    const containerClasses = cn(
+      "relative rounded-xl bg-muted/40 border border-dashed border-border overflow-hidden",
+      isVertical ? "flex flex-col" : "flex"
+    );
+    const mainArea = `<div class="flex-1 flex items-center justify-center p-4 text-xs text-muted-foreground/50">\uD398\uC774\uC9C0 \uC601\uC5ED</div>`;
+    const panel = `<div data-slot="drawer-content" class="${panelClasses}">${handleHtml}${headerHtml}${contentHtml}</div>`;
+    const layout = side === "top" || side === "left" ? `${panel}${mainArea}` : `${mainArea}${panel}`;
     this.innerHTML = `
-      <div data-slot="drawer-content" class="${cn(
-      "flex h-auto flex-col bg-transparent p-2 text-xs/relaxed text-popover-foreground before:absolute before:inset-2 before:-z-10 before:rounded-xl before:border before:border-border before:bg-popover",
-      sideStyles[side] || sideStyles.bottom
-    )}" style="position:relative;">
-        ${handleHtml}
-        ${headerHtml}
-        ${contentHtml}
-        ${footerHtml}
+      <div class="${containerClasses}" style="${isVertical ? "min-height:240px" : "height:240px"}">
+        <span class="absolute top-2 left-3 z-10 text-[10px] text-muted-foreground/60 uppercase tracking-wider">Drawer (${side})</span>
+        ${layout}
       </div>`;
   }
 };
 define("bp-drawer", BpDrawer);
 
 // components/bp-sheet.ts
-var sideStyles2 = {
-  right: "inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
-  left: "inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
-  top: "inset-x-0 top-0 h-auto border-b",
-  bottom: "inset-x-0 bottom-0 h-auto border-t"
-};
 var BpSheet = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const description = attr(this, "description");
     const side = attr(this, "side", "right");
     const body = html(this);
-    const headerHtml = title || description ? `<div data-slot="sheet-header" class="flex flex-col gap-1.5 p-6">
-            ${title ? `<div data-slot="sheet-title" class="font-heading text-sm font-medium text-foreground">${title}</div>` : ""}
-            ${description ? `<div data-slot="sheet-description" class="text-xs/relaxed text-muted-foreground">${description}</div>` : ""}
+    const isHorizontal = side === "left" || side === "right";
+    const headerHtml = title || description ? `<div data-slot="sheet-header" class="flex flex-col gap-1.5 p-4">
+            ${title ? `<div data-slot="sheet-title" class="text-sm font-medium">${title}</div>` : ""}
+            ${description ? `<div data-slot="sheet-description" class="text-xs text-muted-foreground">${description}</div>` : ""}
           </div>` : "";
-    const contentHtml = body ? `<div data-slot="sheet-body" class="p-6">${body}</div>` : "";
-    const footerSlot = attr(this, "footer");
-    const footerHtml = footerSlot ? `<div data-slot="sheet-footer" class="mt-auto flex flex-col gap-2 p-6">${footerSlot}</div>` : "";
+    const contentHtml = body ? `<div data-slot="sheet-body" class="flex-1 p-4">${body}</div>` : "";
+    const panelClasses = cn(
+      "flex flex-col bg-popover text-xs text-popover-foreground shadow-lg",
+      isHorizontal ? "w-64 h-full border-l border-border" : "w-full border-t border-border"
+    );
+    const containerClasses = cn(
+      "relative rounded-xl bg-muted/40 border border-dashed border-border overflow-hidden",
+      isHorizontal ? "flex" : "flex flex-col"
+    );
+    const mainArea = `<div class="flex-1 flex items-center justify-center p-4 text-xs text-muted-foreground/50">\uD398\uC774\uC9C0 \uC601\uC5ED</div>`;
+    const panel = `<div data-slot="sheet-content" data-side="${side}" class="${panelClasses}">${headerHtml}${contentHtml}</div>`;
+    const layout = side === "left" || side === "top" ? `${panel}${mainArea}` : `${mainArea}${panel}`;
     this.innerHTML = `
-      <div data-slot="sheet-content" data-side="${side}" class="${cn(
-      "flex flex-col bg-popover bg-clip-padding text-xs/relaxed text-popover-foreground shadow-lg",
-      sideStyles2[side] || sideStyles2.right
-    )}">
-        ${headerHtml}
-        ${contentHtml}
-        ${footerHtml}
+      <div class="${containerClasses}" style="${isHorizontal ? "height:240px" : "min-height:200px"}">
+        <span class="absolute top-2 left-3 z-10 text-[10px] text-muted-foreground/60 uppercase tracking-wider">Sheet (${side})</span>
+        ${layout}
       </div>`;
   }
 };

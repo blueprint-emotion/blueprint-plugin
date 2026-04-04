@@ -458,16 +458,34 @@
           <bp-sonner title="오류" description="실패했습니다" variant="error"></bp-sonner>
         </div>
 
-        <div class="space-y-2">
+        <div class="space-y-2 col-span-2">
           <h3 class="text-xs font-medium text-muted-foreground uppercase">bp-dialog</h3>
           <bp-dialog title="회원 정보 수정" description="변경할 정보를 입력하세요">
-            <bp-field label="이름"><bp-input placeholder="이름"></bp-input></bp-field>
+            <div class="grid gap-3">
+              <bp-field label="이름">
+                <bp-input placeholder="홍길동"></bp-input>
+              </bp-field>
+              <bp-field label="이메일" description="변경 시 인증 메일이 발송됩니다">
+                <bp-input type="email" placeholder="hong@company.com"></bp-input>
+              </bp-field>
+              <bp-field label="역할">
+                <bp-select placeholder="역할 선택">
+                  <bp-select-item value="admin" label="관리자"></bp-select-item>
+                  <bp-select-item value="editor" label="편집자"></bp-select-item>
+                  <bp-select-item value="viewer" label="뷰어"></bp-select-item>
+                </bp-select>
+              </bp-field>
+              <div class="flex justify-end gap-2 pt-2">
+                <bp-button variant="outline">취소</bp-button>
+                <bp-button>저장</bp-button>
+              </div>
+            </div>
           </bp-dialog>
         </div>
 
-        <div class="space-y-2">
+        <div class="space-y-2 col-span-2">
           <h3 class="text-xs font-medium text-muted-foreground uppercase">bp-alert-dialog</h3>
-          <bp-alert-dialog title="정말 삭제하시겠습니까?" description="이 작업은 되돌릴 수 없습니다." cancel-label="취소" confirm-label="삭제"></bp-alert-dialog>
+          <bp-alert-dialog title="정말 삭제하시겠습니까?" description="이 작업은 되돌릴 수 없습니다. 해당 프로젝트의 모든 데이터가 영구적으로 삭제됩니다." cancel-label="취소" confirm-label="삭제"></bp-alert-dialog>
         </div>
 
         <div class="space-y-2">
@@ -479,31 +497,81 @@
 
         <div class="space-y-2">
           <h3 class="text-xs font-medium text-muted-foreground uppercase">bp-popover</h3>
-          <bp-popover trigger="팝오버 열기">
-            <p class="text-sm font-semibold">팝오버 제목</p>
-            <p class="text-sm text-muted-foreground">팝오버 내용</p>
+          <bp-popover trigger="설정 열기">
+            <div class="grid gap-2">
+              <p class="text-xs font-medium">알림 설정</p>
+              <bp-switch label="이메일 알림" checked="true"></bp-switch>
+              <bp-switch label="SMS 알림"></bp-switch>
+              <bp-switch label="푸시 알림" checked="true"></bp-switch>
+            </div>
           </bp-popover>
         </div>
 
         <div class="space-y-2">
           <h3 class="text-xs font-medium text-muted-foreground uppercase">bp-hover-card</h3>
-          <bp-hover-card trigger="@username">
-            <p class="text-sm font-semibold">사용자 이름</p>
-            <p class="text-sm text-muted-foreground">프론트엔드 개발자</p>
+          <bp-hover-card trigger="@김기획">
+            <div class="flex gap-3">
+              <bp-avatar fallback="김" size="md"></bp-avatar>
+              <div class="space-y-1">
+                <p class="text-sm font-semibold">김기획</p>
+                <p class="text-xs text-muted-foreground">서비스 기획팀 / PM</p>
+                <div class="flex gap-1 pt-1">
+                  <bp-badge variant="secondary">기획</bp-badge>
+                  <bp-badge variant="outline">관리자</bp-badge>
+                </div>
+              </div>
+            </div>
           </bp-hover-card>
         </div>
 
-        <div class="space-y-2">
-          <h3 class="text-xs font-medium text-muted-foreground uppercase">bp-drawer</h3>
+        <div class="space-y-2 col-span-2">
+          <h3 class="text-xs font-medium text-muted-foreground uppercase">bp-drawer (bottom)</h3>
           <bp-drawer title="필터" description="검색 조건을 설정하세요" side="bottom">
-            <p class="text-sm p-2">필터 내용</p>
+            <div class="grid grid-cols-3 gap-3">
+              <bp-field label="카테고리">
+                <bp-select placeholder="전체">
+                  <bp-select-item value="all" label="전체"></bp-select-item>
+                  <bp-select-item value="electronics" label="전자기기"></bp-select-item>
+                </bp-select>
+              </bp-field>
+              <bp-field label="정렬">
+                <bp-select placeholder="최신순">
+                  <bp-select-item value="latest" label="최신순"></bp-select-item>
+                  <bp-select-item value="popular" label="인기순"></bp-select-item>
+                </bp-select>
+              </bp-field>
+              <bp-field label="상태">
+                <bp-select placeholder="전체">
+                  <bp-select-item value="active" label="활성"></bp-select-item>
+                  <bp-select-item value="inactive" label="비활성"></bp-select-item>
+                </bp-select>
+              </bp-field>
+            </div>
           </bp-drawer>
         </div>
 
-        <div class="space-y-2">
-          <h3 class="text-xs font-medium text-muted-foreground uppercase">bp-sheet</h3>
-          <bp-sheet title="상세 정보" description="항목의 세부 정보" side="right">
-            <p class="text-sm">시트 내용</p>
+        <div class="space-y-2 col-span-2">
+          <h3 class="text-xs font-medium text-muted-foreground uppercase">bp-sheet (right)</h3>
+          <bp-sheet title="주문 상세" description="주문번호: ORD-2024-0042" side="right">
+            <div class="space-y-4">
+              <div class="space-y-2">
+                <p class="text-xs font-medium">주문 정보</p>
+                <bp-table>
+                  <table>
+                    <tbody>
+                      <tr><td class="font-medium">상품명</td><td>무선 키보드 MK-700</td></tr>
+                      <tr><td class="font-medium">수량</td><td>2</td></tr>
+                      <tr><td class="font-medium">금액</td><td>89,000원</td></tr>
+                      <tr><td class="font-medium">상태</td><td><bp-badge>배송중</bp-badge></td></tr>
+                    </tbody>
+                  </table>
+                </bp-table>
+              </div>
+              <div class="flex gap-2">
+                <bp-button variant="outline" size="sm">취소 요청</bp-button>
+                <bp-button size="sm">배송 추적</bp-button>
+              </div>
+            </div>
           </bp-sheet>
         </div>
 

@@ -1,4 +1,4 @@
-import { define, attr, html, cn } from "./bp-core";
+import { define, attr, html } from "./bp-core";
 
 class BpDialog extends HTMLElement {
   connectedCallback() {
@@ -9,8 +9,8 @@ class BpDialog extends HTMLElement {
     const headerHtml =
       title || description
         ? `<div data-slot="dialog-header" class="flex flex-col gap-1">
-            ${title ? `<div data-slot="dialog-title" class="font-heading text-sm font-medium">${title}</div>` : ""}
-            ${description ? `<div data-slot="dialog-description" class="text-xs/relaxed text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground">${description}</div>` : ""}
+            ${title ? `<div data-slot="dialog-title" class="text-sm font-medium">${title}</div>` : ""}
+            ${description ? `<div data-slot="dialog-description" class="text-xs text-muted-foreground">${description}</div>` : ""}
           </div>`
         : "";
 
@@ -18,18 +18,15 @@ class BpDialog extends HTMLElement {
       ? `<div data-slot="dialog-body">${body}</div>`
       : "";
 
-    const footerSlot = attr(this, "footer");
-    const footerHtml = footerSlot
-      ? `<div data-slot="dialog-footer" class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">${footerSlot}</div>`
-      : "";
-
     this.innerHTML = `
-      <div data-slot="dialog-content" class="${cn(
-        "grid w-full max-w-[calc(100%-2rem)] gap-4 rounded-xl bg-popover p-4 text-xs/relaxed text-popover-foreground ring-1 ring-foreground/10 sm:max-w-sm"
-      )}">
-        ${headerHtml}
-        ${contentHtml}
-        ${footerHtml}
+      <div class="relative rounded-xl bg-muted/40 border border-dashed border-border p-8" style="min-height:200px">
+        <span class="absolute top-2 left-3 text-[10px] text-muted-foreground/60 uppercase tracking-wider">Dialog</span>
+        <div class="flex items-center justify-center h-full">
+          <div data-slot="dialog-content" class="w-full max-w-sm rounded-xl bg-popover p-4 ring-1 ring-foreground/10 shadow-lg grid gap-4 text-xs">
+            ${headerHtml}
+            ${contentHtml}
+          </div>
+        </div>
       </div>`;
   }
 }

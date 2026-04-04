@@ -1,12 +1,5 @@
 import { define, attr, html, cn } from "./bp-core";
 
-const sideStyles: Record<string, string> = {
-  right: "inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
-  left: "inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
-  top: "inset-x-0 top-0 h-auto border-b",
-  bottom: "inset-x-0 bottom-0 h-auto border-t",
-};
-
 class BpSheet extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
@@ -14,31 +7,43 @@ class BpSheet extends HTMLElement {
     const side = attr(this, "side", "right");
     const body = html(this);
 
+    const isHorizontal = side === "left" || side === "right";
+
     const headerHtml =
       title || description
-        ? `<div data-slot="sheet-header" class="flex flex-col gap-1.5 p-6">
-            ${title ? `<div data-slot="sheet-title" class="font-heading text-sm font-medium text-foreground">${title}</div>` : ""}
-            ${description ? `<div data-slot="sheet-description" class="text-xs/relaxed text-muted-foreground">${description}</div>` : ""}
+        ? `<div data-slot="sheet-header" class="flex flex-col gap-1.5 p-4">
+            ${title ? `<div data-slot="sheet-title" class="text-sm font-medium">${title}</div>` : ""}
+            ${description ? `<div data-slot="sheet-description" class="text-xs text-muted-foreground">${description}</div>` : ""}
           </div>`
         : "";
 
     const contentHtml = body
-      ? `<div data-slot="sheet-body" class="p-6">${body}</div>`
+      ? `<div data-slot="sheet-body" class="flex-1 p-4">${body}</div>`
       : "";
 
-    const footerSlot = attr(this, "footer");
-    const footerHtml = footerSlot
-      ? `<div data-slot="sheet-footer" class="mt-auto flex flex-col gap-2 p-6">${footerSlot}</div>`
-      : "";
+    // Wireframe representation: show a container with the panel on the correct side
+    const panelClasses = cn(
+      "flex flex-col bg-popover text-xs text-popover-foreground shadow-lg",
+      isHorizontal ? "w-64 h-full border-l border-border" : "w-full border-t border-border"
+    );
+
+    const containerClasses = cn(
+      "relative rounded-xl bg-muted/40 border border-dashed border-border overflow-hidden",
+      isHorizontal ? "flex" : "flex flex-col"
+    );
+
+    const mainArea = `<div class="flex-1 flex items-center justify-center p-4 text-xs text-muted-foreground/50">페이지 영역</div>`;
+
+    const panel = `<div data-slot="sheet-content" data-side="${side}" class="${panelClasses}">${headerHtml}${contentHtml}</div>`;
+
+    const layout = (side === "left" || side === "top")
+      ? `${panel}${mainArea}`
+      : `${mainArea}${panel}`;
 
     this.innerHTML = `
-      <div data-slot="sheet-content" data-side="${side}" class="${cn(
-        "flex flex-col bg-popover bg-clip-padding text-xs/relaxed text-popover-foreground shadow-lg",
-        sideStyles[side] || sideStyles.right
-      )}">
-        ${headerHtml}
-        ${contentHtml}
-        ${footerHtml}
+      <div class="${containerClasses}" style="${isHorizontal ? 'height:240px' : 'min-height:200px'}">
+        <span class="absolute top-2 left-3 z-10 text-[10px] text-muted-foreground/60 uppercase tracking-wider">Sheet (${side})</span>
+        ${layout}
       </div>`;
   }
 }
