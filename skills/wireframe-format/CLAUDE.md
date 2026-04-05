@@ -93,4 +93,4 @@
 
 ## 고정 영역
 
-화면 명세에 명시된 고정 영역은 `data-feature`/`data-el` 없이 `<bp-page>`의 header/footer 슬롯에 렌더링.
+화면 명세에 헤더/푸터에 대한 언급이 없으면 기존 헤더/푸터를 건드리지 않는다. 화면 명세에 명시된 고정 영역은 `data-feature`/`data-el` 없이 `<bp-page>`의 header/footer 슬롯에 렌더링.

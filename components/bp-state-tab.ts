@@ -20,9 +20,9 @@ class BpStateTab extends HTMLElement {
           `<button
             data-slot="state-tab-btn"
             data-tab-index="${i}"
-            class="inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all ${
+            class="inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-full px-1.5 py-0.5 text-xs font-medium whitespace-nowrap transition-all ${
               i === 0
-                ? "bg-muted text-foreground"
+                ? "bg-background text-foreground dark:bg-input/30"
                 : "text-foreground/60 hover:text-foreground"
             }"
           >${p.name}</button>`,
@@ -38,7 +38,7 @@ class BpStateTab extends HTMLElement {
 
     this.innerHTML = `
       <div data-slot="bp-state-tab" class="relative flex flex-col rounded-md transition-all">
-        <div data-slot="state-tab-bar" class="absolute -top-4 right-1 z-20 inline-flex items-center gap-0.5 rounded-full border border-dashed border-muted-foreground/50 px-1.5 py-1 opacity-0 transition-opacity">${tabButtons}</div>
+        <div data-slot="state-tab-bar" class="absolute -top-4 right-1 z-20 inline-flex items-center justify-center rounded-full p-[3px] text-muted-foreground bg-muted outline outline-1 outline-dashed outline-offset-0 outline-[color-mix(in_oklch,var(--muted-foreground)_40%,transparent)] opacity-0 transition-opacity">${tabButtons}</div>
         <div data-slot="state-tab-panels">${tabPanels}</div>
       </div>`;
 
@@ -86,9 +86,9 @@ class BpStateTab extends HTMLElement {
           const el = b as HTMLElement;
           if (el.dataset.tabIndex === idx) {
             el.classList.remove("text-foreground/60", "hover:text-foreground");
-            el.classList.add("bg-background", "text-foreground");
+            el.classList.add("bg-background", "text-foreground", "dark:bg-input/30");
           } else {
-            el.classList.remove("bg-background", "text-foreground");
+            el.classList.remove("bg-background", "text-foreground", "dark:bg-input/30");
             el.classList.add("text-foreground/60", "hover:text-foreground");
           }
         }

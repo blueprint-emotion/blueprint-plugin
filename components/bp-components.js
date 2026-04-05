@@ -303,6 +303,8 @@ class BpField extends HTMLElement {
     const label = attr(this, "label");
     const description = attr(this, "description");
     const error = attr(this, "error");
+    if (this.querySelector('[data-slot="field-control"]'))
+      return;
     const fragment = document.createDocumentFragment();
     while (this.firstChild)
       fragment.appendChild(this.firstChild);
@@ -1200,7 +1202,7 @@ define("bp-calendar", BpCalendar);
 // components/bp-tabs.ts
 var tabsRootClasses = "group/tabs flex gap-2 data-horizontal:flex-col";
 var tabsListClasses = "group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none bg-muted";
-var tabsTriggerBase = "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-xs font-medium whitespace-nowrap text-foreground/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start group-data-vertical/tabs:py-[calc(--spacing(1.25))] hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5";
+var tabsTriggerBase = "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border px-1.5 py-0.5 text-xs font-medium whitespace-nowrap text-foreground/60 transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start group-data-vertical/tabs:py-[calc(--spacing(1.25))] hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:text-muted-foreground dark:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5";
 var tabsTriggerLineVariant = "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent";
 var tabsTriggerActiveClasses = "data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/30 dark:data-active:text-foreground";
 var tabsTriggerAfterClasses = "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100";
@@ -1212,19 +1214,28 @@ class BpTab extends HTMLElement {
 
 class BpTabs extends HTMLElement {
   connectedCallback() {
-    const originalHTML = html(this);
-    const temp = document.createElement("div");
-    temp.innerHTML = originalHTML;
-    const tabs = temp.querySelectorAll("bp-tab");
+    const tabs = [];
     let activeIdx = 0;
-    tabs.forEach((tab, i) => {
-      if (tab.hasAttribute("active") && tab.getAttribute("active") !== "false") {
-        activeIdx = i;
+    const children = Array.from(this.children);
+    children.forEach((child, i) => {
+      if (child.tagName.toLowerCase() === "bp-tab") {
+        const label = child.getAttribute("label") || `Tab ${i + 1}`;
+        const active = child.hasAttribute("active") && child.getAttribute("active") !== "false";
+        if (active)
+          activeIdx = tabs.length;
+        const fragment = document.createDocumentFragment();
+        while (child.firstChild)
+          fragment.appendChild(child.firstChild);
+        tabs.push({ label, active, fragment });
       }
     });
+    this.setAttribute("data-slot", "tabs");
+    this.setAttribute("data-orientation", "horizontal");
+    this.setAttribute("data-horizontal", "");
+    this.classList.add(...tabsRootClasses.split(" "));
+    this.style.display = "flex";
     let triggersHTML = "";
     tabs.forEach((tab, i) => {
-      const label = tab.getAttribute("label") || `Tab ${i + 1}`;
       const isActive = i === activeIdx;
       triggersHTML += `<button
         type="button"
@@ -1234,10 +1245,11 @@ class BpTabs extends HTMLElement {
         ${isActive ? 'data-active=""' : ""}
         aria-selected="${isActive}"
         class="${tabsTriggerClasses}"
-      >${label}</button>`;
+        style="border-color:transparent"
+      >${tab.label}</button>`;
     });
     let panelsHTML = "";
-    tabs.forEach((tab, i) => {
+    tabs.forEach((_, i) => {
       const isActive = i === activeIdx;
       panelsHTML += `<div
         data-slot="tabs-content"
@@ -1245,16 +1257,18 @@ class BpTabs extends HTMLElement {
         role="tabpanel"
         class="${tabsContentClasses}"
         style="${isActive ? "" : "display:none"}"
-      >${tab.innerHTML}</div>`;
+      ></div>`;
     });
     this.innerHTML = `
-      <div data-slot="tabs" data-orientation="horizontal" class="${tabsRootClasses}">
-        <div data-slot="tabs-list" data-variant="default" role="tablist" class="${tabsListClasses}">
-          ${triggersHTML}
-        </div>
-        ${panelsHTML}
+      <div data-slot="tabs-list" data-variant="default" role="tablist" class="${tabsListClasses}">
+        ${triggersHTML}
       </div>
+      ${panelsHTML}
     `;
+    tabs.forEach((tab, i) => {
+      const panel = this.querySelector(`[data-slot="tabs-content"][data-tab-index="${i}"]`);
+      panel.appendChild(tab.fragment);
+    });
     this.querySelectorAll("[data-slot='tabs-trigger']").forEach((btn) => {
       btn.addEventListener("click", () => {
         const idx = btn.getAttribute("data-tab-index");
@@ -2065,12 +2079,12 @@ class BpStateTab extends HTMLElement {
     const tabButtons = panels.map((p, i) => `<button
             data-slot="state-tab-btn"
             data-tab-index="${i}"
-            class="inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all ${i === 0 ? "bg-muted text-foreground" : "text-foreground/60 hover:text-foreground"}"
+            class="inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-full px-1.5 py-0.5 text-xs font-medium whitespace-nowrap transition-all ${i === 0 ? "bg-background text-foreground dark:bg-input/30" : "text-foreground/60 hover:text-foreground"}"
           >${p.name}</button>`).join("");
     const tabPanels = panels.map((p, i) => `<div data-slot="state-tab-panel" data-tab-index="${i}" style="${i > 0 ? "display:none" : ""}">${p.content}</div>`).join("");
     this.innerHTML = `
       <div data-slot="bp-state-tab" class="relative flex flex-col rounded-md transition-all">
-        <div data-slot="state-tab-bar" class="absolute -top-4 right-1 z-20 inline-flex items-center gap-0.5 rounded-full border border-dashed border-muted-foreground/50 px-1.5 py-1 opacity-0 transition-opacity">${tabButtons}</div>
+        <div data-slot="state-tab-bar" class="absolute -top-4 right-1 z-20 inline-flex items-center justify-center rounded-full p-[3px] text-muted-foreground bg-muted outline outline-1 outline-dashed outline-offset-0 outline-[color-mix(in_oklch,var(--muted-foreground)_40%,transparent)] opacity-0 transition-opacity">${tabButtons}</div>
         <div data-slot="state-tab-panels">${tabPanels}</div>
       </div>`;
     const root = this.querySelector('[data-slot="bp-state-tab"]');
@@ -2110,9 +2124,9 @@ class BpStateTab extends HTMLElement {
           const el = b;
           if (el.dataset.tabIndex === idx) {
             el.classList.remove("text-foreground/60", "hover:text-foreground");
-            el.classList.add("bg-background", "text-foreground");
+            el.classList.add("bg-background", "text-foreground", "dark:bg-input/30");
           } else {
-            el.classList.remove("bg-background", "text-foreground");
+            el.classList.remove("bg-background", "text-foreground", "dark:bg-input/30");
             el.classList.add("text-foreground/60", "hover:text-foreground");
           }
         }

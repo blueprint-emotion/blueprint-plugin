@@ -6,6 +6,8 @@ class BpField extends HTMLElement {
     const description = attr(this, "description");
     const error = attr(this, "error");
 
+    if (this.querySelector('[data-slot="field-control"]')) return;
+
     const fragment = document.createDocumentFragment();
     while (this.firstChild) fragment.appendChild(this.firstChild);
 
