@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>상품 Q&amp;A 관리</title>
+    <link rel="stylesheet" href="../../../../components/base.css" />
+    <script
+      type="module"
+      src="../../../../components/bp-components.js"
+    ></script>
+    <style type="text/tailwindcss">
+      @custom-variant dark (&:is(.dark *));
+      @theme inline {
+        --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+          "Segoe UI Emoji";
+        --color-background: var(--background);
+        --color-foreground: var(--foreground);
+        --color-card: var(--card);
+        --color-card-foreground: var(--card-foreground);
+        --color-popover: var(--popover);
+        --color-popover-foreground: var(--popover-foreground);
+        --color-primary: var(--primary);
+        --color-primary-foreground: var(--primary-foreground);
+        --color-secondary: var(--secondary);
+        --color-secondary-foreground: var(--secondary-foreground);
+        --color-muted: var(--muted);
+        --color-muted-foreground: var(--muted-foreground);
+        --color-accent: var(--accent);
+        --color-accent-foreground: var(--accent-foreground);
+        --color-destructive: var(--destructive);
+        --color-border: var(--border);
+        --color-input: var(--input);
+        --color-ring: var(--ring);
+        --radius-sm: calc(var(--radius) * 0.6);
+        --radius-md: calc(var(--radius) * 0.8);
+        --radius-lg: var(--radius);
+        --radius-xl: calc(var(--radius) * 1.4);
+        --radius-2xl: calc(var(--radius) * 1.8);
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- @META -->
+    <script type="application/json" id="blueprint-meta">
+      {
+        "generator": "blueprint-wireframe-skill",
+        "version": "2.0",
+        "type": "screen",
+        "screenId": "PRODUCT-QNA-MANAGE",
+        "title": "상품 Q&A 관리",
+        "viewport": "pc",
+        "purpose": "관리자가 상품 문의를 조회하고 답변을 관리하는 화면",
+        "features": [
+          {
+            "featureId": "QNA",
+            "label": "상품 Q&A",
+            "features": [
+              {
+                "featureId": "QNA__LIST",
+                "label": "Q&A 목록",
+                "features": [
+                  {
+                    "featureId": "QNA__LIST__FILTER",
+                    "label": "필터",
+                    "elements": [
+                      {
+                        "id": "TYPE",
+                        "type": "select",
+                        "label": "문의 유형",
+                        "description": "상품문의, 배송문의, 교환/반품, 기타 중 하나를 선택하여 해당 유형의 문의만 목록에 필터링하는 셀렉트 요소. 선택 시 즉시 또는 검색 버튼과 함께 목록이 갱신된다."
+                      },
+                      {
+                        "id": "STATUS",
+                        "type": "select",
+                        "label": "답변 상태",
+                        "description": "미답변 또는 답변완료 상태를 선택하여 해당 상태의 문의만 필터링하는 셀렉트 요소. 관리자가 우선 처리할 미답변 문의를 빠르게 찾는 데 사용된다."
+                      },
+                      {
+                        "id": "PERIOD",
+                        "type": "input",
+                        "label": "기간 설정",
+                        "description": "문의 등록 기간의 시작일과 종료일을 설정하여 해당 기간 내 문의만 조회하는 날짜 입력 영역. 기간 범위 밖의 문의는 목록에서 제외된다."
+                      },
+                      {
+                        "id": "SEARCH",
+                        "type": "input",
+                        "label": "검색어",
+                        "description": "상품명 또는 문의 내용에 포함된 키워드를 입력하는 텍스트 필드. 검색 버튼과 함께 사용하여 특정 상품이나 내용의 문의를 찾는다."
+                      },
+                      {
+                        "id": "SEARCH_BTN",
+                        "type": "button",
+                        "label": "검색 버튼",
+                        "description": "입력된 검색어와 선택된 필터 조건을 기반으로 목록 조회를 실행하는 버튼. 클릭 시 조건에 맞는 문의만 테이블에 표시된다."
+                      },
+                      {
+                        "id": "RESET",
+                        "type": "button",
+                        "label": "초기화 버튼",
+                        "description": "현재 적용된 모든 필터(문의 유형, 답변 상태, 기간, 검색어)를 해제하고 전체 문의 목록으로 되돌리는 초기화 버튼."
+                      }
+                    ]
+                  },
+                  {
+                    "featureId": "QNA__LIST__TABLE",
+                    "label": "목록 테이블",
+                    "elements": [
+                      {
+                        "id": "SELECT_ALL",
+                        "type": "input",
+                        "label": "전체 선택 체크박스",
+                        "description": "테이블 헤더에 위치한 전체 선택 체크박스. 체크 시 현재 페이지의 모든 문의 행이 선택되어 일괄 삭제 등 일괄 작업이 가능해진다."
+                      },
+                      {
+                        "id": "BULK_DELETE",
+                        "type": "button",
+                        "label": "일괄 삭제 버튼",
+                        "description": "체크박스로 선택된 여러 문의를 한 번에 삭제 처리하는 버튼. 스팸이나 중복 문의를 효율적으로 정리하기 위해 사용한다. 선택된 문의가 없으면 비활성 상태이다."
+                      },
+                      {
+                        "id": "TABLE",
+                        "type": "table",
+                        "label": "문의 목록 테이블",
+                        "description": "번호, 문의 유형, 상품명, 문의 내용(요약), 작성자, 등록일, 답변 상태를 컬럼으로 표시하는 데이터 테이블. 행 클릭 시 해당 문의의 상세 내용이 아코디언 형태로 펼쳐진다. 컬럼 헤더 클릭 시 해당 기준으로 오름차순/내림차순 정렬이 토글된다."
+                      },
+                      {
+                        "id": "DETAIL",
+                        "type": "text",
+                        "label": "문의 상세 영역",
+                        "description": "테이블 행 클릭 시 해당 행 아래에 펼쳐지는 상세 내용 영역. 문의 전문, 첨부 이미지, 작성자 정보를 표시하며, 답변 작성/수정/삭제 버튼이 함께 노출된다."
+                      },
+                      {
+                        "id": "PAGINATION",
+                        "type": "button",
+                        "label": "페이지네이션",
+                        "description": "문의 목록의 페이지를 전환하는 하단 네비게이션. 전체 페이지 수와 현재 위치를 표시하며, 이전/다음 페이지로 이동할 수 있다."
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "featureId": "QNA__REPLY",
+                "label": "답변 관리",
+                "elements": [
+                  {
+                    "id": "CONTENT",
+                    "type": "input",
+                    "label": "답변 내용",
+                    "description": "관리자가 고객 문의에 대한 답변을 작성하는 텍스트 영역. 답변 등록 시 문의 상태가 자동으로 '답변완료'로 변경된다. 답변은 1회만 등록 가능하며 등록 후 수정이 가능하다."
+                  },
+                  {
+                    "id": "SUBMIT",
+                    "type": "button",
+                    "label": "답변 등록 버튼",
+                    "description": "작성된 답변을 저장하고 해당 문의의 상태를 '답변완료'로 변경하는 실행 버튼. 클릭 후 답변 입력 영역이 읽기 전용 답변 표시로 전환된다."
+                  },
+                  {
+                    "id": "EDIT",
+                    "type": "button",
+                    "label": "답변 수정 버튼",
+                    "description": "이미 등록된 답변을 수정 모드로 전환하는 버튼. 클릭 시 읽기 전용 답변이 편집 가능한 텍스트 영역으로 바뀐다."
+                  },
+                  {
+                    "id": "DELETE",
+                    "type": "button",
+                    "label": "답변 삭제 버튼",
+                    "description": "등록된 답변을 삭제하고 문의 상태를 '미답변'으로 복원하는 버튼. 삭제 전 확인 다이얼로그가 표시되며, 확인 후 답변이 제거된다."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- @END:META -->
+  </head>
+  <body class="bg-background text-foreground font-sans">
+    <bp-page description>
+      <!-- @SLOT:header -->
+      <div slot="header" class="px-6 py-3 border-b border-border">
+        <div class="flex items-center gap-6">
+          <span class="text-sm font-semibold">상품관리</span>
+          <nav class="flex items-center gap-4 text-sm">
+            <span class="text-muted-foreground">상품 목록</span>
+            <span class="text-muted-foreground">재고 관리</span>
+            <span
+              class="text-foreground font-medium border-b-2 border-primary pb-2.5"
+              >Q&amp;A 관리</span
+            >
+            <span class="text-muted-foreground">리뷰 관리</span>
+          </nav>
+        </div>
+      </div>
+      <!-- @END:header -->
+
+      <!-- QNA -->
+      <bp-section
+        data-feature="QNA"
+        data-label="상품 Q&A"
+        class="flex flex-col flex-1"
+      >
+        <!-- QNA__LIST -->
+        <bp-section
+          data-feature="QNA__LIST"
+          data-label="Q&A 목록"
+          class="flex flex-col flex-1 gap-5"
+        >
+          <!-- @SLOT:toolbar -->
+          <!-- QNA__LIST__FILTER -->
+          <bp-section data-feature="QNA__LIST__FILTER" data-label="필터">
+            <div
+              class="grid grid-cols-[auto_auto_1fr] items-end gap-3 rounded-lg border border-border bg-card p-4"
+            >
+              <div class="flex items-end gap-3">
+                <bp-field label="문의 유형" data-el="TYPE" class="w-32">
+                  <bp-native-select>
+                    <option value="">전체</option>
+                    <option>상품문의</option>
+                    <option>배송문의</option>
+                    <option>교환/반품</option>
+                    <option>기타</option>
+                  </bp-native-select>
+                </bp-field>
+
+                <bp-field label="답변 상태" data-el="STATUS" class="w-28">
+                  <bp-native-select>
+                    <option value="">전체</option>
+                    <option>미답변</option>
+                    <option>답변완료</option>
+                  </bp-native-select>
+                </bp-field>
+
+                <bp-field label="기간" data-el="PERIOD">
+                  <div class="flex items-center gap-1.5">
+                    <bp-input type="text" placeholder="YYYY-MM-DD" value="2026-03-01" />
+                    <span class="text-xs text-muted-foreground">~</span>
+                    <bp-input type="text" placeholder="YYYY-MM-DD" value="2026-04-06" />
+                  </div>
+                </bp-field>
+              </div>
+
+              <div class="flex items-end gap-2">
+                <bp-field label="검색어" data-el="SEARCH" class="w-52">
+                  <bp-input type="text" placeholder="상품명 또는 문의 내용" />
+                </bp-field>
+                <bp-button data-el="SEARCH_BTN">검색</bp-button>
+                <bp-button variant="outline" data-el="RESET">초기화</bp-button>
+              </div>
+            </div>
+          </bp-section>
+          <!-- @END:toolbar -->
+
+          <!-- @SLOT:content -->
+          <!-- QNA__LIST__TABLE -->
+          <bp-section
+            data-feature="QNA__LIST__TABLE"
+            data-label="목록 테이블"
+            class="flex flex-col gap-3"
+          >
+            <bp-state-tab>
+              <div slot="기본">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs text-muted-foreground">총 56건</span>
+                  <bp-button
+                    variant="destructive"
+                    size="sm"
+                    disabled
+                    data-el="BULK_DELETE"
+                    >일괄 삭제</bp-button
+                  >
+                </div>
+
+                <div data-el="TABLE">
+                  <bp-table>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th class="w-10">
+                            <bp-checkbox data-el="SELECT_ALL"></bp-checkbox>
+                          </th>
+                          <th class="w-14">번호</th>
+                          <th class="w-24">유형</th>
+                          <th>상품명</th>
+                          <th>문의 내용</th>
+                          <th class="w-24">작성자</th>
+                          <th class="w-28">등록일</th>
+                          <th class="w-24">상태</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><bp-checkbox></bp-checkbox></td>
+                          <td class="text-muted-foreground">56</td>
+                          <td>
+                            <bp-badge variant="outline">상품문의</bp-badge>
+                          </td>
+                          <td class="text-sm">무선 블루투스 이어폰</td>
+                          <td class="text-sm text-muted-foreground">
+                            배터리 지속시간이 어느 정도...
+                          </td>
+                          <td class="text-sm text-muted-foreground">김**</td>
+                          <td class="text-xs text-muted-foreground">
+                            2026-04-06
+                          </td>
+                          <td>
+                            <bp-badge variant="destructive">미답변</bp-badge>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td><bp-checkbox></bp-checkbox></td>
+                          <td class="text-muted-foreground">55</td>
+                          <td>
+                            <bp-badge variant="outline">배송문의</bp-badge>
+                          </td>
+                          <td class="text-sm">스마트 워치 프로</td>
+                          <td class="text-sm text-muted-foreground">
+                            배송 예정일이 언제인가요...
+                          </td>
+                          <td class="text-sm text-muted-foreground">이**</td>
+                          <td class="text-xs text-muted-foreground">
+                            2026-04-05
+                          </td>
+                          <td>
+                            <bp-badge variant="secondary">답변완료</bp-badge>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td><bp-checkbox></bp-checkbox></td>
+                          <td class="text-muted-foreground">54</td>
+                          <td>
+                            <bp-badge variant="outline">교환/반품</bp-badge>
+                          </td>
+                          <td class="text-sm">USB-C 충전 케이블</td>
+                          <td class="text-sm text-muted-foreground">
+                            불량 제품 교환 요청합니다...
+                          </td>
+                          <td class="text-sm text-muted-foreground">박**</td>
+                          <td class="text-xs text-muted-foreground">
+                            2026-04-04
+                          </td>
+                          <td>
+                            <bp-badge variant="destructive">미답변</bp-badge>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td><bp-checkbox></bp-checkbox></td>
+                          <td class="text-muted-foreground">53</td>
+                          <td><bp-badge variant="outline">기타</bp-badge></td>
+                          <td class="text-sm">노이즈 캔슬링 헤드폰</td>
+                          <td class="text-sm text-muted-foreground">
+                            AS 접수는 어디서 하나요...
+                          </td>
+                          <td class="text-sm text-muted-foreground">최**</td>
+                          <td class="text-xs text-muted-foreground">
+                            2026-04-03
+                          </td>
+                          <td>
+                            <bp-badge variant="secondary">답변완료</bp-badge>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </bp-table>
+                </div>
+
+                <div class="mt-4" data-el="PAGINATION">
+                  <bp-pagination
+                    total="6"
+                    current="1"
+                    siblings="1"
+                  ></bp-pagination>
+                </div>
+              </div>
+
+              <div slot="상세 펼침">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs text-muted-foreground">총 56건</span>
+                  <bp-button
+                    variant="destructive"
+                    size="sm"
+                    disabled
+                    data-el="BULK_DELETE"
+                    >일괄 삭제</bp-button
+                  >
+                </div>
+
+                <div data-el="TABLE">
+                  <bp-table>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th class="w-10">
+                            <bp-checkbox data-el="SELECT_ALL"></bp-checkbox>
+                          </th>
+                          <th class="w-14">번호</th>
+                          <th class="w-24">유형</th>
+                          <th>상품명</th>
+                          <th>문의 내용</th>
+                          <th class="w-24">작성자</th>
+                          <th class="w-28">등록일</th>
+                          <th class="w-24">상태</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="bg-accent/50">
+                          <td><bp-checkbox checked></bp-checkbox></td>
+                          <td class="text-muted-foreground">56</td>
+                          <td>
+                            <bp-badge variant="outline">상품문의</bp-badge>
+                          </td>
+                          <td class="text-sm">무선 블루투스 이어폰</td>
+                          <td class="text-sm text-muted-foreground">
+                            배터리 지속시간이 어느 정도...
+                          </td>
+                          <td class="text-sm text-muted-foreground">김**</td>
+                          <td class="text-xs text-muted-foreground">
+                            2026-04-06
+                          </td>
+                          <td>
+                            <bp-badge variant="destructive">미답변</bp-badge>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </bp-table>
+
+                  <!-- 상세 펼침 영역 -->
+                  <div
+                    class="border border-border rounded-lg mt-1 p-5 bg-card"
+                    data-el="DETAIL"
+                  >
+                    <div class="flex flex-col gap-4">
+                      <div>
+                        <div class="flex items-center gap-2 mb-2">
+                          <bp-badge variant="outline">상품문의</bp-badge>
+                          <span class="text-sm font-medium"
+                            >무선 블루투스 이어폰</span
+                          >
+                          <span class="text-xs text-muted-foreground ml-auto"
+                            >김** | 2026-04-06 14:23</span
+                          >
+                        </div>
+                        <p class="text-sm leading-relaxed">
+                          안녕하세요, 해당 제품의 배터리 지속시간이 어느
+                          정도인지 궁금합니다. 공식 스펙에는 8시간이라고 되어
+                          있는데 실제 사용 시에도 비슷한가요? 그리고 충전 시간은
+                          얼마나 걸리나요?
+                        </p>
+                      </div>
+
+                      <bp-separator></bp-separator>
+
+                      <!-- QNA__REPLY: 미답변 상태 - 답변 작성 -->
+                      <bp-section
+                        data-feature="QNA__REPLY"
+                        data-label="답변 관리"
+                      >
+                        <bp-state-tab>
+                          <div slot="답변 작성">
+                            <div class="flex flex-col gap-3">
+                              <bp-field label="답변 내용" data-el="CONTENT">
+                                <bp-textarea
+                                  rows="4"
+                                  placeholder="고객 문의에 대한 답변을 작성해 주세요."
+                                ></bp-textarea>
+                              </bp-field>
+                              <div class="flex justify-end">
+                                <bp-button data-el="SUBMIT"
+                                  >답변 등록</bp-button
+                                >
+                              </div>
+                            </div>
+                          </div>
+
+                          <div slot="답변 완료">
+                            <div class="flex flex-col gap-3">
+                              <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                  <span class="text-xs font-medium text-primary"
+                                    >관리자 답변</span
+                                  >
+                                  <span class="text-xs text-muted-foreground"
+                                    >2026-04-06 15:30</span
+                                  >
+                                </div>
+                                <p
+                                  class="text-sm leading-relaxed bg-muted/50 rounded-md p-3"
+                                >
+                                  안녕하세요, 해당 제품의 실사용 배터리
+                                  지속시간은 약 7~8시간이며, 완충까지 약
+                                  1.5시간이 소요됩니다. 추가 문의사항이 있으시면
+                                  말씀해 주세요.
+                                </p>
+                              </div>
+                              <div class="flex justify-end gap-2">
+                                <bp-button
+                                  variant="outline"
+                                  size="sm"
+                                  data-el="EDIT"
+                                  >답변 수정</bp-button
+                                >
+                                <bp-button
+                                  variant="destructive"
+                                  size="sm"
+                                  data-el="DELETE"
+                                  >답변 삭제</bp-button
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </bp-state-tab>
+                      </bp-section>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-4" data-el="PAGINATION">
+                  <bp-pagination
+                    total="6"
+                    current="1"
+                    siblings="1"
+                  ></bp-pagination>
+                </div>
+              </div>
+            </bp-state-tab>
+          </bp-section>
+          <!-- @END:content -->
+        </bp-section>
+      </bp-section>
+    </bp-page>
+  </body>
+</html>

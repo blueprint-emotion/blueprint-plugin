@@ -1,4 +1,4 @@
-import { define, attr, boolAttr, html } from "./bp-core";
+import { define, attr, html } from "./bp-core";
 
 class BpRadioGroup extends HTMLElement {
   connectedCallback() {
@@ -42,7 +42,12 @@ class BpRadioGroup extends HTMLElement {
       `;
     });
 
-    this.innerHTML = `<div data-slot="radio-group" role="radiogroup" class="grid w-full gap-3">${itemsHTML}</div>`;
+    // Apply data-slot and classes directly on the custom element (Fix 1)
+    this.setAttribute("data-slot", "radio-group");
+    this.setAttribute("role", "radiogroup");
+    this.classList.add(..."grid w-full gap-3".split(" "));
+    this.style.display = "grid";
+    this.innerHTML = itemsHTML;
 
     // Interaction
     this.querySelectorAll<HTMLButtonElement>("[role='radio']").forEach((btn) => {

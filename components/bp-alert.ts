@@ -22,11 +22,13 @@ class BpAlert extends HTMLElement {
 
     const variantClasses = variants[variant] || variants.default;
 
-    this.innerHTML = `
-      <div data-slot="alert" role="alert" class="${cn(base, variantClasses)}">
-        ${title ? `<div data-slot="alert-title" class="${titleClasses}">${title}</div>` : ""}
-        ${description ? `<div data-slot="alert-description" class="${descriptionClasses}">${description}</div>` : ""}
-      </div>`;
+    this.setAttribute("data-slot", "alert");
+    this.setAttribute("role", "alert");
+    this.classList.add(...cn(base, variantClasses).split(" "));
+    this.style.display = "grid";
+
+    this.innerHTML =
+      `${title ? `<div data-slot="alert-title" class="${titleClasses}">${title}</div>` : ""}${description ? `<div data-slot="alert-description" class="${descriptionClasses}">${description}</div>` : ""}`;
   }
 }
 

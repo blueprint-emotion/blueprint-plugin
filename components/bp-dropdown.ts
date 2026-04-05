@@ -1,12 +1,13 @@
-import { define, attr, html, cn } from "./bp-core";
+import { define, attr, html } from "./bp-core";
 
 /* ── Tailwind classes extracted from .shadcn/ui/dropdown-menu.tsx ── */
 
 const triggerBase =
   "inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium shadow-xs outline-none hover:bg-accent hover:text-accent-foreground";
 
+// DropdownMenuContent: "z-50 max-h-(--available-height) w-(--anchor-width) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 outline-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:overflow-hidden data-closed:fade-out-0 data-closed:zoom-out-95"
 const contentBase =
-  "z-50 max-h-(--available-height) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10";
+  "z-50 max-h-(--available-height) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 outline-none";
 
 const itemBase =
   "group/dropdown-menu-item relative flex min-h-7 cursor-default items-center gap-2 rounded-md px-2 py-1 text-xs/relaxed outline-hidden select-none focus:bg-accent focus:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground data-inset:pl-7.5 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 data-[variant=destructive]:focus:text-destructive dark:data-[variant=destructive]:focus:bg-destructive/20 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5 data-[variant=destructive]:*:[svg]:text-destructive";
@@ -70,15 +71,33 @@ class BpDropdown extends HTMLElement {
       }
     }
 
+    this.setAttribute("data-slot", "dropdown-menu");
+    this.classList.add(..."relative inline-block".split(" "));
+    this.style.display = "inline-block";
+
     this.innerHTML = `
-      <div data-slot="dropdown-menu" class="relative inline-block">
-        <button data-slot="dropdown-menu-trigger" class="${triggerBase}" aria-expanded="true" type="button">
+        <button data-slot="dropdown-menu-trigger" class="${triggerBase}" aria-expanded="false" type="button">
           ${label}${chevronSvg}
         </button>
-        <div data-slot="dropdown-menu-content" role="menu" class="${contentBase}" style="margin-top:4px">
+        <div data-slot="dropdown-menu-content" role="menu" class="${contentBase}" style="margin-top:4px;display:none;position:absolute;left:0;top:100%">
           ${itemsHTML}
-        </div>
-      </div>`;
+        </div>`;
+
+    const trigger = this.querySelector<HTMLElement>('[data-slot="dropdown-menu-trigger"]')!;
+    const content = this.querySelector<HTMLElement>('[data-slot="dropdown-menu-content"]')!;
+
+    trigger.addEventListener("click", () => {
+      const open = content.style.display !== "none";
+      content.style.display = open ? "none" : "";
+      trigger.setAttribute("aria-expanded", String(!open));
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!this.contains(e.target as Node)) {
+        content.style.display = "none";
+        trigger.setAttribute("aria-expanded", "false");
+      }
+    });
   }
 }
 

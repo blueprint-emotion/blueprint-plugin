@@ -1,4 +1,4 @@
-import { define, attr, html, cn } from "./bp-core";
+import { define, attr, cn } from "./bp-core";
 
 /**
  * bp-breadcrumb — Breadcrumb navigation.
@@ -38,12 +38,13 @@ class BpBreadcrumbItem extends HTMLElement {
 
 class BpBreadcrumb extends HTMLElement {
   connectedCallback() {
-    const originalHTML = html(this);
+    // Collect child bp-breadcrumb-item elements before clearing
+    const items = Array.from(this.querySelectorAll("bp-breadcrumb-item"));
 
-    // Parse child bp-breadcrumb-item elements
-    const temp = document.createElement("div");
-    temp.innerHTML = originalHTML;
-    const items = temp.querySelectorAll("bp-breadcrumb-item");
+    // Apply data-slot directly on the custom element (shadcn Breadcrumb is a <nav>)
+    this.setAttribute("data-slot", "breadcrumb");
+    this.setAttribute("aria-label", "breadcrumb");
+    this.setAttribute("role", "navigation");
 
     let listHTML = "";
     items.forEach((item, i) => {
@@ -71,11 +72,9 @@ class BpBreadcrumb extends HTMLElement {
     });
 
     this.innerHTML = `
-      <nav aria-label="breadcrumb" data-slot="breadcrumb">
-        <ol data-slot="breadcrumb-list" class="${breadcrumbListClasses}">
-          ${listHTML}
-        </ol>
-      </nav>
+      <ol data-slot="breadcrumb-list" class="${breadcrumbListClasses}">
+        ${listHTML}
+      </ol>
     `;
   }
 }

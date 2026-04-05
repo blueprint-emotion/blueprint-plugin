@@ -87,14 +87,18 @@ class BpChart extends HTMLElement {
         ).join("")
       : "";
 
+    // Fix 1: Apply data-slot and classes directly on the custom element
+    this.setAttribute("data-slot", "chart");
+    this.classList.add(...containerClasses.split(" "));
+    this.style.display = "flex";
+    this.style.height = `${height}px`;
+
     this.innerHTML = `
-      <div data-slot="chart" class="${containerClasses}" style="height:${height}px">
         <div class="flex flex-col w-full gap-2">
           ${title ? `<div class="text-sm font-medium">${title}</div>` : ""}
           ${chartSvg}
           ${legendItems ? `<div class="${legendClasses}">${legendItems}</div>` : ""}
-        </div>
-      </div>`;
+        </div>`;
   }
 }
 

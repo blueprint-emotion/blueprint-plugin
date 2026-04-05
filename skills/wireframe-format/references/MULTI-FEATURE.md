@@ -25,50 +25,11 @@ toc:
 
 ## 검색/필터
 
-### 와이어프레임 요소
-
-| id | 요소 | type | 설명 |
-|----|------|------|------|
-| CATEGORY | 카테고리 필터 | list | 상품 카테고리 체크박스 목록 |
-| PRICE | 가격 범위 | input | 최소~최대 가격 입력 필드 |
-| APPLY | 필터 적용 버튼 | button | 선택한 조건을 목록에 반영하는 실행 버튼 |
-| RESET | 필터 초기화 | link | 적용된 필터를 모두 해제하는 링크 |
-
-### 상태
-
-| 상태 | 설명 |
-|------|------|
-| 기본 | 모든 필터 비활성, 전체 목록 조회 상태 |
-| 필터 적용 중 | 일부 카테고리 선택, 가격 범위 입력 완료 |
-
-### 인터랙션
-
-- 카테고리 체크 → 목록 조건 즉시 변경
-- 가격 범위 입력 → 필터 적용 버튼 클릭 시 반영
-- 필터 초기화 클릭 → 모든 필터 해제
+(비즈니스 로직 없음 — 화면명세의 Requirement에서 행동 정의)
 
 ## 상품 목록
 
-### 와이어프레임 요소
-
-| id | 요소 | type | 설명 |
-|----|------|------|------|
-| SORT | 정렬 선택 | select | 인기순, 최신순, 가격순 정렬 드롭다운 |
-| CARDS | 상품 카드 | list | 상품 이미지, 이름, 가격, 평점을 보여주는 카드 그리드 |
-| PAGINATION | 페이지네이션 | button | 이전/다음 페이지 이동 버튼 |
-
-### 상태
-
-| 상태 | 설명 |
-|------|------|
-| 기본 | 상품 카드 그리드 표시, 인기순 정렬 |
-| 빈 상태 | "검색 결과가 없습니다" 메시지와 조건 재확인 안내 |
-
-### 인터랙션
-
-- 정렬 변경 → 상품 목록 재정렬
-- 상품 카드 클릭 → 상품 상세 화면으로 이동
-- 페이지 버튼 클릭 → 다음 결과 페이지 조회
+(비즈니스 로직 없음 — 화면명세의 Requirement에서 행동 정의)
 ```
 
 ---
@@ -169,12 +130,38 @@ features: [PRODUCT]
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>상품 목록</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <script src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframes/shared/bp-platform.js"></script>
-
+  <link rel="stylesheet" href="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframes/shared/base.css" />
+  <script type="module" src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframes/shared/bp-components.js"></script>
   <style type="text/tailwindcss">
-    @custom-variant dark (&:where(.dark, .dark *));
+    @custom-variant dark (&:is(.dark *));
+    @theme inline {
+      --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+      --color-background: var(--background);
+      --color-foreground: var(--foreground);
+      --color-card: var(--card);
+      --color-card-foreground: var(--card-foreground);
+      --color-popover: var(--popover);
+      --color-popover-foreground: var(--popover-foreground);
+      --color-primary: var(--primary);
+      --color-primary-foreground: var(--primary-foreground);
+      --color-secondary: var(--secondary);
+      --color-secondary-foreground: var(--secondary-foreground);
+      --color-muted: var(--muted);
+      --color-muted-foreground: var(--muted-foreground);
+      --color-accent: var(--accent);
+      --color-accent-foreground: var(--accent-foreground);
+      --color-destructive: var(--destructive);
+      --color-border: var(--border);
+      --color-input: var(--input);
+      --color-ring: var(--ring);
+      --radius-sm: calc(var(--radius) * 0.6);
+      --radius-md: calc(var(--radius) * 0.8);
+      --radius-lg: var(--radius);
+      --radius-xl: calc(var(--radius) * 1.4);
+      --radius-2xl: calc(var(--radius) * 1.8);
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
   <!-- @META -->
   <script type="application/json" id="blueprint-meta">
@@ -217,180 +204,140 @@ features: [PRODUCT]
   </script>
   <!-- @END:META -->
 </head>
-<body class="bg-zinc-100 dark:bg-zinc-950 p-8">
-  <div class="mx-auto min-w-[1280px] min-h-[calc(100vh-4rem)] flex flex-col rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-
+<body class="bg-background text-foreground font-sans">
+  <bp-page description>
     <!-- @SLOT:header -->
-    <header class="flex h-10 items-center rounded-t-xl border-b border-zinc-200 px-5 dark:border-zinc-700">
-      <span class="text-xs text-zinc-300 dark:text-zinc-600">Header</span>
-    </header>
+    <div slot="header" class="px-6 py-3">
+      <span class="text-xs text-muted-foreground">Header</span>
+    </div>
     <!-- @END:header -->
 
-    <!-- PRODUCT: 루트 feature 래퍼 (elements 없음, features만) -->
-    <div data-feature="PRODUCT" data-label="상품" class="flex flex-1">
+    <!-- @SLOT:footer -->
+    <div slot="footer" class="px-6 py-3">
+      <span class="text-xs text-muted-foreground">Footer</span>
+    </div>
+    <!-- @END:footer -->
+
+    <!-- PRODUCT -->
+    <bp-section data-feature="PRODUCT" data-label="상품" class="flex flex-1">
 
       <!-- @SLOT:sidebar -->
       <!-- PRODUCT__SEARCH_FILTER -->
-      <aside data-feature="PRODUCT__SEARCH_FILTER" data-label="검색/필터"
-             class="w-60 border-r border-zinc-200 p-4 dark:border-zinc-700">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold text-zinc-500 uppercase dark:text-zinc-400">필터</span>
-          <a class="text-xs text-zinc-400 hover:underline dark:text-zinc-500" href="#" data-el="RESET">초기화</a>
-        </div>
-
-        <div class="mt-4 flex flex-col gap-4">
-          <div data-el="CATEGORY">
-            <div class="mb-1.5 text-xs font-medium text-zinc-400 dark:text-zinc-500">카테고리</div>
-            <div class="flex flex-col gap-1.5">
-              <label class="flex items-center gap-2 text-sm"><input class="h-3.5 w-3.5 rounded border-zinc-300 dark:border-zinc-600" type="checkbox" checked disabled /> 전자기기</label>
-              <label class="flex items-center gap-2 text-sm"><input class="h-3.5 w-3.5 rounded border-zinc-300 dark:border-zinc-600" type="checkbox" disabled /> 의류</label>
-              <label class="flex items-center gap-2 text-sm"><input class="h-3.5 w-3.5 rounded border-zinc-300 dark:border-zinc-600" type="checkbox" disabled /> 생활용품</label>
-              <label class="flex items-center gap-2 text-sm"><input class="h-3.5 w-3.5 rounded border-zinc-300 dark:border-zinc-600" type="checkbox" disabled /> 도서</label>
-            </div>
+      <aside class="w-60 border-r border-border p-4">
+        <bp-section data-feature="PRODUCT__SEARCH_FILTER" data-label="검색/필터">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase text-muted-foreground">필터</span>
+            <a class="text-xs text-muted-foreground hover:underline" href="#" data-el="RESET">초기화</a>
           </div>
 
-          <div data-el="PRICE">
-            <div class="mb-1.5 text-xs font-medium text-zinc-400 dark:text-zinc-500">가격 범위</div>
-            <div class="flex items-center gap-1.5">
-              <input class="h-8 w-full rounded-md border border-zinc-200 bg-transparent px-2 text-xs dark:border-zinc-700" type="text" value="30,000" readonly />
-              <span class="text-xs text-zinc-300 dark:text-zinc-600">~</span>
-              <input class="h-8 w-full rounded-md border border-zinc-200 bg-transparent px-2 text-xs dark:border-zinc-700" type="text" value="200,000" readonly />
+          <div class="mt-4 flex flex-col gap-4">
+            <div data-el="CATEGORY">
+              <div class="mb-1.5 text-xs font-medium text-muted-foreground">카테고리</div>
+              <div class="flex flex-col gap-1.5">
+                <bp-checkbox label="전자기기" checked></bp-checkbox>
+                <bp-checkbox label="의류"></bp-checkbox>
+                <bp-checkbox label="생활용품"></bp-checkbox>
+                <bp-checkbox label="도서"></bp-checkbox>
+              </div>
             </div>
-          </div>
 
-          <button class="h-8 rounded-md bg-zinc-800 text-xs font-medium text-white dark:bg-zinc-200 dark:text-zinc-900" data-el="APPLY">
-            필터 적용
-          </button>
-        </div>
+            <div data-el="PRICE">
+              <div class="mb-1.5 text-xs font-medium text-muted-foreground">가격 범위</div>
+              <div class="flex items-center gap-1.5">
+                <bp-input type="text" value="30,000" />
+                <span class="text-xs text-muted-foreground">~</span>
+                <bp-input type="text" value="200,000" />
+              </div>
+            </div>
+
+            <bp-button data-el="APPLY">필터 적용</bp-button>
+          </div>
+        </bp-section>
       </aside>
       <!-- @END:sidebar -->
 
       <!-- @SLOT:content -->
-      <!-- PRODUCT__LIST: data-state로 상태 탭 자동 생성 -->
+      <!-- PRODUCT__LIST: bp-state-tab으로 상태 전환 -->
       <main class="flex-1 p-5">
-        <div data-feature="PRODUCT__LIST" data-label="상품 목록">
+        <bp-section data-feature="PRODUCT__LIST" data-label="상품 목록">
+          <bp-state-tab>
 
-          <div data-state="기본">
-            <div class="mb-4 flex items-center justify-between">
-              <span class="text-xs text-zinc-400 dark:text-zinc-500">총 128개 상품</span>
-              <div data-el="SORT">
-                <select class="h-8 rounded-md border border-zinc-200 bg-transparent px-2 text-xs dark:border-zinc-700" disabled>
-                  <option>인기순</option>
-                  <option>최신순</option>
-                  <option>가격 낮은순</option>
-                  <option>가격 높은순</option>
-                </select>
+            <div slot="기본">
+              <div class="mb-4 flex items-center justify-between">
+                <span class="text-xs text-muted-foreground">총 128개 상품</span>
+                <div data-el="SORT">
+                  <bp-native-select>
+                    <option>인기순</option>
+                    <option>최신순</option>
+                    <option>가격 낮은순</option>
+                    <option>가격 높은순</option>
+                  </bp-native-select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-4 gap-3" data-el="CARDS">
+                <bp-card>
+                  <bp-image ratio="4/3"></bp-image>
+                  <div class="mt-2 flex flex-col gap-0.5">
+                    <span class="text-sm font-medium">무선 블루투스 이어폰</span>
+                    <span class="text-xs text-muted-foreground">&#8361;45,000</span>
+                    <span class="text-[11px] text-muted-foreground/50">&#9733;&#9733;&#9733;&#9733;&#9734; (234)</span>
+                  </div>
+                </bp-card>
+                <bp-card>
+                  <bp-image ratio="4/3"></bp-image>
+                  <div class="mt-2 flex flex-col gap-0.5">
+                    <span class="text-sm font-medium">스마트 워치 프로</span>
+                    <span class="text-xs text-muted-foreground">&#8361;189,000</span>
+                    <span class="text-[11px] text-muted-foreground/50">&#9733;&#9733;&#9733;&#9733;&#9733; (89)</span>
+                  </div>
+                </bp-card>
+                <bp-card>
+                  <bp-image ratio="4/3"></bp-image>
+                  <div class="mt-2 flex flex-col gap-0.5">
+                    <span class="text-sm font-medium">USB-C 충전 케이블</span>
+                    <span class="text-xs text-muted-foreground">&#8361;12,900</span>
+                    <span class="text-[11px] text-muted-foreground/50">&#9733;&#9733;&#9733;&#9733;&#9734; (1,024)</span>
+                  </div>
+                </bp-card>
+                <bp-card>
+                  <bp-image ratio="4/3"></bp-image>
+                  <div class="mt-2 flex flex-col gap-0.5">
+                    <span class="text-sm font-medium">노이즈 캔슬링 헤드폰</span>
+                    <span class="text-xs text-muted-foreground">&#8361;320,000</span>
+                    <span class="text-[11px] text-muted-foreground/50">&#9733;&#9733;&#9733;&#9733;&#9733; (567)</span>
+                  </div>
+                </bp-card>
+              </div>
+
+              <div class="mt-5" data-el="PAGINATION">
+                <bp-pagination total="12" current="1" siblings="1"></bp-pagination>
               </div>
             </div>
 
-            <div class="grid grid-cols-4 gap-3" data-el="CARDS">
-              <div class="rounded-lg border border-zinc-100 p-2.5 dark:border-zinc-800">
-                <div class="aspect-[4/3] rounded-md bg-zinc-100 dark:bg-zinc-800"></div>
-                <div class="mt-2 flex flex-col gap-0.5">
-                  <span class="text-sm font-medium">무선 블루투스 이어폰</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400">&#8361;45,000</span>
-                  <span class="text-[11px] text-zinc-300 dark:text-zinc-600">&#9733;&#9733;&#9733;&#9733;&#9734; (234)</span>
+            <div slot="결과 없음">
+              <div class="mb-4 flex items-center justify-between">
+                <span class="text-xs text-muted-foreground">총 0개 상품</span>
+                <div data-el="SORT">
+                  <bp-native-select>
+                    <option>인기순</option>
+                  </bp-native-select>
                 </div>
               </div>
-              <div class="rounded-lg border border-zinc-100 p-2.5 dark:border-zinc-800">
-                <div class="aspect-[4/3] rounded-md bg-zinc-100 dark:bg-zinc-800"></div>
-                <div class="mt-2 flex flex-col gap-0.5">
-                  <span class="text-sm font-medium">스마트 워치 프로</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400">&#8361;189,000</span>
-                  <span class="text-[11px] text-zinc-300 dark:text-zinc-600">&#9733;&#9733;&#9733;&#9733;&#9733; (89)</span>
-                </div>
-              </div>
-              <div class="rounded-lg border border-zinc-100 p-2.5 dark:border-zinc-800">
-                <div class="aspect-[4/3] rounded-md bg-zinc-100 dark:bg-zinc-800"></div>
-                <div class="mt-2 flex flex-col gap-0.5">
-                  <span class="text-sm font-medium">USB-C 충전 케이블</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400">&#8361;12,900</span>
-                  <span class="text-[11px] text-zinc-300 dark:text-zinc-600">&#9733;&#9733;&#9733;&#9733;&#9734; (1,024)</span>
-                </div>
-              </div>
-              <div class="rounded-lg border border-zinc-100 p-2.5 dark:border-zinc-800">
-                <div class="aspect-[4/3] rounded-md bg-zinc-100 dark:bg-zinc-800"></div>
-                <div class="mt-2 flex flex-col gap-0.5">
-                  <span class="text-sm font-medium">노이즈 캔슬링 헤드폰</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400">&#8361;320,000</span>
-                  <span class="text-[11px] text-zinc-300 dark:text-zinc-600">&#9733;&#9733;&#9733;&#9733;&#9733; (567)</span>
-                </div>
-              </div>
-              <div class="rounded-lg border border-zinc-100 p-2.5 dark:border-zinc-800">
-                <div class="aspect-[4/3] rounded-md bg-zinc-100 dark:bg-zinc-800"></div>
-                <div class="mt-2 flex flex-col gap-0.5">
-                  <span class="text-sm font-medium">미니 보조 배터리</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400">&#8361;29,900</span>
-                  <span class="text-[11px] text-zinc-300 dark:text-zinc-600">&#9733;&#9733;&#9733;&#9734;&#9734; (412)</span>
-                </div>
-              </div>
-              <div class="rounded-lg border border-zinc-100 p-2.5 dark:border-zinc-800">
-                <div class="aspect-[4/3] rounded-md bg-zinc-100 dark:bg-zinc-800"></div>
-                <div class="mt-2 flex flex-col gap-0.5">
-                  <span class="text-sm font-medium">기계식 텐키리스 키보드</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400">&#8361;89,000</span>
-                  <span class="text-[11px] text-zinc-300 dark:text-zinc-600">&#9733;&#9733;&#9733;&#9733;&#9734; (178)</span>
-                </div>
-              </div>
-              <div class="rounded-lg border border-zinc-100 p-2.5 dark:border-zinc-800">
-                <div class="aspect-[4/3] rounded-md bg-zinc-100 dark:bg-zinc-800"></div>
-                <div class="mt-2 flex flex-col gap-0.5">
-                  <span class="text-sm font-medium">무선 충전 패드</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400">&#8361;25,000</span>
-                  <span class="text-[11px] text-zinc-300 dark:text-zinc-600">&#9733;&#9733;&#9733;&#9734;&#9734; (98)</span>
-                </div>
-              </div>
-              <div class="rounded-lg border border-zinc-100 p-2.5 dark:border-zinc-800">
-                <div class="aspect-[4/3] rounded-md bg-zinc-100 dark:bg-zinc-800"></div>
-                <div class="mt-2 flex flex-col gap-0.5">
-                  <span class="text-sm font-medium">포터블 블루투스 스피커</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400">&#8361;67,000</span>
-                  <span class="text-[11px] text-zinc-300 dark:text-zinc-600">&#9733;&#9733;&#9733;&#9733;&#9734; (312)</span>
-                </div>
+
+              <div data-el="CARDS">
+                <bp-empty icon="search" title="검색 결과가 없습니다" description="현재 필터 조건을 다시 확인하거나 일부 조건을 해제해 보세요."></bp-empty>
               </div>
             </div>
 
-            <div class="mt-5 flex items-center justify-center gap-1.5" data-el="PAGINATION">
-              <button class="h-8 rounded-md border border-zinc-200 px-2.5 text-xs text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">이전</button>
-              <button class="h-8 w-8 rounded-md bg-zinc-800 text-xs font-medium text-white dark:bg-zinc-200 dark:text-zinc-900">1</button>
-              <button class="h-8 w-8 text-xs text-zinc-400 dark:text-zinc-500">2</button>
-              <button class="h-8 w-8 text-xs text-zinc-400 dark:text-zinc-500">3</button>
-              <span class="text-xs text-zinc-300 dark:text-zinc-600">...</span>
-              <button class="h-8 w-8 text-xs text-zinc-400 dark:text-zinc-500">12</button>
-              <button class="h-8 rounded-md border border-zinc-200 px-2.5 text-xs text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">다음</button>
-            </div>
-          </div>
-
-          <div data-state="결과 없음">
-            <div class="mb-4 flex items-center justify-between">
-              <span class="text-xs text-zinc-400 dark:text-zinc-500">총 0개 상품</span>
-              <div data-el="SORT">
-                <select class="h-8 rounded-md border border-zinc-200 bg-transparent px-2 text-xs dark:border-zinc-700" disabled>
-                  <option>인기순</option>
-                </select>
-              </div>
-            </div>
-
-            <div data-el="CARDS" class="rounded-lg border border-dashed border-zinc-200 p-10 text-center dark:border-zinc-700">
-              <div class="mx-auto h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-800"></div>
-              <div class="mt-3 text-sm font-medium text-zinc-500 dark:text-zinc-400">검색 결과가 없습니다</div>
-              <p class="mt-1 text-xs text-zinc-400 dark:text-zinc-500">현재 필터 조건을 다시 확인하거나 일부 조건을 해제해 보세요.</p>
-            </div>
-          </div>
-
-        </div>
+          </bp-state-tab>
+        </bp-section>
       </main>
       <!-- @END:content -->
 
-    </div>
+    </bp-section>
 
-    <!-- @SLOT:footer -->
-    <footer class="flex h-10 items-center rounded-b-xl border-t border-zinc-200 px-5 dark:border-zinc-700">
-      <span class="text-xs text-zinc-300 dark:text-zinc-600">Footer</span>
-    </footer>
-    <!-- @END:footer -->
-
-  </div>
+  </bp-page>
 </body>
 </html>
 ```
@@ -404,11 +351,13 @@ features: [PRODUCT]
 | 한 도메인에 여러 L1 기능 | `PRODUCT` 도메인 안에 `SEARCH_FILTER`, `LIST` 두 기능 |
 | featureId 파생 | `domain: PRODUCT` + `id: SEARCH_FILTER` → `PRODUCT__SEARCH_FILTER` |
 | 두 영역 레이아웃 | 사이드바(`SEARCH_FILTER`) + 메인(`LIST`). 메인이 시각적 중심 |
-| 캔버스 프레임 | `bg-zinc-100 p-8` + `rounded-xl border shadow-sm` 컨테이너 |
-| 고정 영역 | 헤더/푸터에 `data-feature` 없음. 기본 라벨만 표시 |
-| 상태 탭 (data-state) | `LIST`에 `data-state="기본"`, `data-state="결과 없음"` — bp-platform.js가 자동 탭 생성 |
+| bp-page 프레임 | `<bp-page description>` — 메타바 + aside 패널 자동 구성 |
+| 고정 영역 | `slot="header"` / `slot="footer"` — `data-feature` 없음. 기본 라벨만 |
+| 모든 feature는 `<bp-section>` | `PRODUCT`, `SEARCH_FILTER`, `LIST` 모두 `<bp-section>` |
+| 상태 탭 (bp-state-tab) | `LIST`에 `slot="기본"`, `slot="결과 없음"` — 컴포넌트가 자동 탭 생성 |
+| bp-* 컴포넌트 사용 | `<bp-checkbox>`, `<bp-input>`, `<bp-button>`, `<bp-native-select>`, `<bp-card>`, `<bp-image>`, `<bp-pagination>`, `<bp-empty>` |
 | element는 짧은 키 | `data-el="CATEGORY"`, `data-el="SORT"` — 각각 부모 feature 스코프 내 유니크 |
 | 상태 패널 내 data-el 재사용 | `SORT`, `CARDS`가 두 패널에 존재 — 상호배타이므로 허용 |
 | description은 비즈니스 의미 | "사용자가 관심 상품 카테고리만 남기도록…" — 단순 라벨이 아닌 역할 설명 |
-| bp-platform.js | 호버 하이라이트 + 상태 탭 자동 처리. `<style>`에는 다크모드만 |
+| 시맨틱 색상 | `text-muted-foreground`, `border-border` — raw zinc 사용 안 함 |
 | 화면 참조 문법 | `@PRODUCT/SEARCH_FILTER`, `@PRODUCT/LIST` |

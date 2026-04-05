@@ -69,10 +69,6 @@
     "Feature": {
       "type": "object",
       "required": ["featureId", "label"],
-      "anyOf": [
-        { "required": ["elements"] },
-        { "required": ["features"] }
-      ],
       "properties": {
         "featureId": {
           "type": "string",

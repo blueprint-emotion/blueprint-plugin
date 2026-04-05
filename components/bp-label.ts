@@ -7,10 +7,11 @@ class BpLabel extends HTMLElement {
     const base =
       "flex items-center gap-2 text-xs/relaxed leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50";
 
-    this.innerHTML = `<label
-      data-slot="label"
-      class="${cn(base)}"
-    >${text}</label>`;
+    this.setAttribute("data-slot", "label");
+    this.classList.add(...base.split(" "));
+    this.style.display = "flex";
+
+    this.textContent = text;
   }
 }
 

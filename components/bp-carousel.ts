@@ -1,12 +1,10 @@
-import { define, html } from "./bp-core";
+import { define } from "./bp-core";
 
 class BpCarousel extends HTMLElement {
   connectedCallback() {
+    // Collect slides from children before clearing
     const slides = Array.from(this.children);
-    const body = slides.map((child) => child.outerHTML).join("");
 
-    // shadcn: Carousel root
-    const rootClasses = "relative";
     // shadcn: CarouselContent wrapper
     const overflowClasses = "overflow-hidden";
     // shadcn: CarouselContent inner (horizontal)
@@ -28,8 +26,14 @@ class BpCarousel extends HTMLElement {
     const chevronLeft = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
     const chevronRight = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 
+    // Fix 1: Apply data-slot and classes directly on the custom element
+    this.setAttribute("data-slot", "carousel");
+    this.classList.add(..."relative".split(" "));
+    this.setAttribute("role", "region");
+    this.setAttribute("aria-roledescription", "carousel");
+    this.style.display = "block";
+
     this.innerHTML = `
-      <div data-slot="carousel" class="${rootClasses}" role="region" aria-roledescription="carousel">
         <div data-slot="carousel-content" class="${overflowClasses}">
           <div class="${contentClasses}">
             ${slideItems}
@@ -42,8 +46,7 @@ class BpCarousel extends HTMLElement {
         <button data-slot="carousel-next" class="${nextClasses} inline-flex items-center justify-center size-7 rounded-full border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground">
           ${chevronRight}
           <span class="sr-only">Next slide</span>
-        </button>
-      </div>`;
+        </button>`;
   }
 }
 

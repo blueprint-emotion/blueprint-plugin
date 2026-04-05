@@ -1,4 +1,4 @@
-import { define, attr, boolAttr, cn, html } from "./bp-core";
+import { define, attr, boolAttr, cn } from "./bp-core";
 
 /**
  * bp-accordion — shadcn accordion as web components.
@@ -16,9 +16,9 @@ import { define, attr, boolAttr, cn, html } from "./bp-core";
 
 class BpAccordion extends HTMLElement {
   connectedCallback() {
-    const body = html(this);
-    // AccordionPrimitive.Root: "flex w-full flex-col overflow-hidden rounded-md border"
-    this.innerHTML = `<div data-slot="accordion" class="flex w-full flex-col overflow-hidden rounded-md border">${body}</div>`;
+    this.setAttribute("data-slot", "accordion");
+    this.classList.add(..."flex w-full flex-col overflow-hidden rounded-md border".split(" "));
+    this.style.display = "flex";
   }
 }
 
@@ -26,55 +26,51 @@ define("bp-accordion", BpAccordion);
 
 /* ── AccordionItem ── */
 
+const triggerClass = "group/accordion-trigger relative flex flex-1 items-start justify-between gap-6 border p-2 text-left text-xs/relaxed font-medium transition-all outline-none hover:underline aria-disabled:pointer-events-none aria-disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 **:data-[slot=accordion-trigger-icon]:text-muted-foreground";
+
+const panelClass = "overflow-hidden px-2 text-xs/relaxed";
+
+const innerClass = "pt-0 pb-4 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4";
+
 class BpAccordionItem extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const open = boolAttr(this, "open");
-    const body = html(this);
 
-    // AccordionItem: "not-last:border-b data-open:bg-muted/50"
-    const itemClass = cn(
-      "not-last:border-b",
-      open && "bg-muted/50"
-    );
+    const fragment = document.createDocumentFragment();
+    while (this.firstChild) fragment.appendChild(this.firstChild);
 
-    // AccordionTrigger header wrapper: "flex"
-    // AccordionTrigger: "group/accordion-trigger relative flex flex-1 items-start justify-between gap-6 border border-transparent p-2 text-left text-xs/relaxed font-medium transition-all outline-none hover:underline aria-disabled:pointer-events-none aria-disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 **:data-[slot=accordion-trigger-icon]:text-muted-foreground"
-    const triggerClass = "group/accordion-trigger relative flex flex-1 items-start justify-between gap-6 border border-transparent p-2 text-left text-xs/relaxed font-medium transition-all outline-none hover:underline aria-disabled:pointer-events-none aria-disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 **:data-[slot=accordion-trigger-icon]:text-muted-foreground";
+    // Style the custom element itself so :not(:last-child) works among siblings
+    this.style.display = "block";
+    this.setAttribute("data-slot", "accordion-item");
+    this.classList.add("not-last:border-b");
+    if (open) this.classList.add("bg-muted/50");
 
-    // Chevron icons: collapsed = ChevronDown visible, expanded = ChevronUp visible
-    // ChevronDownIcon: "pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
-    // ChevronUpIcon: "pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
     const chevronDown = `<svg data-slot="accordion-trigger-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none shrink-0 ${open ? "hidden" : ""}"><path d="m6 9 6 6 6-6"/></svg>`;
     const chevronUp = `<svg data-slot="accordion-trigger-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none shrink-0 ${open ? "" : "hidden"}"><path d="m18 15-6-6-6 6"/></svg>`;
-
-    // AccordionContent panel: "overflow-hidden px-2 text-xs/relaxed data-open:animate-accordion-down data-closed:animate-accordion-up"
-    const panelClass = "overflow-hidden px-2 text-xs/relaxed";
-
-    // AccordionContent inner div: "h-(--accordion-panel-height) pt-0 pb-4 data-ending-style:h-0 data-starting-style:h-0 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4"
-    const innerClass = "pt-0 pb-4 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4";
 
     const id = `bp-acc-${Math.random().toString(36).slice(2, 8)}`;
 
     this.innerHTML = `
-      <div data-slot="accordion-item" class="${itemClass}">
-        <div class="flex">
-          <button
-            data-slot="accordion-trigger"
-            class="${triggerClass}"
-            aria-expanded="${open}"
-            aria-controls="${id}"
-            onclick="this.closest('bp-accordion-item').toggle()"
-          >
-            <span>${title}</span>
-            ${chevronDown}
-            ${chevronUp}
-          </button>
-        </div>
-        <div id="${id}" data-slot="accordion-content" class="${panelClass}" style="${open ? "" : "display:none"}">
-          <div class="${innerClass}">${body}</div>
-        </div>
+      <div class="flex">
+        <button
+          data-slot="accordion-trigger"
+          class="${triggerClass}"
+          aria-expanded="${open}"
+          aria-controls="${id}"
+          style="border-color:transparent"
+          onclick="this.closest('bp-accordion-item').toggle()"
+        >
+          <span>${title}</span>
+          ${chevronDown}
+          ${chevronUp}
+        </button>
+      </div>
+      <div id="${id}" data-slot="accordion-content" class="${panelClass}" style="${open ? "" : "display:none"}">
+        <div class="${innerClass}" data-slot="accordion-body"></div>
       </div>`;
+
+    this.querySelector('[data-slot="accordion-body"]')!.appendChild(fragment);
   }
 
   toggle() {
@@ -86,11 +82,8 @@ class BpAccordionItem extends HTMLElement {
     trigger.setAttribute("aria-expanded", String(!expanded));
     content.style.display = expanded ? "none" : "";
 
-    // Toggle bg-muted/50 on item wrapper
-    const item = this.querySelector("[data-slot='accordion-item']") as HTMLElement;
-    if (item) {
-      item.classList.toggle("bg-muted/50", !expanded);
-    }
+    // Toggle bg-muted/50 on this element directly
+    this.classList.toggle("bg-muted/50", !expanded);
 
     // Toggle chevron visibility
     const svgs = trigger.querySelectorAll("svg");

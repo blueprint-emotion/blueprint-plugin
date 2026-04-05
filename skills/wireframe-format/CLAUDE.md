@@ -3,8 +3,8 @@
 ## DOM 구조
 
 - feature 컨테이너는 **중첩**한다 (상위가 하위를 감쌈)
-- 호버는 bp-platform.js가 가장 깊은 feature만 강조 — 별도 CSS 불필요
 - 메타데이터 JSON의 계층 구조와 DOM 중첩이 1:1 대응
+- 모든 feature → `<bp-section data-feature="..." data-label="...">` — elements와 하위 features 공존 가능
 
 ## 속성 규칙
 
@@ -12,37 +12,63 @@
 |------|------|------|
 | `data-feature` | feature 컨테이너 | featureId 값. 호버 강조 + 코멘트 앵커 |
 | `data-label` | feature 컨테이너 | 한국어 표시명 (코멘트 UI용) |
-| `data-el` | 개별 UI 요소 | ELEMENT_ID 짧은 키. 부모 `data-feature` 스코프 내 유니크. 플랫폼이 `closest('[data-feature]')` + `data-el`로 전체 ID 조합 |
+| `data-el` | 개별 UI 요소 | ELEMENT_ID 짧은 키. 부모 `data-feature` 스코프 내 유니크 |
 
-### `data-el` 래핑 규칙
+### `data-el` 배치 규칙
 
-레이블이 있는 요소는 **가능하면 래퍼 `<div data-el>`로 레이블과 입력을 함께 감싼다.**
-레이블 없이 단독인 버튼·링크는 요소 자체에 `data-el`.
+- 레이블 입력 → `<bp-field data-el="...">`로 래핑
+- 단독 버튼/링크 → 요소 자체에 `data-el`
+- 복합 영역 → `<div data-el="...">`
 
 ```html
-<!-- 중첩 DOM 예시 -->
-<div data-feature="AUTH" data-label="인증">
-  <div data-feature="AUTH__LOGIN" data-label="로그인">
-    <div data-feature="AUTH__LOGIN__EMAIL_LOGIN" data-label="이메일 로그인">
-      <input data-el="EMAIL" placeholder="이메일" />
-      <button data-el="SUBMIT">로그인</button>
+<bp-section data-feature="AUTH" data-label="인증">
+  <bp-section data-feature="AUTH__LOGIN" data-label="로그인">
+    <bp-field label="이메일" data-el="EMAIL">
+      <bp-input type="email" placeholder="이메일" />
+    </bp-field>
+    <bp-button data-el="SUBMIT">로그인</bp-button>
 
-      <div data-feature="AUTH__LOGIN__EMAIL_LOGIN__MFA" data-label="2단계 인증">
-        <input data-el="CODE" placeholder="인증 코드" />
-        <button data-el="VERIFY">인증 확인</button>
-      </div>
-    </div>
-  </div>
-</div>
+    <bp-section data-feature="AUTH__LOGIN__MFA" data-label="2단계 인증">
+      <bp-input-otp length="6" data-el="CODE"></bp-input-otp>
+      <bp-button data-el="VERIFY">인증 확인</bp-button>
+    </bp-section>
+  </bp-section>
+</bp-section>
 ```
 
-## 플랫폼 스크립트 (bp-platform.js)
+## 컴포넌트 시스템
 
-`bp-platform.js`가 호버 하이라이트와 상태 탭을 자동 처리한다.
+`bp-*` 웹 컴포넌트 라이브러리를 사용한다. Head에 `base.css` + `bp-components.js` + Tailwind CDN 포함.
 
-- 호버: `data-feature`, `data-el`에 인디고 outline 자동 주입
-- 상태 탭: `data-state` 직접 자식이 2개 이상이면 탭 자동 생성
-- `<style>` 블록에 호버 CSS나 `:has()` 규칙 불필요 — 다크모드 설정 + Tailwind로 표현 불가한 최소 커스텀 CSS만 포함
+- UI 요소는 `bp-*` 컴포넌트 사용 (raw `<input>`, `<button>` 금지)
+- 색상은 시맨틱 토큰 (`bg-primary`, `text-foreground`, `bg-muted` 등)
+- raw 색상 (`bg-zinc-*`, `text-red-*` 등) 사용 금지
+- 다크모드: `base.css`가 자동 처리. 수동 `dark:` 접두사 불필요
+
+## 상태 탭
+
+`<bp-state-tab>` 컴포넌트로 상태 전환. 자식에 `slot="상태명"` 사용:
+
+```html
+<bp-state-tab>
+  <div slot="기본">기본 상태 UI</div>
+  <div slot="에러">에러 상태 UI</div>
+</bp-state-tab>
+```
+
+## 화면 프레임
+
+`<bp-page>` 컴포넌트가 셸 자동 구성:
+
+```html
+<body class="bg-background text-foreground font-sans">
+  <bp-page description>
+    <div slot="header" class="px-6 py-3">Header</div>
+    <div slot="footer" class="px-6 py-3">Footer</div>
+    <!-- 메인 콘텐츠 -->
+  </bp-page>
+</body>
+```
 
 ## 메타데이터 (`blueprint-meta`)
 
@@ -57,29 +83,14 @@
   "title": "로그인",
   "viewport": "pc",
   "purpose": "화면 목적 설명",
-  "features": [
-    {
-      "featureId": "AUTH",
-      "label": "인증",
-      "features": [
-        {
-          "featureId": "AUTH__LOGIN",
-          "label": "로그인",
-          "elements": [
-            { "id": "EMAIL", "type": "input", "label": "이메일", "description": "역할 설명" }
-          ],
-          "features": [ ... ]
-        }
-      ]
-    }
-  ]
+  "features": [...]
 }
 ```
 
 - `features[]`는 재귀 (하위 feature 중첩)
-- 각 feature에 `elements` 또는 `features` 중 최소 하나
+- 각 feature에 elements와 features 공존 가능
 - `elements[].id`는 ELEMENT_ID (featureId 접두사 없이 짧은 키)
 
 ## 고정 영역
 
-메뉴바, 상태바 등 화면 명세에 명시된 고정 영역은 `data-feature`/`data-el` 없이 일반 HTML로 렌더링.
+화면 명세에 명시된 고정 영역은 `data-feature`/`data-el` 없이 `<bp-page>`의 header/footer 슬롯에 렌더링.

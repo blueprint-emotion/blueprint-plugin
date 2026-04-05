@@ -2,14 +2,12 @@ import { define, attr } from "./bp-core";
 
 class BpSlider extends HTMLElement {
   connectedCallback() {
-    this.classList.add("block");
     const min = Number(attr(this, "min", "0"));
     const max = Number(attr(this, "max", "100"));
     const value = Number(attr(this, "value", String(Math.round((min + max) / 2))));
     const step = Number(attr(this, "step", "1"));
     const disabled = this.hasAttribute("disabled");
 
-    const rootClasses = "data-horizontal:w-full data-vertical:h-full";
     const controlClasses = "relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:min-h-40 data-vertical:w-auto data-vertical:flex-col";
     const trackClasses = "relative grow overflow-hidden rounded-md bg-muted select-none data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1";
     const rangeClasses = "bg-primary select-none data-horizontal:h-full data-vertical:w-full";
@@ -17,8 +15,13 @@ class BpSlider extends HTMLElement {
 
     const pct = ((value - min) / (max - min)) * 100;
 
+    // Apply data-slot and classes directly on the custom element (Fix 1)
+    this.setAttribute("data-slot", "slider");
+    this.setAttribute("data-horizontal", "");
+    this.classList.add(..."data-horizontal:w-full data-vertical:h-full".split(" "));
+    this.style.display = "block";
+
     this.innerHTML = `
-      <div data-slot="slider" data-horizontal class="${rootClasses}">
         <div class="${controlClasses}" ${disabled ? 'data-disabled=""' : ""}>
           <div data-slot="slider-track" data-horizontal class="${trackClasses}" style="position:relative;">
             <div
@@ -48,7 +51,6 @@ class BpSlider extends HTMLElement {
             style="position:absolute; left:${pct}%; transform:translateX(-50%);"
           ></div>
         </div>
-      </div>
     `;
 
     const rangeInput = this.querySelector("input[type='range']") as HTMLInputElement;

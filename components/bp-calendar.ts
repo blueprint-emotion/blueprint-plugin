@@ -11,7 +11,7 @@ class BpCalendar extends HTMLElement {
     // shadcn: nav
     const navClasses = "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1";
     // shadcn: button_previous / button_next (ghost variant + sizing)
-    const navBtnClasses = "size-(--cell-size) p-0 select-none inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground";
+    const navBtnClasses = "size-(--cell-size) p-0 select-none aria-disabled:opacity-50 inline-flex items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground";
     // shadcn: month_caption
     const captionClasses = "flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)";
     // shadcn: caption_label (captionLayout="label" branch)
@@ -27,9 +27,9 @@ class BpCalendar extends HTMLElement {
     // shadcn: CalendarDayButton
     const dayBtnClasses = "relative isolate z-10 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 border-0 leading-none font-normal inline-flex items-center justify-center rounded-md text-sm hover:bg-accent hover:text-accent-foreground";
     // shadcn: today
-    const todayClasses = "rounded-(--cell-radius) bg-muted text-foreground";
+    const todayClasses = "rounded-(--cell-radius) bg-muted text-foreground data-[selected=true]:rounded-none";
     // shadcn: outside
-    const outsideClasses = "text-muted-foreground";
+    const outsideClasses = "text-muted-foreground aria-selected:text-muted-foreground";
 
     const now = new Date();
     const year = now.getFullYear();
@@ -79,8 +79,12 @@ class BpCalendar extends HTMLElement {
       weeks.push(`<tr class="${weekClasses}">${cells.slice(i, i + 7).join("")}</tr>`);
     }
 
+    // Fix 1: Apply data-slot and classes directly on the custom element
+    this.setAttribute("data-slot", "calendar");
+    this.classList.add(...rootClasses.split(" "));
+    this.style.display = "block";
+
     this.innerHTML = `
-      <div data-slot="calendar" class="${rootClasses}">
         <div class="${monthsClasses}">
           <div class="${monthClasses}">
             <div class="${navClasses}">
@@ -99,8 +103,7 @@ class BpCalendar extends HTMLElement {
               </tbody>
             </table>
           </div>
-        </div>
-      </div>`;
+        </div>`;
   }
 }
 

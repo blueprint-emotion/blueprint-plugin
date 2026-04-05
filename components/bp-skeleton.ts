@@ -1,35 +1,24 @@
 import { define, attr, cn } from "./bp-core";
 
 /**
- * <bp-skeleton width="" height="" variant="text|circular|rectangular">
+ * <bp-skeleton width="" height="">
  *
  * Classes extracted from .shadcn/ui/skeleton.tsx
  */
-
-const variantClasses: Record<string, string> = {
-  text: "rounded-md",
-  circular: "rounded-full",
-  rectangular: "rounded-none",
-};
 
 class BpSkeleton extends HTMLElement {
   connectedCallback() {
     const width = attr(this, "width");
     const height = attr(this, "height");
-    const variant = attr(this, "variant", "text");
 
     // Skeleton: "animate-pulse rounded-md bg-muted"
-    const baseClasses = "animate-pulse bg-muted";
-    const shape = variantClasses[variant] || variantClasses.text;
+    const baseClasses = "animate-pulse rounded-md bg-muted";
 
-    const style = [
-      width ? `width:${width}` : "",
-      height ? `height:${height}` : "",
-    ]
-      .filter(Boolean)
-      .join(";");
-
-    this.innerHTML = `<div data-slot="skeleton" class="${cn(baseClasses, shape)}"${style ? ` style="${style}"` : ""}></div>`;
+    this.setAttribute("data-slot", "skeleton");
+    this.classList.add(...baseClasses.split(" "));
+    this.style.display = "block";
+    if (width) this.style.width = width;
+    if (height) this.style.height = height;
   }
 }
 

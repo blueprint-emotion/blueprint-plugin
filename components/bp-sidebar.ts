@@ -13,9 +13,9 @@ import { define, attr, cn } from "./bp-core";
 class BpSidebarContent extends HTMLElement {
   connectedCallback() {
     // SidebarContent: "no-scrollbar flex min-h-0 flex-1 flex-col gap-0 overflow-auto group-data-[collapsible=icon]:overflow-hidden"
-    // Simplified for web-component context (no group-data):
-    const classes = "no-scrollbar flex min-h-0 flex-1 flex-col gap-0 overflow-auto";
+    const classes = "no-scrollbar flex min-h-0 flex-1 flex-col gap-0 overflow-auto group-data-[collapsible=icon]:overflow-hidden";
     this.setAttribute("data-slot", "sidebar-content");
+    this.setAttribute("data-sidebar", "content");
     this.classList.add(...classes.split(" "));
   }
 }
@@ -23,7 +23,7 @@ class BpSidebarContent extends HTMLElement {
 /* ── bp-sidebar-main ── */
 class BpSidebarMain extends HTMLElement {
   connectedCallback() {
-    // SidebarInset: "relative flex w-full flex-1 flex-col bg-background"
+    // SidebarInset: "relative flex w-full flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2"
     const classes = "relative flex w-full flex-1 flex-col bg-background";
     this.setAttribute("data-slot", "sidebar-inset");
     this.classList.add(...classes.split(" "));
@@ -36,63 +36,95 @@ class BpSidebar extends HTMLElement {
     const width = attr(this, "width", "16rem");
     const side = attr(this, "side", "left") as "left" | "right";
 
+    // Capture children into fragment
+    const fragment = document.createDocumentFragment();
+    while (this.firstChild) fragment.appendChild(this.firstChild);
+
+    // Separate sidebar-content and sidebar-main children from fragment
+    const tempHolder = document.createElement("div");
+    tempHolder.appendChild(fragment);
+
+    let sidebarContentEl: Element | null = null;
+    let mainContentEl: Element | null = null;
+    const otherChildren: Node[] = [];
+
+    for (const child of Array.from(tempHolder.childNodes)) {
+      if (child instanceof Element) {
+        if (child.tagName.toLowerCase() === "bp-sidebar-content") {
+          sidebarContentEl = child;
+        } else if (child.tagName.toLowerCase() === "bp-sidebar-main") {
+          mainContentEl = child;
+        } else {
+          otherChildren.push(child);
+        }
+      } else {
+        otherChildren.push(child);
+      }
+    }
+
     // SidebarProvider wrapper: "group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar"
-    const wrapperClasses = "group/sidebar-wrapper flex min-h-svh w-full";
+    const wrapperClasses = "group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar";
 
     // Sidebar outer: "group peer hidden text-sidebar-foreground md:block"
     const outerClasses = "group peer text-sidebar-foreground";
 
     // Sidebar gap: "relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear"
-    const gapClasses = "relative bg-transparent transition-[width] duration-200 ease-linear";
+    const gapClasses = "relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear";
 
-    // Sidebar container: core fixed classes from the source
+    // Sidebar container: core fixed classes from shadcn
     const containerBase = cn(
-      "fixed inset-y-0 z-10 hidden h-svh transition-[left,right,width] duration-200 ease-linear md:flex",
+      "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear data-[side=left]:left-0 data-[side=right]:right-0 md:flex",
       side === "left"
-        ? "left-0 border-r"
-        : "right-0 border-l"
+        ? "border-r"
+        : "border-l"
     );
 
-    // Sidebar inner: "flex size-full flex-col bg-sidebar"
-    const innerClasses = "flex size-full flex-col bg-sidebar";
+    // Sidebar inner: "flex size-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:shadow-sm group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-sidebar-border"
+    const innerClasses = "flex size-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:shadow-sm group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-sidebar-border";
 
-    const content = this.innerHTML;
-    // Separate children
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = content;
-    let sidebarContentHtml = "";
-    let mainContentHtml = "";
-    const children = Array.from(tempDiv.children);
-
-    for (const child of children) {
-      if (child.tagName.toLowerCase() === "bp-sidebar-content") {
-        sidebarContentHtml = child.outerHTML;
-      } else if (child.tagName.toLowerCase() === "bp-sidebar-main") {
-        mainContentHtml = child.outerHTML;
-      }
-    }
-
-    // If no explicit children found, put everything in sidebar content
-    if (!sidebarContentHtml && !mainContentHtml) {
-      sidebarContentHtml = content;
-    }
-
-    this.style.setProperty("--sidebar-width", width);
+    // Fix 1: Apply data-slot and classes directly on the custom element
     this.setAttribute("data-slot", "sidebar-wrapper");
     this.setAttribute("data-side", side);
+    this.classList.add(...wrapperClasses.split(" "));
+    this.style.setProperty("--sidebar-width", width);
+    this.style.display = "flex";
 
     this.innerHTML = `
-      <div class="${wrapperClasses}" style="--sidebar-width: ${width}">
         <div class="${outerClasses}" data-slot="sidebar" data-side="${side}" data-state="expanded">
-          <div data-slot="sidebar-gap" class="${gapClasses}" style="width: var(--sidebar-width)"></div>
-          <div data-slot="sidebar-container" data-side="${side}" class="${containerBase}" style="width: var(--sidebar-width)">
+          <div data-slot="sidebar-gap" class="${gapClasses}"></div>
+          <div data-slot="sidebar-container" data-side="${side}" class="${containerBase}">
             <div data-sidebar="sidebar" data-slot="sidebar-inner" class="${innerClasses}">
-              ${sidebarContentHtml}
+              <div data-slot="sidebar-children"></div>
             </div>
           </div>
         </div>
-        ${mainContentHtml}
-      </div>`;
+        <div data-slot="sidebar-main-slot"></div>`;
+
+    // Place sidebar content
+    const sidebarSlot = this.querySelector('[data-slot="sidebar-children"]')!;
+    if (sidebarContentEl) {
+      sidebarSlot.appendChild(sidebarContentEl);
+    } else if (!mainContentEl) {
+      // If no explicit children found, put everything in sidebar content
+      otherChildren.forEach((child) => sidebarSlot.appendChild(child));
+    }
+
+    // Place main content
+    const mainSlot = this.querySelector('[data-slot="sidebar-main-slot"]')!;
+    if (mainContentEl) {
+      mainSlot.parentNode!.replaceChild(mainContentEl, mainSlot);
+    } else {
+      mainSlot.remove();
+    }
+
+    // Remove the temporary wrapper div
+    const sidebarChildrenWrapper = this.querySelector('[data-slot="sidebar-children"]');
+    if (sidebarChildrenWrapper) {
+      while (sidebarChildrenWrapper.firstChild) {
+        sidebarChildrenWrapper.parentNode!.insertBefore(sidebarChildrenWrapper.firstChild, sidebarChildrenWrapper);
+      }
+      sidebarChildrenWrapper.remove();
+    }
   }
 }
 

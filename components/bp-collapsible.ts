@@ -1,4 +1,4 @@
-import { define, attr, boolAttr, html } from "./bp-core";
+import { define, attr, boolAttr } from "./bp-core";
 
 /**
  * bp-collapsible — shadcn collapsible as a web component.
@@ -17,25 +17,27 @@ class BpCollapsible extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title", "Toggle");
     const open = boolAttr(this, "open");
-    const body = html(this);
+
+    const fragment = document.createDocumentFragment();
+    while (this.firstChild) fragment.appendChild(this.firstChild);
 
     const id = `bp-coll-${Math.random().toString(36).slice(2, 8)}`;
 
-    // shadcn Collapsible.Root: data-slot="collapsible" (no classes)
+    // Apply data-slot directly on the custom element (shadcn Collapsible root)
+    this.setAttribute("data-slot", "collapsible");
+
     // shadcn CollapsibleTrigger: data-slot="collapsible-trigger" (no classes)
     // shadcn CollapsibleContent: data-slot="collapsible-content" (no classes)
     this.innerHTML = `
-      <div data-slot="collapsible">
-        <button
-          data-slot="collapsible-trigger"
-          aria-expanded="${open}"
-          aria-controls="${id}"
-          onclick="this.closest('bp-collapsible').toggle()"
-        >${title}</button>
-        <div id="${id}" data-slot="collapsible-content" style="${open ? "" : "display:none"}">
-          ${body}
-        </div>
-      </div>`;
+      <button
+        data-slot="collapsible-trigger"
+        aria-expanded="${open}"
+        aria-controls="${id}"
+        onclick="this.closest('bp-collapsible').toggle()"
+      >${title}</button>
+      <div id="${id}" data-slot="collapsible-content" style="${open ? "" : "display:none"}"></div>`;
+
+    this.querySelector('[data-slot="collapsible-content"]')!.appendChild(fragment);
   }
 
   toggle() {

@@ -15,9 +15,9 @@ const paginationClasses = "mx-auto flex w-full justify-center";
 // From PaginationContent: cn("flex items-center gap-0.5", ...)
 const paginationContentClasses = "flex items-center gap-0.5";
 
-// Button base from .shadcn/ui/button.tsx buttonVariants base
+// Button base from .shadcn/ui/button.tsx buttonVariants base (without border-transparent — applied via inline style)
 const buttonBase =
-  "inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-xs/relaxed font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+  "inline-flex shrink-0 items-center justify-center rounded-md border bg-clip-padding text-xs/relaxed font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
 
 // Button variant=ghost from .shadcn/ui/button.tsx
 const buttonGhost =
@@ -40,7 +40,7 @@ const paginationPrevClasses = cn(buttonBase, buttonGhost, buttonSizeDefault, "pl
 // PaginationNext: cn("pr-2!", ...) with size="default"
 const paginationNextClasses = cn(buttonBase, buttonGhost, buttonSizeDefault, "pr-2!");
 
-// PaginationLink active (variant=outline, size=icon)
+// PaginationLink active (variant=outline, size=icon) — outline has its own border-border so no transparent needed
 const paginationLinkActive = cn(buttonBase, buttonOutline, buttonSizeIcon);
 
 // PaginationLink inactive (variant=ghost, size=icon)
@@ -83,16 +83,22 @@ class BpPagination extends HTMLElement {
     const current = parseInt(attr(this, "current", "1"), 10);
     const siblings = parseInt(attr(this, "siblings", "1"), 10);
 
+    // Apply data-slot and classes directly on the custom element (shadcn Pagination is a <nav>)
+    this.setAttribute("data-slot", "pagination");
+    this.setAttribute("role", "navigation");
+    this.setAttribute("aria-label", "pagination");
+    this.classList.add(...paginationClasses.split(" "));
+
     this.render(total, current, siblings);
   }
 
   private render(total: number, current: number, siblings: number) {
     const pages = buildPageRange(total, current, siblings);
 
-    // Previous button — from PaginationPrevious
+    // Previous button — from PaginationPrevious (ghost variant, needs border-color:transparent)
     const prevDisabled = current <= 1;
     const prevHTML = `<li data-slot="pagination-item">
-      <a aria-label="Go to previous page" data-slot="pagination-link" data-page="${current - 1}" class="${paginationPrevClasses}" ${prevDisabled ? 'aria-disabled="true" style="pointer-events:none;opacity:0.5"' : ""}>
+      <a aria-label="Go to previous page" data-slot="pagination-link" data-page="${current - 1}" class="${paginationPrevClasses}" style="border-color:transparent" ${prevDisabled ? 'aria-disabled="true" style="border-color:transparent;pointer-events:none;opacity:0.5"' : ""}>
         ${chevronLeftSVG}<span class="hidden sm:block">Previous</span>
       </a>
     </li>`;
@@ -108,26 +114,27 @@ class BpPagination extends HTMLElement {
         </li>`;
       } else {
         const isActive = p === current;
+        // Active uses outline variant (has border-border in class, no transparent needed)
+        // Inactive uses ghost variant (needs border-color:transparent)
+        const styleAttr = isActive ? "" : ' style="border-color:transparent"';
         pagesHTML += `<li data-slot="pagination-item">
-          <a data-slot="pagination-link" data-page="${p}" data-active="${isActive}" ${isActive ? 'aria-current="page"' : ""} class="${isActive ? paginationLinkActive : paginationLinkInactive}">${p}</a>
+          <a data-slot="pagination-link" data-page="${p}" data-active="${isActive}" ${isActive ? 'aria-current="page"' : ""} class="${isActive ? paginationLinkActive : paginationLinkInactive}"${styleAttr}>${p}</a>
         </li>`;
       }
     });
 
-    // Next button — from PaginationNext
+    // Next button — from PaginationNext (ghost variant, needs border-color:transparent)
     const nextDisabled = current >= total;
     const nextHTML = `<li data-slot="pagination-item">
-      <a aria-label="Go to next page" data-slot="pagination-link" data-page="${current + 1}" class="${paginationNextClasses}" ${nextDisabled ? 'aria-disabled="true" style="pointer-events:none;opacity:0.5"' : ""}>
+      <a aria-label="Go to next page" data-slot="pagination-link" data-page="${current + 1}" class="${paginationNextClasses}" style="border-color:transparent" ${nextDisabled ? 'aria-disabled="true" style="border-color:transparent;pointer-events:none;opacity:0.5"' : ""}>
         <span class="hidden sm:block">Next</span>${chevronRightSVG}
       </a>
     </li>`;
 
     this.innerHTML = `
-      <nav role="navigation" aria-label="pagination" data-slot="pagination" class="${paginationClasses}">
-        <ul data-slot="pagination-content" class="${paginationContentClasses}">
-          ${prevHTML}${pagesHTML}${nextHTML}
-        </ul>
-      </nav>
+      <ul data-slot="pagination-content" class="${paginationContentClasses}">
+        ${prevHTML}${pagesHTML}${nextHTML}
+      </ul>
     `;
 
     // Click interaction

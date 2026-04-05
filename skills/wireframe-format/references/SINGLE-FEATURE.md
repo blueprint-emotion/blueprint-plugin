@@ -23,25 +23,6 @@ toc:
 
 ## 로그인
 
-### 와이어프레임 요소
-
-| id | 요소 | type | 설명 |
-|----|------|------|------|
-| EMAIL | 이메일 | input | 이메일 주소 입력 필드 |
-| PASSWORD | 비밀번호 | input | 비밀번호 입력 필드 (마스킹) |
-| SUBMIT | 로그인 버튼 | button | 인증 요청 주요 액션 버튼 |
-
-### 상태
-
-| 상태 | 설명 |
-|------|------|
-| 기본 | 폼 비어있음, 로그인 버튼 활성 |
-| 에러 | "이메일 또는 비밀번호가 올바르지 않습니다" 메시지 |
-
-### 인터랙션
-
-- 로그인 버튼 클릭 → 인증 API 호출 → 성공 시 대시보드로 이동
-
 ### 비즈니스 로직
 
 - 이메일 형식 검증
@@ -82,7 +63,7 @@ pc
 
 ## 제약사항
 
-- 5회 연속 실패 시 계정 잠금 안내가 필요하다
+- 반복 로그인 실패 시 계정 잠금 안내가 필요하다
 ```
 
 ---
@@ -111,7 +92,7 @@ features: [AUTH]
 ### 인증 — @AUTH/LOGIN
 - Given 이메일과 비밀번호 입력 완료 When 로그인 버튼 클릭 Then 인증 요청 후 메인 화면 이동
 - Given 이메일 형식 오류 When 로그인 버튼 클릭 Then 이메일 형식 에러 메시지 표시
-- Given 5회 연속 로그인 실패 When 6번째 시도 Then 계정 잠금 안내 메시지 표시
+- Given 반복 로그인 실패로 계정이 잠긴 상태 When 로그인 시도 Then 계정 잠금 안내 메시지가 표시된다
 
 ## UserStory
 
@@ -133,12 +114,38 @@ features: [AUTH]
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>로그인</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <script src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframes/shared/bp-platform.js"></script>
-
+  <link rel="stylesheet" href="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframes/shared/base.css" />
+  <script type="module" src="https://kxyhbeykjlphcifhbbkr.supabase.co/storage/v1/object/public/wireframes/shared/bp-components.js"></script>
   <style type="text/tailwindcss">
-    @custom-variant dark (&:where(.dark, .dark *));
+    @custom-variant dark (&:is(.dark *));
+    @theme inline {
+      --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+      --color-background: var(--background);
+      --color-foreground: var(--foreground);
+      --color-card: var(--card);
+      --color-card-foreground: var(--card-foreground);
+      --color-popover: var(--popover);
+      --color-popover-foreground: var(--popover-foreground);
+      --color-primary: var(--primary);
+      --color-primary-foreground: var(--primary-foreground);
+      --color-secondary: var(--secondary);
+      --color-secondary-foreground: var(--secondary-foreground);
+      --color-muted: var(--muted);
+      --color-muted-foreground: var(--muted-foreground);
+      --color-accent: var(--accent);
+      --color-accent-foreground: var(--accent-foreground);
+      --color-destructive: var(--destructive);
+      --color-border: var(--border);
+      --color-input: var(--input);
+      --color-ring: var(--ring);
+      --radius-sm: calc(var(--radius) * 0.6);
+      --radius-md: calc(var(--radius) * 0.8);
+      --radius-lg: var(--radius);
+      --radius-xl: calc(var(--radius) * 1.4);
+      --radius-2xl: calc(var(--radius) * 1.8);
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
   <!-- @META -->
   <script type="application/json" id="blueprint-meta">
@@ -171,58 +178,52 @@ features: [AUTH]
   </script>
   <!-- @END:META -->
 </head>
-<body class="bg-zinc-100 dark:bg-zinc-950 p-8">
-  <div class="mx-auto min-w-[1280px] min-h-[calc(100vh-4rem)] flex items-center justify-center rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+<body class="bg-background text-foreground font-sans">
+  <bp-page description>
 
     <!-- @SLOT:content -->
-    <!-- AUTH: 그루핑 래퍼 (elements 없음, features만) -->
-    <div data-feature="AUTH" data-label="인증">
+    <div class="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+      <!-- AUTH -->
+      <bp-section data-feature="AUTH" data-label="인증">
 
-      <!-- AUTH__LOGIN: data-state로 상태 탭 자동 생성 -->
-      <div data-feature="AUTH__LOGIN" data-label="로그인"
-           class="w-full max-w-md flex flex-col gap-6 rounded-lg border border-zinc-200 p-8 dark:border-zinc-700">
+        <!-- AUTH__LOGIN: bp-state-tab으로 상태 전환 -->
+        <bp-section data-feature="AUTH__LOGIN" data-label="로그인">
+          <bp-state-tab>
 
-        <!-- 상태 1: 기본 -->
-        <div data-state="기본">
-          <h1 class="text-lg font-semibold text-center">로그인</h1>
-          <div class="flex flex-col gap-4 mt-6">
-            <div class="flex flex-col gap-1.5" data-el="EMAIL">
-              <label class="text-sm font-medium text-zinc-600 dark:text-zinc-400">이메일</label>
-              <input class="h-10 px-3 text-sm border border-zinc-200 dark:border-zinc-700 rounded-md bg-transparent" type="text" value="user@example.com" readonly />
+            <div slot="기본" class="w-full max-w-md flex flex-col gap-6 rounded-lg border border-border p-8">
+              <h1 class="text-lg font-semibold text-center">로그인</h1>
+              <div class="flex flex-col gap-4">
+                <bp-field label="이메일" data-el="EMAIL">
+                  <bp-input type="email" value="user@example.com" />
+                </bp-field>
+                <bp-field label="비밀번호" data-el="PASSWORD">
+                  <bp-input type="password" value="********" />
+                </bp-field>
+              </div>
+              <bp-button data-el="SUBMIT" class="w-full">로그인</bp-button>
             </div>
-            <div class="flex flex-col gap-1.5" data-el="PASSWORD">
-              <label class="text-sm font-medium text-zinc-600 dark:text-zinc-400">비밀번호</label>
-              <input class="h-10 px-3 text-sm border border-zinc-200 dark:border-zinc-700 rounded-md bg-transparent" type="text" value="********" readonly />
-            </div>
-          </div>
-          <button class="h-10 w-full mt-6 text-sm font-semibold bg-zinc-800 text-white dark:bg-zinc-200 dark:text-zinc-900 rounded-md" data-el="SUBMIT">
-            로그인
-          </button>
-        </div>
 
-        <!-- 상태 2: 에러 -->
-        <div data-state="에러">
-          <h1 class="text-lg font-semibold text-center">로그인</h1>
-          <div class="flex flex-col gap-4 mt-6">
-            <div class="flex flex-col gap-1.5" data-el="EMAIL">
-              <label class="text-sm font-medium text-zinc-600 dark:text-zinc-400">이메일</label>
-              <input class="h-10 px-3 text-sm border border-zinc-200 dark:border-zinc-700 rounded-md bg-transparent" type="text" value="user@example.com" readonly />
+            <div slot="에러" class="w-full max-w-md flex flex-col gap-6 rounded-lg border border-border p-8">
+              <h1 class="text-lg font-semibold text-center">로그인</h1>
+              <div class="flex flex-col gap-4">
+                <bp-field label="이메일" data-el="EMAIL">
+                  <bp-input type="email" value="user@example.com" />
+                </bp-field>
+                <bp-field label="비밀번호" error="이메일 또는 비밀번호가 올바르지 않습니다" data-el="PASSWORD">
+                  <bp-input type="password" value="********" />
+                </bp-field>
+              </div>
+              <bp-button data-el="SUBMIT" class="w-full">로그인</bp-button>
             </div>
-            <div class="flex flex-col gap-1.5" data-el="PASSWORD">
-              <label class="text-sm font-medium text-zinc-600 dark:text-zinc-400">비밀번호</label>
-              <input class="h-10 px-3 text-sm border border-zinc-200 dark:border-zinc-700 rounded-md bg-transparent" type="text" value="********" readonly />
-              <div class="text-xs text-red-500 dark:text-red-400">이메일 또는 비밀번호가 올바르지 않습니다</div>
-            </div>
-          </div>
-          <button class="h-10 w-full mt-6 text-sm font-semibold bg-zinc-800 text-white dark:bg-zinc-200 dark:text-zinc-900 rounded-md" data-el="SUBMIT">
-            로그인
-          </button>
-        </div>
 
-      </div>
+          </bp-state-tab>
+        </bp-section>
+
+      </bp-section>
     </div>
     <!-- @END:content -->
-  </div>
+
+  </bp-page>
 </body>
 </html>
 ```
@@ -234,12 +235,13 @@ features: [AUTH]
 | 패턴 | 이 예제에서 |
 |------|-----------|
 | featureId는 TOC 파생 | `domain: AUTH` + `id: LOGIN` → `AUTH__LOGIN` |
-| 그루핑 feature | `AUTH`는 `elements` 없이 `features`만 보유 |
+| 모든 feature는 `<bp-section>` | `AUTH`, `AUTH__LOGIN` 모두 `<bp-section>` |
 | DOM 중첩 | `data-feature="AUTH"` > `data-feature="AUTH__LOGIN"` |
 | element는 짧은 키 | `data-el="EMAIL"`, `data-el="SUBMIT"` — 부모 feature 스코프 내 유니크 |
-| 상태 탭 (data-state) | `data-state="기본"`, `data-state="에러"` — bp-platform.js가 자동 탭 생성 |
+| bp-field로 입력 래핑 | `<bp-field label="..." data-el="..."><bp-input /></bp-field>` |
+| 상태 탭 (bp-state-tab) | `slot="기본"`, `slot="에러"` — 컴포넌트가 자동 탭 생성 |
 | 상태 패널 내 data-el 재사용 | 같은 `data-el="EMAIL"`이 두 패널에 존재 — 상호배타이므로 허용 |
-| 캔버스 프레임 | `bg-zinc-100 p-8` + `rounded-xl border shadow-sm` 컨테이너 |
-| 단일 포커스 레이아웃 | 캔버스 내 중앙 카드, 고정 영역 없음 |
-| bp-platform.js | 호버 하이라이트 + 상태 탭 자동 처리. `<style>`에는 다크모드만 |
+| bp-page 프레임 | `<bp-page description>` — 메타바 + aside 패널 자동 구성 |
+| 단일 포커스 레이아웃 | 본문 내 중앙 정렬 카드, 고정 영역 없음 |
+| 시맨틱 색상 | `border-border`, `bg-background` — raw zinc 사용 안 함 |
 | 화면 참조 문법 | `@AUTH/LOGIN` — 도메인/TOC_ID |

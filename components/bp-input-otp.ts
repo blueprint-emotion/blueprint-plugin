@@ -6,8 +6,6 @@ const slotBase =
 const groupBase =
   "flex items-center rounded-md has-aria-invalid:border-destructive has-aria-invalid:ring-2 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40";
 
-const containerBase = "cn-input-otp flex items-center has-disabled:opacity-50";
-
 class BpInputOtp extends HTMLElement {
   connectedCallback() {
     const length = parseInt(attr(this, "length", "6"), 10);
@@ -20,13 +18,15 @@ class BpInputOtp extends HTMLElement {
       >${val}</div>`;
     }).join("");
 
+    // Apply data-slot and classes directly on the custom element (Fix 1)
+    this.setAttribute("data-slot", "input-otp");
+    this.classList.add(..."cn-input-otp flex items-center has-disabled:opacity-50".split(" "));
+    this.style.display = "flex";
+
     this.innerHTML = `<div
-      data-slot="input-otp"
-      class="${cn(containerBase)}"
-    ><div
         data-slot="input-otp-group"
         class="${cn(groupBase)}"
-      >${slots}</div></div>`;
+      >${slots}</div>`;
   }
 }
 

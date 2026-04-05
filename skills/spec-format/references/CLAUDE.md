@@ -6,7 +6,7 @@
 
 | 예제 | 파일 | 사용 시점 |
 |------|------|----------|
-| 기능 명세 | [FEATURE-SPEC.md](FEATURE-SPEC.md) | 도메인 파일 작성 시. TOC, 와이어프레임 요소, 상태, 인터랙션, 비즈니스 로직 포함 |
+| 기능 명세 | [FEATURE-SPEC.md](FEATURE-SPEC.md) | 도메인 파일 작성 시. TOC, 비즈니스 로직 포함 |
 | 화면 명세 | [SCREEN-SPEC.md](SCREEN-SPEC.md) | 화면 통합 문서 작성 시. 3섹션(Screen + Requirement + UserStory) 포함 |
 
 ## 작성 순서
@@ -19,6 +19,6 @@
 
 - frontmatter TOC가 기능 계층의 **단일 소스**
 - 본문 헤딩은 TOC와 **반드시 일치**
-- 최소 작성 기준은 `와이어프레임 요소` 테이블
+- 최소 작성 기준은 `비즈니스 로직` 섹션
 - 화면의 `features` 배열에 참조 도메인을 모두 포함
 - 레이아웃 참조 `@DOMAIN/PATH`의 PATH가 해당 도메인 TOC에 존재해야 함

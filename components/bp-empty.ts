@@ -16,8 +16,8 @@ class BpEmpty extends HTMLElement {
     const rootClasses = "flex w-full min-w-0 flex-1 flex-col items-center justify-center gap-4 rounded-xl border-dashed p-6 text-center text-balance";
     // shadcn: EmptyHeader
     const headerClasses = "flex max-w-sm flex-col items-center gap-1";
-    // shadcn: EmptyMedia variant="icon"
-    const mediaClasses = "mb-2 flex shrink-0 items-center justify-center flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-foreground [&_svg:not([class*='size-'])]:size-4";
+    // shadcn: EmptyMedia base + variant="icon"
+    const mediaClasses = "mb-2 flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0 flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-foreground [&_svg:not([class*='size-'])]:size-4";
     // shadcn: EmptyTitle
     const titleClasses = "font-heading text-sm font-medium tracking-tight";
     // shadcn: EmptyDescription
@@ -25,16 +25,18 @@ class BpEmpty extends HTMLElement {
 
     const iconSvg = icons[icon] || icons.inbox;
 
+    this.setAttribute("data-slot", "empty");
+    this.classList.add(...rootClasses.split(" "));
+    this.style.display = "flex";
+
     this.innerHTML = `
-      <div data-slot="empty" class="${rootClasses}">
         <div data-slot="empty-header" class="${headerClasses}">
           <div data-slot="empty-icon" data-variant="icon" class="${mediaClasses}">
             ${iconSvg}
           </div>
           ${title ? `<div data-slot="empty-title" class="${titleClasses}">${title}</div>` : ""}
           ${description ? `<div data-slot="empty-description" class="${descClasses}">${description}</div>` : ""}
-        </div>
-      </div>`;
+        </div>`;
   }
 }
 

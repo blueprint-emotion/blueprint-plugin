@@ -2,7 +2,7 @@ import { define, attr, boolAttr } from "./bp-core";
 
 class BpTextarea extends HTMLElement {
   connectedCallback() {
-    this.classList.add("block");
+    this.style.display = "contents";
     const placeholder = attr(this, "placeholder");
     const rows = attr(this, "rows", "3");
     const disabled = boolAttr(this, "disabled");

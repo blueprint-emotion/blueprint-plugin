@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: 리뷰어 에이전트. 기능명세·화면명세·와이어프레임의 정합성을 검증하고 개별 항목별 pass/fail/skip 판정을 반환한다. 읽기 전용(Read/Grep/Glob)으로 동작하며, 직접 파일을 수정하지 않는다. "리뷰해줘", "검증해줘", "정합성 확인" 등의 요청에 사용한다.
+description: (내부 전용) plan 하네스가 호출하는 리뷰어 에이전트. 사용자가 직접 호출하지 않는다. 기능명세·화면명세·와이어프레임의 정합성을 검증하고 개별 항목별 pass/fail/skip 판정을 반환한다. 읽기 전용(Read/Grep/Glob)으로 동작하며, 직접 파일을 수정하지 않는다.
 skills:
   - spec-format
   - wireframe-format
@@ -27,7 +27,7 @@ skills:
 
 ### 1. 명세 리뷰 (spec-review)
 
-트리거: "명세 리뷰해줘", "spec review", 또는 planner 완료 후 자동 실행
+트리거: 하네스가 planner 완료 후 자동 호출
 
 대상: 호출자가 파일 목록을 명시하면 해당 파일만, 명시하지 않으면 `docs/features/*.md` (INDEX.md, CLAUDE.md 제외), `docs/screens/*/*_screen.md`, `docs/features/INDEX.md` 전체.
 
@@ -41,7 +41,7 @@ skills:
 |---|------|------|
 | S1 | frontmatter 필수 필드 | feature: `domain`, `label`, `toc`. screen: `screenId`, `title`, `purpose`, `viewport`, `features` |
 | S2 | TOC-본문 일치 | TOC의 모든 항목에 대응하는 본문 헤딩이 존재하고, 본문에 TOC에 없는 헤딩이 없음 |
-| S3 | 와이어프레임 요소 테이블 | 리프 기능에 `와이어프레임 요소` 테이블이 존재 (하위 기능이 있으면 생략 가능) |
+| S3 | 기능 콘텐츠 존재 | 기능에 비즈니스 로직 섹션 또는 하위 기능이 존재 (둘 다 없으면 빈 기능으로 fail) |
 | S4 | 화면 레이아웃 참조 | 화면의 모든 `@DOMAIN/PATH` 참조에 대응하는 기능이 해당 도메인 파일에 존재 |
 | S5 | features 배열 동기화 | frontmatter `features` 배열이 레이아웃에서 참조하는 모든 도메인을 포함 |
 | S6 | INDEX.md 동기화 | 리뷰 대상 도메인 파일이 INDEX.md에 모두 등록됨. 전역 도메인 정합성은 full-review에서 별도로 확인 |
@@ -50,12 +50,12 @@ skills:
 | S9 | Requirement 커버리지 | Requirement·UserStory의 H3 헤딩에 `— @DOMAIN/PATH` 연결 표식이 있어야 하고, 레이아웃에서 참조한 모든 기능에 대응하는 Requirement 그룹이 최소 1개 존재 |
 | S10 | 인수조건 형식 | Requirement의 각 항목이 Given/When/Then 형식을 따르고, "적절한", "빠르게", "충분한" 등 모호한 표현이 없음 |
 | S11 | intake 결정적 필드 반영 | intake의 결정적 필드 3개를 화면 명세와 대조한다: (1) `## 화면 목적` → frontmatter `purpose`와 의미 일치, (2) `## viewport` → frontmatter `viewport`와 값 일치 (intake의 `둘 다`와 frontmatter의 `[pc, mobile]`은 동치로 취급한다), (3) `## 모달` → 레이아웃 `모달:` 항목과 대조 (intake `## 모달`에 기록된 화면 종속 모달이 레이아웃에 `모달:` 항목으로 존재하는지. "없음"이면 건너뜀). intake가 없으면 `fail`로 처리하고 "intake 파일 없음 — planner가 intake를 먼저 생성해야 함"을 보고한다 |
-| S12 | intake 커버리지 반영 | intake의 나머지 4개 필드를 기계적으로 대조한다: (1) `## 핵심 행동`의 각 bullet은 Requirement 또는 UserStory에 같은 명사구/동사구 수준으로 대응하는 항목이 최소 1개 있어야 함, (2) `## 화면 구성`은 `## Screen` 레이아웃에 같은 구조어(예: 상단/하단, 사이드바, 패널, 탭, 전체 화면 전환)가 반영되어야 함, (3) `## 특수 인터랙션`이 "없음"이 아니면 Requirement 또는 레이아웃 설명에 해당 인터랙션 키워드가 존재해야 함, (4) `## 제약사항`이 "없음"이 아니면 Requirement, 비즈니스 로직, 또는 명시적 열린 이슈로 반영되어야 함. `정책 미확정`, `추후 확정` 같은 미결정 표현은 허용하되, 이 경우 명세에도 동일한 열린 이슈/가정이 남아 있어야 pass |
+| S12 | intake 커버리지 반영 | intake의 나머지 4개 필드를 기계적으로 대조한다: (1) `## 핵심 행동`의 각 bullet은 Requirement 또는 UserStory에 같은 명사구/동사구 수준으로 대응하는 항목이 최소 1개 있어야 함, (2) `## 화면 구성`은 `## Screen` 레이아웃에 같은 구조어(예: 상단/하단, 사이드바, 패널, 탭, 전체 화면 전환)가 반영되어야 함, (3) `## 특수 인터랙션`이 "없음"이 아니면 Requirement 또는 레이아웃 설명에 해당 인터랙션 키워드가 존재해야 함, (4) `## 제약사항`이 "없음"이 아니면 반영되어야 함 — 비즈니스 정책(수치·규칙)은 기능명세의 비즈니스 로직에, UI 제약은 화면명세의 Requirement에, 미확정이면 명시적 열린 이슈로 반영. `정책 미확정`, `추후 확정` 같은 미결정 표현은 허용하되, 이 경우 명세에도 동일한 열린 이슈/가정이 남아 있어야 pass |
 | S13 | 뷰포트별 레이아웃 | frontmatter `viewport`가 `[pc, mobile]`이면 `### 레이아웃 (PC)`과 `### 레이아웃 (Mobile)` 헤딩이 모두 존재해야 함. 단일 뷰포트면 `skip` |
 
 ### 2. 와이어프레임 리뷰 (wireframe-review)
 
-트리거: "와이어프레임 리뷰해줘", "wireframe review", 또는 wireframer 완료 후 자동 실행
+트리거: 하네스가 wireframer 완료 후 자동 호출
 
 대상: 호출자가 파일 목록을 명시하면 해당 파일만, 명시하지 않으면 `docs/screens/*/*.html` 전체 (메인 와이어프레임 + 모달 파일 포함).
 
@@ -69,18 +69,18 @@ skills:
 | W2 | 메타데이터 필수 필드 | `generator`("blueprint-wireframe-skill"), `version`("2.0"), `type`("screen" \| "modal"), `screenId`, `title`, `purpose`, `features`. `type`이 `"modal"`이면 `modalId`도 필수이며, `modalId` 값이 파일명의 slug와 일치해야 함 (예: `*_modal-upload.html` → `modalId: "upload"`) |
 | W3 | feature 래퍼 존재 | 메타데이터 `features[]`의 모든 항목에 대응하는 `[data-feature]` DOM 요소 존재 |
 | W4 | feature-명세 일치 | 모든 `data-feature` 값이 기능명세 TOC에서 파생한 featureId와 일치 |
-| W5 | element 매핑 | 메타데이터 `elements[].id`에 대응하는 `[data-el]` DOM 요소가 해당 `[data-feature]` 안에 존재 |
+| W5 | element 매핑 | 메타데이터 `elements[].id`에 대응하는 `[data-el]` DOM 요소가 해당 `[data-feature]` 안에 존재 (와이어프레임 내부 일관성 검증) |
 | W6 | DOM 중첩 구조 | 하위 feature의 `[data-feature]`가 부모 `[data-feature]` 안에 위치 |
-| W7 | Tailwind + 플랫폼 스크립트 + 다크모드 | Tailwind CDN 포함, `bp-platform.js` 스크립트 포함, `<style>`에 다크모드 규칙, 모든 색상에 `dark:` 변형 |
+| W7 | 컴포넌트 시스템 + 다크모드 | `base.css` + `bp-components.js`(`type="module"`) + `@theme inline` + Tailwind CDN 포함. UI 요소에 `bp-*` 컴포넌트 사용, 시맨틱 색상 토큰 사용 (raw zinc 금지) |
 | W8 | data-label 존재 | 모든 `[data-feature]`에 `data-label` 속성 존재 |
-| W9 | data-state 배치 | `[data-state]` 요소가 `[data-feature]`의 직접 자식인지 확인. 중간 래퍼가 있으면 상태 탭이 작동하지 않음 |
+| W9 | 상태 탭 구조 | 상태 전환은 `<bp-state-tab>` 컴포넌트를 사용하고, 자식에 `slot="상태명"` 속성으로 각 상태 패널 정의. `<bp-state-tab>`이 `<bp-section>`(data-feature) 내부에 위치하는지 확인 |
 | W10 | HTML 유효성 | `[data-feature]` 래퍼가 block-level 요소(`<div>`, `<section>` 등)인지 확인. `<span>` 등 inline 요소 안에 block 요소가 중첩되면 fail |
 | W11 | feature 범위 일치 | 화면 명세가 참조하는 기능이 와이어프레임에 모두 존재해야 한다 (모달 파일의 feature도 포함). 와이어프레임에는 해당 참조 기능들의 조상 feature를 구조적 래퍼로 포함할 수 있다. 조상 관계가 아닌 추가 feature가 있거나, 참조 feature가 누락되면 fail |
 | W12 | 슬롯 마커 보존 | partial-update 지원을 위해 `<!-- @SLOT:{region} -->` ~ `<!-- @END:{region} -->`과 `<!-- @META -->` ~ `<!-- @END:META -->` 마커 쌍이 존재하고 올바르게 닫혀 있는지 확인 |
 
 ### 3. 전체 정합성 리뷰 (full-review)
 
-트리거: "전체 리뷰", "full review" (명세 + 와이어프레임이 모두 존재할 때 수동 요청)
+트리거: 하네스가 명세 + 와이어프레임 모두 존재할 때 호출
 
 명세 리뷰 + 와이어프레임 리뷰를 모두 실행하고, 추가로 교차 검증:
 

@@ -79,3 +79,10 @@ body {
   color: var(--foreground);
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 }
+
+/* Wireframe element highlight */
+[data-highlight] {
+  outline: 3px solid oklch(from var(--primary) l c h / 20%);
+  outline-offset: 5px;
+  border-radius: 4px;
+}

@@ -1,31 +1,19 @@
-import { define, attr, cn } from "./bp-core";
+import { define } from "./bp-core";
 
 /**
- * <bp-spinner size="sm|md|lg">
+ * <bp-spinner>
  *
  * Classes extracted from .shadcn/ui/spinner.tsx
  * Uses an inline SVG replica of Loader2Icon (lucide) since we cannot import lucide in a web component.
  */
 
-const sizes: Record<string, string> = {
-  sm: "size-3",
-  md: "size-4",
-  lg: "size-6",
-};
-
 class BpSpinner extends HTMLElement {
   connectedCallback() {
-    const size = attr(this, "size", "md");
-
-    // Spinner: "size-4 animate-spin"
-    const baseClasses = "animate-spin";
-    const sizeClass = sizes[size] || sizes.md;
-
     // Loader2 SVG from lucide-react
     this.innerHTML = `<svg
       role="status"
       aria-label="Loading"
-      class="${cn(baseClasses, sizeClass)}"
+      class="size-4 animate-spin"
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
