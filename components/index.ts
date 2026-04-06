@@ -20,7 +20,7 @@ import "./bp-dropdown";
 import "./bp-card";
 import "./bp-accordion";
 import "./bp-collapsible";
-import "./bp-separator";
+
 import "./bp-scroll-area";
 import "./bp-sidebar";
 

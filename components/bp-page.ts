@@ -86,18 +86,108 @@ function buildAside(meta: BlueprintMeta): string {
     </aside>`;
 }
 
+function isVisible(el: HTMLElement): boolean {
+  return el.getClientRects().length > 0;
+}
+
+interface TabRestoreState {
+  stateTab: HTMLElement;
+  previousIndex: string;
+  activatedIndex: string;
+}
+
+function getActiveStateTabIndex(stateTab: HTMLElement): string | null {
+  const visiblePanel = stateTab.querySelector<HTMLElement>(
+    '[data-slot="state-tab-panel"]:not([style*="display:none"])',
+  );
+  return visiblePanel?.dataset.tabIndex ?? null;
+}
+
+function setStateTabIndex(stateTab: HTMLElement, index: string) {
+  const button = stateTab.querySelector<HTMLElement>(
+    `[data-slot="state-tab-btn"][data-tab-index="${index}"]`,
+  );
+  button?.click();
+}
+
+function ensureElementVisible(target: HTMLElement): {
+  target: HTMLElement;
+  restoreStates: TabRestoreState[];
+} {
+  const restoreStates: TabRestoreState[] = [];
+  const panel = target.closest<HTMLElement>('[data-slot="state-tab-panel"]');
+  if (!panel || panel.style.display !== "none") {
+    return { target, restoreStates };
+  }
+
+  const stateTab = panel.closest<HTMLElement>('[data-slot="bp-state-tab"]');
+  const tabIndex = panel.dataset.tabIndex;
+  if (!stateTab || tabIndex == null) {
+    return { target, restoreStates };
+  }
+
+  const previousIndex = getActiveStateTabIndex(stateTab);
+  if (previousIndex != null && previousIndex !== tabIndex) {
+    restoreStates.push({ stateTab, previousIndex, activatedIndex: tabIndex });
+  }
+
+  setStateTabIndex(stateTab, tabIndex);
+
+  const targetEl = target.dataset.el;
+  if (!targetEl) return { target, restoreStates };
+
+  const visibleMatch = Array.from(
+    stateTab.querySelectorAll<HTMLElement>(`[data-el="${targetEl}"]`),
+  ).find((el) => isVisible(el));
+
+  return { target: visibleMatch ?? target, restoreStates };
+}
+
+function findHighlightTarget(content: Element, targetEl: string): {
+  target: HTMLElement | null;
+  restoreStates: TabRestoreState[];
+} {
+  const matches = Array.from(
+    content.querySelectorAll<HTMLElement>(`[data-el="${targetEl}"]`),
+  );
+  if (matches.length === 0) return { target: null, restoreStates: [] };
+
+  const visibleMatch = matches.find((el) => isVisible(el));
+  if (visibleMatch) return { target: visibleMatch, restoreStates: [] };
+
+  return ensureElementVisible(matches[0]!);
+}
+
 function bindHoverHighlight(content: Element, aside: Element) {
+  const hoverRestoreStates = new WeakMap<HTMLElement, TabRestoreState[]>();
+
   aside.addEventListener("mouseover", (e: Event) => {
     const li = (e.target as HTMLElement).closest<HTMLElement>("[data-target-el]");
     if (!li) return;
-    const target = content.querySelector<HTMLElement>(`[data-el="${li.dataset.targetEl}"]`);
+    const targetEl = li.dataset.targetEl;
+    if (!targetEl) return;
+    const { target, restoreStates } = findHighlightTarget(content, targetEl);
+    hoverRestoreStates.set(li, restoreStates);
     if (target) target.setAttribute("data-highlight", "");
   });
   aside.addEventListener("mouseout", (e: Event) => {
     const li = (e.target as HTMLElement).closest<HTMLElement>("[data-target-el]");
     if (!li) return;
-    const target = content.querySelector<HTMLElement>(`[data-el="${li.dataset.targetEl}"]`);
-    if (target) target.removeAttribute("data-highlight");
+    const targetEl = li.dataset.targetEl;
+    if (!targetEl) return;
+    const targets = content.querySelectorAll<HTMLElement>(`[data-el="${targetEl}"]`);
+    for (const target of targets) {
+      target.removeAttribute("data-highlight");
+    }
+
+    const restoreStates = hoverRestoreStates.get(li) ?? [];
+    for (const restore of restoreStates) {
+      const activeIndex = getActiveStateTabIndex(restore.stateTab);
+      if (activeIndex === restore.activatedIndex) {
+        setStateTabIndex(restore.stateTab, restore.previousIndex);
+      }
+    }
+    hoverRestoreStates.delete(li);
   });
   content.addEventListener("mouseover", (e: Event) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>("[data-el]");
@@ -138,10 +228,10 @@ class BpPage extends HTMLElement {
     const asideHtml = showDescription ? buildAside(meta) : "";
 
     this.innerHTML = `
-      <div data-slot="bp-page" class="flex min-h-screen bg-background text-foreground">
+      <div data-slot="bp-page" class="flex min-h-screen min-w-[1520px] bg-background text-foreground">
         <div class="flex-1 min-w-0">
           ${metaBarHtml}
-          <div data-slot="bp-page-content" class="p-6 bg-muted"></div>
+          <div data-slot="bp-page-content" class="p-6 bg-muted min-w-[1200px]"></div>
         </div>
         ${asideHtml}
       </div>`;

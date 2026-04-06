@@ -30,12 +30,17 @@ function addClasses(el: Element, classes: string) {
 
 class BpTable extends HTMLElement {
   connectedCallback() {
-    // Wrap in container div: "relative w-full overflow-x-auto"
     this.setAttribute("data-slot", "table-container");
-    this.classList.add("relative", "w-full", "overflow-x-auto");
+    this.style.display = "block";
 
+    // Wrap table in overflow container so data-highlight outline is not clipped
     const table = this.querySelector("table");
     if (!table) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("relative", "w-full", "overflow-x-auto");
+    table.parentNode!.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
 
     table.setAttribute("data-slot", "table");
     addClasses(table, TABLE_CLASSES);

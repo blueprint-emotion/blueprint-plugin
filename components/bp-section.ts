@@ -8,6 +8,7 @@ class BpSection extends HTMLElement {
     const fragment = document.createDocumentFragment();
     while (this.firstChild) fragment.appendChild(this.firstChild);
 
+    this.style.display = "block";
     this.innerHTML = `
       <div data-slot="bp-section" class="relative flex flex-col gap-3">
         <div data-slot="bp-section-content"></div>

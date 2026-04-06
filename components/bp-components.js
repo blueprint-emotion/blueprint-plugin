@@ -4,8 +4,7 @@ function define(tag, ctor) {
     const orig = ctor.prototype.connectedCallback;
     if (orig) {
       ctor.prototype.connectedCallback = function() {
-        if (this.__bp)
-          return;
+        if (this.__bp) return;
         this.__bp = true;
         orig.call(this);
       };
@@ -32,8 +31,9 @@ function html(el) {
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
+
 // components/bp-input.ts
-class BpInput extends HTMLElement {
+var BpInput = class extends HTMLElement {
   connectedCallback() {
     this.style.display = "contents";
     const placeholder = attr(this, "placeholder");
@@ -49,11 +49,11 @@ class BpInput extends HTMLElement {
       class="h-7 w-full min-w-0 rounded-md border border-input bg-input/20 px-2 py-0.5 text-sm transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-xs/relaxed file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 md:text-xs/relaxed dark:bg-input/30 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40"
     />`;
   }
-}
+};
 define("bp-input", BpInput);
 
 // components/bp-textarea.ts
-class BpTextarea extends HTMLElement {
+var BpTextarea = class extends HTMLElement {
   connectedCallback() {
     this.style.display = "contents";
     const placeholder = attr(this, "placeholder");
@@ -68,11 +68,11 @@ class BpTextarea extends HTMLElement {
       class="flex field-sizing-content min-h-16 w-full resize-none rounded-md border border-input bg-input/20 px-2 py-2 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 md:text-xs/relaxed dark:bg-input/30 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40"
     >${value}</textarea>`;
   }
-}
+};
 define("bp-textarea", BpTextarea);
 
 // components/bp-checkbox.ts
-class BpCheckbox extends HTMLElement {
+var BpCheckbox = class extends HTMLElement {
   connectedCallback() {
     this.classList.add("inline-flex", "items-center", "gap-2");
     const label = attr(this, "label");
@@ -99,8 +99,7 @@ class BpCheckbox extends HTMLElement {
     `;
     const btn = this.querySelector("button");
     btn.addEventListener("click", () => {
-      if (disabled)
-        return;
+      if (disabled) return;
       const isChecked = btn.getAttribute("aria-checked") === "true";
       const next = !isChecked;
       btn.setAttribute("aria-checked", String(next));
@@ -110,15 +109,14 @@ class BpCheckbox extends HTMLElement {
         btn.removeAttribute("data-checked");
       }
       const indicator = btn.querySelector("[data-slot='checkbox-indicator']");
-      if (indicator)
-        indicator.style.display = next ? "" : "none";
+      if (indicator) indicator.style.display = next ? "" : "none";
     });
   }
-}
+};
 define("bp-checkbox", BpCheckbox);
 
 // components/bp-radio-group.ts
-class BpRadioGroup extends HTMLElement {
+var BpRadioGroup = class extends HTMLElement {
   connectedCallback() {
     const name = attr(this, "name");
     const value = attr(this, "value");
@@ -164,26 +162,24 @@ class BpRadioGroup extends HTMLElement {
           b.setAttribute("aria-checked", "false");
           b.removeAttribute("data-checked");
           const ind = b.querySelector("[data-slot='radio-group-indicator']");
-          if (ind)
-            ind.style.display = "none";
+          if (ind) ind.style.display = "none";
         });
         btn.setAttribute("aria-checked", "true");
         btn.setAttribute("data-checked", "");
         const indicator = btn.querySelector("[data-slot='radio-group-indicator']");
-        if (indicator)
-          indicator.style.display = "";
+        if (indicator) indicator.style.display = "";
       });
     });
   }
-}
-
-class BpRadioItem extends HTMLElement {
-}
+};
+var BpRadioItem = class extends HTMLElement {
+  // Parsed by parent; no-op if rendered standalone
+};
 define("bp-radio-group", BpRadioGroup);
 define("bp-radio-item", BpRadioItem);
 
 // components/bp-switch.ts
-class BpSwitch extends HTMLElement {
+var BpSwitch = class extends HTMLElement {
   connectedCallback() {
     this.classList.add("inline-flex", "items-center", "gap-2");
     const label = attr(this, "label");
@@ -213,8 +209,7 @@ class BpSwitch extends HTMLElement {
     `;
     const btn = this.querySelector("button");
     btn.addEventListener("click", () => {
-      if (disabled)
-        return;
+      if (disabled) return;
       const isChecked = btn.getAttribute("aria-checked") === "true";
       const next = !isChecked;
       btn.setAttribute("aria-checked", String(next));
@@ -232,11 +227,11 @@ class BpSwitch extends HTMLElement {
       }
     });
   }
-}
+};
 define("bp-switch", BpSwitch);
 
 // components/bp-slider.ts
-class BpSlider extends HTMLElement {
+var BpSlider = class extends HTMLElement {
   connectedCallback() {
     const min = Number(attr(this, "min", "0"));
     const max = Number(attr(this, "max", "100"));
@@ -294,20 +289,18 @@ class BpSlider extends HTMLElement {
       thumb.setAttribute("aria-valuenow", String(v));
     });
   }
-}
+};
 define("bp-slider", BpSlider);
 
 // components/bp-field.ts
-class BpField extends HTMLElement {
+var BpField = class extends HTMLElement {
   connectedCallback() {
     const label = attr(this, "label");
     const description = attr(this, "description");
     const error = attr(this, "error");
-    if (this.querySelector('[data-slot="field-control"]'))
-      return;
+    if (this.querySelector('[data-slot="field-control"]')) return;
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     const labelHtml = label ? `<label data-slot="field-label" class="flex w-fit items-center gap-2 text-xs/relaxed font-medium leading-snug select-none group-data-[disabled=true]/field:opacity-50">${label}</label>` : "";
     const descHtml = description ? `<div data-slot="field-description" class="text-left text-xs/relaxed leading-normal font-normal text-muted-foreground">${description}</div>` : "";
     const errorHtml = error ? `<div role="alert" data-slot="field-error" class="text-xs/relaxed font-normal text-destructive">${error}</div>` : "";
@@ -326,27 +319,26 @@ class BpField extends HTMLElement {
         ${errorHtml}`;
     this.querySelector('[data-slot="field-control"]').appendChild(fragment);
   }
-}
+};
 define("bp-field", BpField);
 
 // components/bp-label.ts
-class BpLabel extends HTMLElement {
+var BpLabel = class extends HTMLElement {
   connectedCallback() {
     const text = this.textContent?.trim() || "";
-    const base = "flex items-center gap-2 text-xs/relaxed leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50";
+    const base2 = "flex items-center gap-2 text-xs/relaxed leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50";
     this.setAttribute("data-slot", "label");
-    this.classList.add(...base.split(" "));
+    this.classList.add(...base2.split(" "));
     this.style.display = "flex";
     this.textContent = text;
   }
-}
+};
 define("bp-label", BpLabel);
 
 // components/bp-input-otp.ts
 var slotBase = "relative flex size-7 items-center justify-center border-y border-r border-input bg-input/20 text-xs/relaxed transition-all outline-none first:rounded-l-md first:border-l last:rounded-r-md aria-invalid:border-destructive data-[active=true]:z-10 data-[active=true]:border-ring data-[active=true]:ring-2 data-[active=true]:ring-ring/30 data-[active=true]:aria-invalid:border-destructive data-[active=true]:aria-invalid:ring-destructive/20 dark:bg-input/30 dark:data-[active=true]:aria-invalid:ring-destructive/40";
 var groupBase = "flex items-center rounded-md has-aria-invalid:border-destructive has-aria-invalid:ring-2 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40";
-
-class BpInputOtp extends HTMLElement {
+var BpInputOtp = class extends HTMLElement {
   connectedCallback() {
     const length = parseInt(attr(this, "length", "6"), 10);
     const slots = Array.from({ length }, (_, i) => {
@@ -364,20 +356,19 @@ class BpInputOtp extends HTMLElement {
         class="${cn(groupBase)}"
       >${slots}</div>`;
   }
-}
+};
 define("bp-input-otp", BpInputOtp);
 
 // components/bp-native-select.ts
 var selectBase = "h-7 w-full min-w-0 appearance-none rounded-md border border-input bg-input/20 py-0.5 pr-6 pl-2 text-xs/relaxed transition-colors outline-none select-none selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:pointer-events-none disabled:cursor-not-allowed aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 data-[size=sm]:h-6 data-[size=sm]:text-[0.625rem] dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40";
 var iconBase = "pointer-events-none absolute top-1/2 right-1.5 size-3.5 -translate-y-1/2 text-muted-foreground select-none group-data-[size=sm]/native-select:size-3 group-data-[size=sm]/native-select:-translate-y-[calc(--spacing(1.25))]";
 var wrapperBase = "group/native-select relative w-fit has-[select:disabled]:opacity-50";
-
-class BpNativeSelect extends HTMLElement {
+var BpNativeSelect = class extends HTMLElement {
   connectedCallback() {
     const size = attr(this, "size", "default");
     const disabled = this.hasAttribute("disabled");
     const options = html(this);
-    const chevronSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${cn(iconBase)}" aria-hidden="true" data-slot="native-select-icon"><path d="m6 9 6 6 6-6"/></svg>`;
+    const chevronSvg2 = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${cn(iconBase)}" aria-hidden="true" data-slot="native-select-icon"><path d="m6 9 6 6 6-6"/></svg>`;
     this.innerHTML = `<div
       class="${cn(wrapperBase)}"
       data-slot="native-select-wrapper"
@@ -387,9 +378,9 @@ class BpNativeSelect extends HTMLElement {
         data-size="${size}"
         class="${cn(selectBase)}"
         ${disabled ? "disabled" : ""}
-      >${options}</select>${chevronSvg}</div>`;
+      >${options}</select>${chevronSvg2}</div>`;
   }
-}
+};
 define("bp-native-select", BpNativeSelect);
 
 // components/bp-button.ts
@@ -411,8 +402,7 @@ var sizes = {
   "icon-sm": "size-6 [&_svg:not([class*='size-'])]:size-3",
   "icon-lg": "size-8 [&_svg:not([class*='size-'])]:size-4"
 };
-
-class BpButton extends HTMLElement {
+var BpButton = class extends HTMLElement {
   connectedCallback() {
     const variant = attr(this, "variant", "default");
     const size = attr(this, "size", "default");
@@ -423,15 +413,15 @@ class BpButton extends HTMLElement {
     if (disabled) {
       this.setAttribute("aria-disabled", "true");
     }
-    const base = "group/button inline-flex shrink-0 items-center justify-center rounded-md border bg-clip-padding text-xs/relaxed font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
-    this.classList.add(...cn(base, variants[variant] || variants.default, sizes[size] || sizes.default, disabled && "pointer-events-none opacity-50").split(" "));
+    const base2 = "group/button inline-flex shrink-0 items-center justify-center rounded-md border bg-clip-padding text-xs/relaxed font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4";
+    this.classList.add(...cn(base2, variants[variant] || variants.default, sizes[size] || sizes.default, disabled && "pointer-events-none opacity-50").split(" "));
     if (variant !== "outline") {
       this.style.borderColor = "transparent";
     }
     this.style.display = "inline-flex";
     this.innerHTML = label;
   }
-}
+};
 define("bp-button", BpButton);
 
 // components/bp-dropdown.ts
@@ -442,17 +432,13 @@ var separatorBase = "-mx-1 my-1 h-px bg-border/50";
 var labelBase = "px-2 py-1.5 text-xs text-muted-foreground data-inset:pl-7.5";
 var shortcutBase = "ml-auto text-[0.625rem] tracking-widest text-muted-foreground group-focus/dropdown-menu-item:text-accent-foreground";
 var chevronSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-3.5 opacity-60" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
-
-class BpDropdownItem extends HTMLElement {
-}
-
-class BpDropdownSeparator extends HTMLElement {
-}
-
-class BpDropdownLabel extends HTMLElement {
-}
-
-class BpDropdown extends HTMLElement {
+var BpDropdownItem = class extends HTMLElement {
+};
+var BpDropdownSeparator = class extends HTMLElement {
+};
+var BpDropdownLabel = class extends HTMLElement {
+};
+var BpDropdown = class extends HTMLElement {
   connectedCallback() {
     const label = attr(this, "label", "Open");
     const originalHTML = html(this);
@@ -460,7 +446,7 @@ class BpDropdown extends HTMLElement {
     temp.innerHTML = originalHTML;
     const children = temp.children;
     let itemsHTML = "";
-    for (let i = 0;i < children.length; i++) {
+    for (let i = 0; i < children.length; i++) {
       const child = children[i];
       const tag = child.tagName.toLowerCase();
       if (tag === "bp-dropdown-separator") {
@@ -508,21 +494,20 @@ class BpDropdown extends HTMLElement {
       }
     });
   }
-}
+};
 define("bp-dropdown", BpDropdown);
 define("bp-dropdown-item", BpDropdownItem);
 define("bp-dropdown-separator", BpDropdownSeparator);
 define("bp-dropdown-label", BpDropdownLabel);
 
 // components/bp-card.ts
-class BpCard extends HTMLElement {
+var BpCard = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const description = attr(this, "description");
     const footer = attr(this, "footer");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     this.setAttribute("data-slot", "card");
     this.classList.add(..."group/card flex flex-col gap-4 overflow-hidden rounded-lg bg-card py-4 text-xs/relaxed text-card-foreground ring-1 ring-foreground/10".split(" "));
     this.style.display = "flex";
@@ -539,34 +524,31 @@ class BpCard extends HTMLElement {
       ${footerHtml}`;
     this.querySelector('[data-slot="card-content"]').appendChild(fragment);
   }
-}
+};
 define("bp-card", BpCard);
 
 // components/bp-accordion.ts
-class BpAccordion extends HTMLElement {
+var BpAccordion = class extends HTMLElement {
   connectedCallback() {
     this.setAttribute("data-slot", "accordion");
     this.classList.add(..."flex w-full flex-col overflow-hidden rounded-md border".split(" "));
     this.style.display = "flex";
   }
-}
+};
 define("bp-accordion", BpAccordion);
 var triggerClass = "group/accordion-trigger relative flex flex-1 items-start justify-between gap-6 border p-2 text-left text-xs/relaxed font-medium transition-all outline-none hover:underline aria-disabled:pointer-events-none aria-disabled:opacity-50 **:data-[slot=accordion-trigger-icon]:ml-auto **:data-[slot=accordion-trigger-icon]:size-4 **:data-[slot=accordion-trigger-icon]:text-muted-foreground";
 var panelClass = "overflow-hidden px-2 text-xs/relaxed";
 var innerClass = "pt-0 pb-4 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4";
-
-class BpAccordionItem extends HTMLElement {
+var BpAccordionItem = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const open = boolAttr(this, "open");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     this.style.display = "block";
     this.setAttribute("data-slot", "accordion-item");
     this.classList.add("not-last:border-b");
-    if (open)
-      this.classList.add("bg-muted/50");
+    if (open) this.classList.add("bg-muted/50");
     const chevronDown = `<svg data-slot="accordion-trigger-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none shrink-0 ${open ? "hidden" : ""}"><path d="m6 9 6 6 6-6"/></svg>`;
     const chevronUp = `<svg data-slot="accordion-trigger-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none shrink-0 ${open ? "" : "hidden"}"><path d="m18 15-6-6-6 6"/></svg>`;
     const id = `bp-acc-${Math.random().toString(36).slice(2, 8)}`;
@@ -593,8 +575,7 @@ class BpAccordionItem extends HTMLElement {
   toggle() {
     const trigger = this.querySelector("[data-slot='accordion-trigger']");
     const content = this.querySelector("[data-slot='accordion-content']");
-    if (!trigger || !content)
-      return;
+    if (!trigger || !content) return;
     const expanded = trigger.getAttribute("aria-expanded") === "true";
     trigger.setAttribute("aria-expanded", String(!expanded));
     content.style.display = expanded ? "none" : "";
@@ -605,17 +586,16 @@ class BpAccordionItem extends HTMLElement {
       svgs[1].classList.toggle("hidden", expanded);
     }
   }
-}
+};
 define("bp-accordion-item", BpAccordionItem);
 
 // components/bp-collapsible.ts
-class BpCollapsible extends HTMLElement {
+var BpCollapsible = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title", "Toggle");
     const open = boolAttr(this, "open");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     const id = `bp-coll-${Math.random().toString(36).slice(2, 8)}`;
     this.setAttribute("data-slot", "collapsible");
     this.innerHTML = `
@@ -631,64 +611,20 @@ class BpCollapsible extends HTMLElement {
   toggle() {
     const trigger = this.querySelector("[data-slot='collapsible-trigger']");
     const content = this.querySelector("[data-slot='collapsible-content']");
-    if (!trigger || !content)
-      return;
+    if (!trigger || !content) return;
     const expanded = trigger.getAttribute("aria-expanded") === "true";
     trigger.setAttribute("aria-expanded", String(!expanded));
     content.style.display = expanded ? "none" : "";
   }
-}
+};
 define("bp-collapsible", BpCollapsible);
 
-// components/bp-separator.ts
-class BpSeparator extends HTMLElement {
-  connectedCallback() {
-    const orientation = attr(this, "orientation", "horizontal");
-    const label = attr(this, "label");
-    const base = "shrink-0 bg-border data-horizontal:h-px data-horizontal:w-full data-vertical:w-px data-vertical:self-stretch";
-    const dataDir = orientation === "vertical" ? "data-vertical" : "data-horizontal";
-    if (label) {
-      if (orientation === "vertical") {
-        this.classList.add("flex");
-        const hasHeight = Array.from(this.classList).some((c) => c.startsWith("h-"));
-        if (!hasHeight)
-          this.classList.add("h-full");
-      }
-      const flexDir = orientation === "vertical" ? "flex-col" : "";
-      this.innerHTML = `
-        <div class="flex items-center gap-2 ${flexDir}" role="none">
-          <div data-slot="separator" ${dataDir} data-orientation="${orientation}" role="separator" aria-orientation="${orientation}" class="${cn(base, "flex-1")}"></div>
-          <span class="text-xs text-muted-foreground">${label}</span>
-          <div data-slot="separator" ${dataDir} data-orientation="${orientation}" role="separator" aria-orientation="${orientation}" class="${cn(base, "flex-1")}"></div>
-        </div>`;
-    } else {
-      this.setAttribute("data-slot", "separator");
-      this.setAttribute("role", "separator");
-      this.setAttribute("aria-orientation", orientation);
-      if (orientation === "vertical") {
-        this.setAttribute("data-vertical", "");
-      } else {
-        this.setAttribute("data-horizontal", "");
-      }
-      this.classList.add(...base.split(" "));
-      this.style.display = "block";
-      if (orientation === "vertical") {
-        const hasHeight = Array.from(this.classList).some((c) => c.startsWith("h-"));
-        if (!hasHeight)
-          this.classList.add("h-full");
-      }
-    }
-  }
-}
-define("bp-separator", BpSeparator);
-
 // components/bp-scroll-area.ts
-class BpScrollArea extends HTMLElement {
+var BpScrollArea = class extends HTMLElement {
   connectedCallback() {
     const height = attr(this, "height", "auto");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     this.setAttribute("data-slot", "scroll-area");
     this.classList.add("relative");
     this.style.display = "block";
@@ -704,34 +640,31 @@ class BpScrollArea extends HTMLElement {
       </div>`;
     this.querySelector('[data-slot="scroll-area-viewport"]').appendChild(fragment);
   }
-}
+};
 define("bp-scroll-area", BpScrollArea);
 
 // components/bp-sidebar.ts
-class BpSidebarContent extends HTMLElement {
+var BpSidebarContent = class extends HTMLElement {
   connectedCallback() {
     const classes = "no-scrollbar flex min-h-0 flex-1 flex-col gap-0 overflow-auto group-data-[collapsible=icon]:overflow-hidden";
     this.setAttribute("data-slot", "sidebar-content");
     this.setAttribute("data-sidebar", "content");
     this.classList.add(...classes.split(" "));
   }
-}
-
-class BpSidebarMain extends HTMLElement {
+};
+var BpSidebarMain = class extends HTMLElement {
   connectedCallback() {
     const classes = "relative flex w-full flex-1 flex-col bg-background";
     this.setAttribute("data-slot", "sidebar-inset");
     this.classList.add(...classes.split(" "));
   }
-}
-
-class BpSidebar extends HTMLElement {
+};
+var BpSidebar = class extends HTMLElement {
   connectedCallback() {
     const width = attr(this, "width", "16rem");
     const side = attr(this, "side", "left");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     const tempHolder = document.createElement("div");
     tempHolder.appendChild(fragment);
     let sidebarContentEl = null;
@@ -753,7 +686,10 @@ class BpSidebar extends HTMLElement {
     const wrapperClasses = "group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar";
     const outerClasses = "group peer text-sidebar-foreground";
     const gapClasses = "relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear";
-    const containerBase = cn("fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear data-[side=left]:left-0 data-[side=right]:right-0 md:flex", side === "left" ? "border-r" : "border-l");
+    const containerBase = cn(
+      "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear data-[side=left]:left-0 data-[side=right]:right-0 md:flex",
+      side === "left" ? "border-r" : "border-l"
+    );
     const innerClasses = "flex size-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:shadow-sm group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-sidebar-border";
     this.setAttribute("data-slot", "sidebar-wrapper");
     this.setAttribute("data-side", side);
@@ -790,7 +726,7 @@ class BpSidebar extends HTMLElement {
       sidebarChildrenWrapper.remove();
     }
   }
-}
+};
 define("bp-sidebar-content", BpSidebarContent);
 define("bp-sidebar-main", BpSidebarMain);
 define("bp-sidebar", BpSidebar);
@@ -806,18 +742,19 @@ var TD_CLASSES = "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr
 var CAPTION_CLASSES = "mt-4 text-xs text-muted-foreground";
 function addClasses(el, classes) {
   for (const cls of classes.split(" ")) {
-    if (cls)
-      el.classList.add(cls);
+    if (cls) el.classList.add(cls);
   }
 }
-
-class BpTable extends HTMLElement {
+var BpTable = class extends HTMLElement {
   connectedCallback() {
     this.setAttribute("data-slot", "table-container");
-    this.classList.add("relative", "w-full", "overflow-x-auto");
+    this.style.display = "block";
     const table = this.querySelector("table");
-    if (!table)
-      return;
+    if (!table) return;
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("relative", "w-full", "overflow-x-auto");
+    table.parentNode.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
     table.setAttribute("data-slot", "table");
     addClasses(table, TABLE_CLASSES);
     for (const thead of Array.from(table.querySelectorAll("thead"))) {
@@ -849,7 +786,7 @@ class BpTable extends HTMLElement {
       addClasses(caption, CAPTION_CLASSES);
     }
   }
-}
+};
 define("bp-table", BpTable);
 
 // components/bp-badge.ts
@@ -861,25 +798,24 @@ var variants2 = {
   ghost: "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
   link: "text-primary underline-offset-4 hover:underline"
 };
-
-class BpBadge extends HTMLElement {
+var BpBadge = class extends HTMLElement {
   connectedCallback() {
     const variant = attr(this, "variant", "default");
     const text = this.textContent?.trim() || "";
-    const base = "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border px-2 py-0.5 text-[0.625rem] font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-2.5!";
+    const base2 = "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border px-2 py-0.5 text-[0.625rem] font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-2.5!";
     this.setAttribute("data-slot", "badge");
-    this.classList.add(...cn(base, variants2[variant] || variants2.default).split(" "));
+    this.classList.add(...cn(base2, variants2[variant] || variants2.default).split(" "));
     this.style.display = "inline-flex";
     if (variant !== "outline") {
       this.style.borderColor = "transparent";
     }
     this.innerHTML = text;
   }
-}
+};
 define("bp-badge", BpBadge);
 
 // components/bp-avatar.ts
-class BpAvatar extends HTMLElement {
+var BpAvatar = class extends HTMLElement {
   connectedCallback() {
     const src = attr(this, "src");
     const fallback = attr(this, "fallback");
@@ -895,11 +831,11 @@ class BpAvatar extends HTMLElement {
     const fallbackHtml = `<span data-slot="avatar-fallback" class="${fallbackClasses}" ${src ? 'style="display:none"' : ""}>${fallback || ""}</span>`;
     this.innerHTML = `${imageHtml}${fallbackHtml}`;
   }
-}
+};
 define("bp-avatar", BpAvatar);
 
 // components/bp-chart.ts
-class BpChart extends HTMLElement {
+var BpChart = class extends HTMLElement {
   connectedCallback() {
     const type = attr(this, "type", "bar");
     const title = attr(this, "title");
@@ -966,10 +902,12 @@ class BpChart extends HTMLElement {
           ${pieSlices}
         </svg>`;
     }
-    const legendItems = type === "pie" ? ["40%", "25%", "20%", "15%"].map((pct, i) => `<div class="${legendClasses.replace("flex items-center justify-center gap-4 pt-3", "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground")}">
+    const legendItems = type === "pie" ? ["40%", "25%", "20%", "15%"].map(
+      (pct, i) => `<div class="${legendClasses.replace("flex items-center justify-center gap-4 pt-3", "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground")}">
             <div class="${legendDotClasses}" style="background-color:var(--color-primary, hsl(var(--primary)));opacity:${[0.9, 0.7, 0.5, 0.3][i]}"></div>
             <span class="text-xs text-muted-foreground">${pct}</span>
-          </div>`).join("") : "";
+          </div>`
+    ).join("") : "";
     this.setAttribute("data-slot", "chart");
     this.classList.add(...containerClasses.split(" "));
     this.style.display = "flex";
@@ -981,11 +919,11 @@ class BpChart extends HTMLElement {
           ${legendItems ? `<div class="${legendClasses}">${legendItems}</div>` : ""}
         </div>`;
   }
-}
+};
 define("bp-chart", BpChart);
 
 // components/bp-kbd.ts
-class BpKbd extends HTMLElement {
+var BpKbd = class extends HTMLElement {
   connectedCallback() {
     const text = this.textContent?.trim() || "";
     const classes = "pointer-events-none inline-flex h-5 w-fit min-w-5 items-center justify-center gap-1 rounded-xs bg-muted px-1 font-sans text-[0.625rem] font-medium text-muted-foreground select-none in-data-[slot=tooltip-content]:bg-background/20 in-data-[slot=tooltip-content]:text-background dark:in-data-[slot=tooltip-content]:bg-background/10 [&_svg:not([class*='size-'])]:size-3";
@@ -994,11 +932,11 @@ class BpKbd extends HTMLElement {
     this.style.display = "inline-flex";
     this.innerHTML = text;
   }
-}
+};
 define("bp-kbd", BpKbd);
 
 // components/bp-spinner.ts
-class BpSpinner extends HTMLElement {
+var BpSpinner = class extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `<svg
       role="status"
@@ -1017,11 +955,11 @@ class BpSpinner extends HTMLElement {
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     </svg>`;
   }
-}
+};
 define("bp-spinner", BpSpinner);
 
 // components/bp-skeleton.ts
-class BpSkeleton extends HTMLElement {
+var BpSkeleton = class extends HTMLElement {
   connectedCallback() {
     const width = attr(this, "width");
     const height = attr(this, "height");
@@ -1029,16 +967,14 @@ class BpSkeleton extends HTMLElement {
     this.setAttribute("data-slot", "skeleton");
     this.classList.add(...baseClasses.split(" "));
     this.style.display = "block";
-    if (width)
-      this.style.width = width;
-    if (height)
-      this.style.height = height;
+    if (width) this.style.width = width;
+    if (height) this.style.height = height;
   }
-}
+};
 define("bp-skeleton", BpSkeleton);
 
 // components/bp-progress.ts
-class BpProgress extends HTMLElement {
+var BpProgress = class extends HTMLElement {
   connectedCallback() {
     const value = Math.max(0, Math.min(100, Number(attr(this, "value", "0"))));
     const label = attr(this, "label");
@@ -1052,11 +988,11 @@ class BpProgress extends HTMLElement {
     this.style.display = "flex";
     this.innerHTML = `${label ? `<span data-slot="progress-label" class="${labelClasses}">${label}</span>` : ""}<span data-slot="progress-value" class="${valueClasses}">${value}%</span><div data-slot="progress-track" class="${trackClasses}"><div data-slot="progress-indicator" class="${indicatorClasses}" style="width:${value}%"></div></div>`;
   }
-}
+};
 define("bp-progress", BpProgress);
 
 // components/bp-carousel.ts
-class BpCarousel extends HTMLElement {
+var BpCarousel = class extends HTMLElement {
   connectedCallback() {
     const slides = Array.from(this.children);
     const overflowClasses = "overflow-hidden";
@@ -1064,7 +1000,9 @@ class BpCarousel extends HTMLElement {
     const itemClasses = "min-w-0 shrink-0 grow-0 basis-full pl-4";
     const prevClasses = "absolute touch-manipulation rounded-full top-1/2 -left-12 -translate-y-1/2";
     const nextClasses = "absolute touch-manipulation rounded-full top-1/2 -right-12 -translate-y-1/2";
-    const slideItems = slides.length > 0 ? slides.map((child, i) => `<div role="group" aria-roledescription="slide" data-slot="carousel-item" class="${itemClasses}" ${i > 0 ? 'style="display:none"' : ""}>${child.outerHTML}</div>`).join("") : `<div role="group" aria-roledescription="slide" data-slot="carousel-item" class="${itemClasses}"><div class="flex items-center justify-center h-32 bg-muted rounded-lg text-muted-foreground text-xs">Slide</div></div>`;
+    const slideItems = slides.length > 0 ? slides.map(
+      (child, i) => `<div role="group" aria-roledescription="slide" data-slot="carousel-item" class="${itemClasses}" ${i > 0 ? 'style="display:none"' : ""}>${child.outerHTML}</div>`
+    ).join("") : `<div role="group" aria-roledescription="slide" data-slot="carousel-item" class="${itemClasses}"><div class="flex items-center justify-center h-32 bg-muted rounded-lg text-muted-foreground text-xs">Slide</div></div>`;
     const chevronLeft = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>`;
     const chevronRight = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
     this.setAttribute("data-slot", "carousel");
@@ -1087,7 +1025,7 @@ class BpCarousel extends HTMLElement {
           <span class="sr-only">Next slide</span>
         </button>`;
   }
-}
+};
 define("bp-carousel", BpCarousel);
 
 // components/bp-empty.ts
@@ -1096,8 +1034,7 @@ var icons = {
   file: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>`,
   search: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`
 };
-
-class BpEmpty extends HTMLElement {
+var BpEmpty = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const description = attr(this, "description");
@@ -1105,7 +1042,7 @@ class BpEmpty extends HTMLElement {
     const rootClasses = "flex w-full min-w-0 flex-1 flex-col items-center justify-center gap-4 rounded-xl border-dashed p-6 text-center text-balance";
     const headerClasses = "flex max-w-sm flex-col items-center gap-1";
     const mediaClasses = "mb-2 flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0 flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-foreground [&_svg:not([class*='size-'])]:size-4";
-    const titleClasses = "font-heading text-sm font-medium tracking-tight";
+    const titleClasses2 = "font-heading text-sm font-medium tracking-tight";
     const descClasses = "text-xs/relaxed text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary";
     const iconSvg = icons[icon] || icons.inbox;
     this.setAttribute("data-slot", "empty");
@@ -1116,15 +1053,15 @@ class BpEmpty extends HTMLElement {
           <div data-slot="empty-icon" data-variant="icon" class="${mediaClasses}">
             ${iconSvg}
           </div>
-          ${title ? `<div data-slot="empty-title" class="${titleClasses}">${title}</div>` : ""}
+          ${title ? `<div data-slot="empty-title" class="${titleClasses2}">${title}</div>` : ""}
           ${description ? `<div data-slot="empty-description" class="${descClasses}">${description}</div>` : ""}
         </div>`;
   }
-}
+};
 define("bp-empty", BpEmpty);
 
 // components/bp-calendar.ts
-class BpCalendar extends HTMLElement {
+var BpCalendar = class extends HTMLElement {
   connectedCallback() {
     const rootClasses = "group/calendar bg-background p-3 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(6)]";
     const monthsClasses = "relative flex flex-col gap-4 md:flex-row";
@@ -1140,7 +1077,7 @@ class BpCalendar extends HTMLElement {
     const dayBtnClasses = "relative isolate z-10 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 border-0 leading-none font-normal inline-flex items-center justify-center rounded-md text-sm hover:bg-accent hover:text-accent-foreground";
     const todayClasses = "rounded-(--cell-radius) bg-muted text-foreground data-[selected=true]:rounded-none";
     const outsideClasses = "text-muted-foreground aria-selected:text-muted-foreground";
-    const now = new Date;
+    const now = /* @__PURE__ */ new Date();
     const year = now.getFullYear();
     const month = now.getMonth();
     const today = now.getDate();
@@ -1153,23 +1090,23 @@ class BpCalendar extends HTMLElement {
     const chevronRight = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="m9 18 6-6-6-6"/></svg>`;
     const weekdayHeaders = dayNames.map((d) => `<th class="${weekdayClasses}" style="text-align:center;padding:4px 0">${d}</th>`).join("");
     const cells = [];
-    for (let i = firstDay - 1;i >= 0; i--) {
+    for (let i = firstDay - 1; i >= 0; i--) {
       const d = daysInPrevMonth - i;
       cells.push(`<td class="${dayClasses}"><button class="${dayBtnClasses} ${outsideClasses}" tabindex="-1">${d}</button></td>`);
     }
-    for (let d = 1;d <= daysInMonth; d++) {
+    for (let d = 1; d <= daysInMonth; d++) {
       const isToday = d === today;
       const extraClasses = isToday ? todayClasses : "";
       cells.push(`<td class="${dayClasses}${isToday ? " " + todayClasses : ""}"><button class="${dayBtnClasses}${isToday ? " " + todayClasses : ""}" tabindex="-1">${d}</button></td>`);
     }
     const remaining = 7 - cells.length % 7;
     if (remaining < 7) {
-      for (let d = 1;d <= remaining; d++) {
+      for (let d = 1; d <= remaining; d++) {
         cells.push(`<td class="${dayClasses}"><button class="${dayBtnClasses} ${outsideClasses}" tabindex="-1">${d}</button></td>`);
       }
     }
     const weeks = [];
-    for (let i = 0;i < cells.length; i += 7) {
+    for (let i = 0; i < cells.length; i += 7) {
       weeks.push(`<tr class="${weekClasses}">${cells.slice(i, i + 7).join("")}</tr>`);
     }
     this.setAttribute("data-slot", "calendar");
@@ -1196,7 +1133,7 @@ class BpCalendar extends HTMLElement {
           </div>
         </div>`;
   }
-}
+};
 define("bp-calendar", BpCalendar);
 
 // components/bp-tabs.ts
@@ -1206,13 +1143,17 @@ var tabsTriggerBase = "relative inline-flex h-[calc(100%-1px)] flex-1 items-cent
 var tabsTriggerLineVariant = "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent";
 var tabsTriggerActiveClasses = "data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/30 dark:data-active:text-foreground";
 var tabsTriggerAfterClasses = "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100";
-var tabsTriggerClasses = cn(tabsTriggerBase, tabsTriggerLineVariant, tabsTriggerActiveClasses, tabsTriggerAfterClasses);
+var tabsTriggerClasses = cn(
+  tabsTriggerBase,
+  tabsTriggerLineVariant,
+  tabsTriggerActiveClasses,
+  tabsTriggerAfterClasses
+);
 var tabsContentClasses = "flex-1 text-xs/relaxed outline-none";
-
-class BpTab extends HTMLElement {
-}
-
-class BpTabs extends HTMLElement {
+var BpTab = class extends HTMLElement {
+  // Parsed by parent bp-tabs; no-op standalone
+};
+var BpTabs = class extends HTMLElement {
   connectedCallback() {
     const tabs = [];
     let activeIdx = 0;
@@ -1221,11 +1162,9 @@ class BpTabs extends HTMLElement {
       if (child.tagName.toLowerCase() === "bp-tab") {
         const label = child.getAttribute("label") || `Tab ${i + 1}`;
         const active = child.hasAttribute("active") && child.getAttribute("active") !== "false";
-        if (active)
-          activeIdx = tabs.length;
+        if (active) activeIdx = tabs.length;
         const fragment = document.createDocumentFragment();
-        while (child.firstChild)
-          fragment.appendChild(child.firstChild);
+        while (child.firstChild) fragment.appendChild(child.firstChild);
         tabs.push({ label, active, fragment });
       }
     });
@@ -1266,25 +1205,33 @@ class BpTabs extends HTMLElement {
       ${panelsHTML}
     `;
     tabs.forEach((tab, i) => {
-      const panel = this.querySelector(`[data-slot="tabs-content"][data-tab-index="${i}"]`);
+      const panel = this.querySelector(
+        `[data-slot="tabs-content"][data-tab-index="${i}"]`
+      );
       panel.appendChild(tab.fragment);
     });
-    this.querySelectorAll("[data-slot='tabs-trigger']").forEach((btn) => {
+    this.querySelectorAll(
+      "[data-slot='tabs-trigger']"
+    ).forEach((btn) => {
       btn.addEventListener("click", () => {
         const idx = btn.getAttribute("data-tab-index");
-        this.querySelectorAll("[data-slot='tabs-trigger']").forEach((t) => {
+        this.querySelectorAll(
+          "[data-slot='tabs-trigger']"
+        ).forEach((t) => {
           t.removeAttribute("data-active");
           t.setAttribute("aria-selected", "false");
         });
         btn.setAttribute("data-active", "");
         btn.setAttribute("aria-selected", "true");
-        this.querySelectorAll("[data-slot='tabs-content']").forEach((p) => {
+        this.querySelectorAll(
+          "[data-slot='tabs-content']"
+        ).forEach((p) => {
           p.style.display = p.getAttribute("data-tab-index") === idx ? "" : "none";
         });
       });
     });
   }
-}
+};
 define("bp-tab", BpTab);
 define("bp-tabs", BpTabs);
 
@@ -1295,11 +1242,10 @@ var breadcrumbLinkClasses = "transition-colors hover:text-foreground";
 var breadcrumbPageClasses = "font-normal text-foreground";
 var breadcrumbSeparatorClasses = "[&>svg]:size-3.5";
 var chevronRightSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
-
-class BpBreadcrumbItem extends HTMLElement {
-}
-
-class BpBreadcrumb extends HTMLElement {
+var BpBreadcrumbItem = class extends HTMLElement {
+  // Parsed by parent bp-breadcrumb; no-op standalone
+};
+var BpBreadcrumb = class extends HTMLElement {
   connectedCallback() {
     const items = Array.from(this.querySelectorAll("bp-breadcrumb-item"));
     this.setAttribute("data-slot", "breadcrumb");
@@ -1327,7 +1273,7 @@ class BpBreadcrumb extends HTMLElement {
       </ol>
     `;
   }
-}
+};
 define("bp-breadcrumb-item", BpBreadcrumbItem);
 define("bp-breadcrumb", BpBreadcrumb);
 
@@ -1353,21 +1299,18 @@ function buildPageRange(total, current, siblings) {
   const right = Math.min(total, current + siblings);
   if (left > 1) {
     pages.push(1);
-    if (left > 2)
-      pages.push("ellipsis");
+    if (left > 2) pages.push("ellipsis");
   }
-  for (let i = left;i <= right; i++) {
+  for (let i = left; i <= right; i++) {
     pages.push(i);
   }
   if (right < total) {
-    if (right < total - 1)
-      pages.push("ellipsis");
+    if (right < total - 1) pages.push("ellipsis");
     pages.push(total);
   }
   return pages;
 }
-
-class BpPagination extends HTMLElement {
+var BpPagination = class extends HTMLElement {
   connectedCallback() {
     const total = parseInt(attr(this, "total", "1"), 10);
     const current = parseInt(attr(this, "current", "1"), 10);
@@ -1417,26 +1360,24 @@ class BpPagination extends HTMLElement {
       link.addEventListener("click", (e) => {
         e.preventDefault();
         const page = parseInt(link.getAttribute("data-page") || "1", 10);
-        if (page < 1 || page > total)
-          return;
+        if (page < 1 || page > total) return;
         this.setAttribute("current", String(page));
         this.render(total, page, siblings);
         this.dispatchEvent(new CustomEvent("page-change", { detail: { page }, bubbles: true }));
       });
     });
   }
-}
+};
 define("bp-pagination", BpPagination);
 
 // components/bp-dialog.ts
-class BpDialog extends HTMLElement {
+var BpDialog = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const description = attr(this, "description");
     const trigger = attr(this, "trigger");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     const headerHtml = title || description ? `<div data-slot="dialog-header" class="flex flex-col gap-1">
             ${title ? `<div data-slot="dialog-title" class="font-heading text-sm font-medium">${title}</div>` : ""}
             ${description ? `<div data-slot="dialog-description" class="text-xs/relaxed text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground">${description}</div>` : ""}
@@ -1463,8 +1404,7 @@ class BpDialog extends HTMLElement {
       triggerBtn.addEventListener("click", () => overlay.style.display = "");
       closeBtn.addEventListener("click", () => overlay.style.display = "none");
       overlay.addEventListener("click", (e) => {
-        if (e.target === overlay)
-          overlay.style.display = "none";
+        if (e.target === overlay) overlay.style.display = "none";
       });
     } else {
       this.innerHTML = `
@@ -1480,20 +1420,19 @@ class BpDialog extends HTMLElement {
       this.querySelector('[data-slot="dialog-body"]').appendChild(fragment);
     }
   }
-}
+};
 define("bp-dialog", BpDialog);
 
 // components/bp-alert-dialog.ts
-class BpAlertDialog extends HTMLElement {
+var BpAlertDialog = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const description = attr(this, "description");
-    const confirmLabel = attr(this, "confirm-label", "확인");
-    const cancelLabel = attr(this, "cancel-label", "취소");
+    const confirmLabel = attr(this, "confirm-label", "\uD655\uC778");
+    const cancelLabel = attr(this, "cancel-label", "\uCDE8\uC18C");
     const trigger = attr(this, "trigger");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     const headerHtml = title || description ? `<div data-slot="alert-dialog-header" class="grid grid-rows-[auto_1fr] place-items-center gap-1 text-center sm:place-items-start sm:text-left">
             ${title ? `<div data-slot="alert-dialog-title" class="font-heading text-sm font-medium">${title}</div>` : ""}
             ${description ? `<div data-slot="alert-dialog-description" class="text-xs/relaxed text-balance text-muted-foreground md:text-pretty *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground">${description}</div>` : ""}
@@ -1538,19 +1477,18 @@ class BpAlertDialog extends HTMLElement {
       this.querySelector('[data-slot="alert-dialog-body"]').appendChild(fragment);
     }
   }
-}
+};
 define("bp-alert-dialog", BpAlertDialog);
 
 // components/bp-drawer.ts
-class BpDrawer extends HTMLElement {
+var BpDrawer = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const description = attr(this, "description");
     const side = attr(this, "side", "bottom");
     const trigger = attr(this, "trigger");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     const isVertical = side === "bottom" || side === "top";
     const handleHtml = side === "bottom" ? `<div class="mx-auto mt-4 h-1.5 w-[100px] shrink-0 rounded-full bg-muted"></div>` : "";
     const headerHtml = title || description ? `<div data-slot="drawer-header" class="${cn("flex flex-col gap-1 p-4", isVertical && "text-center", "md:text-left")}">
@@ -1578,13 +1516,18 @@ class BpDrawer extends HTMLElement {
       const overlay = this.querySelector("[data-slot=drawer-overlay]");
       triggerBtn.addEventListener("click", () => overlay.style.display = "");
       overlay.addEventListener("click", (e) => {
-        if (e.target === overlay)
-          overlay.style.display = "none";
+        if (e.target === overlay) overlay.style.display = "none";
       });
     } else {
-      const panelClasses = cn("flex flex-col bg-popover text-xs/relaxed text-popover-foreground rounded-t-xl border-t border-border", isVertical ? "w-full" : "w-64 h-full border-l border-border rounded-none");
-      const containerClasses = cn("relative rounded-xl bg-muted/40 border border-dashed border-border overflow-hidden", isVertical ? "flex flex-col" : "flex");
-      const mainArea = `<div class="flex-1 flex items-center justify-center p-4 text-xs text-muted-foreground/50">페이지 영역</div>`;
+      const panelClasses = cn(
+        "flex flex-col bg-popover text-xs/relaxed text-popover-foreground rounded-t-xl border-t border-border",
+        isVertical ? "w-full" : "w-64 h-full border-l border-border rounded-none"
+      );
+      const containerClasses = cn(
+        "relative rounded-xl bg-muted/40 border border-dashed border-border overflow-hidden",
+        isVertical ? "flex flex-col" : "flex"
+      );
+      const mainArea = `<div class="flex-1 flex items-center justify-center p-4 text-xs text-muted-foreground/50">\uD398\uC774\uC9C0 \uC601\uC5ED</div>`;
       const panel = `<div data-slot="drawer-content" class="${panelClasses}">${handleHtml}${headerHtml}<div data-slot="drawer-body" class="p-4 overflow-y-auto"></div></div>`;
       const layout = side === "top" || side === "left" ? `${panel}${mainArea}` : `${mainArea}${panel}`;
       this.innerHTML = `
@@ -1595,19 +1538,18 @@ class BpDrawer extends HTMLElement {
       this.querySelector('[data-slot="drawer-body"]').appendChild(fragment);
     }
   }
-}
+};
 define("bp-drawer", BpDrawer);
 
 // components/bp-sheet.ts
-class BpSheet extends HTMLElement {
+var BpSheet = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const description = attr(this, "description");
     const side = attr(this, "side", "right");
     const trigger = attr(this, "trigger");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     const isHorizontal = side === "left" || side === "right";
     const headerHtml = title || description ? `<div data-slot="sheet-header" class="flex flex-col gap-1.5 p-6">
             ${title ? `<div data-slot="sheet-title" class="font-heading text-sm font-medium text-foreground">${title}</div>` : ""}
@@ -1639,13 +1581,18 @@ class BpSheet extends HTMLElement {
       triggerBtn.addEventListener("click", () => overlay.style.display = "");
       closeBtn.addEventListener("click", () => overlay.style.display = "none");
       overlay.addEventListener("click", (e) => {
-        if (e.target === overlay)
-          overlay.style.display = "none";
+        if (e.target === overlay) overlay.style.display = "none";
       });
     } else {
-      const panelClasses = cn("flex flex-col bg-popover text-xs/relaxed text-popover-foreground shadow-lg", isHorizontal ? "w-64 h-full border-l border-border" : "w-full border-t border-border");
-      const containerClasses = cn("relative rounded-xl bg-muted/40 border border-dashed border-border overflow-hidden", isHorizontal ? "flex" : "flex flex-col");
-      const mainArea = `<div class="flex-1 flex items-center justify-center p-4 text-xs text-muted-foreground/50">페이지 영역</div>`;
+      const panelClasses = cn(
+        "flex flex-col bg-popover text-xs/relaxed text-popover-foreground shadow-lg",
+        isHorizontal ? "w-64 h-full border-l border-border" : "w-full border-t border-border"
+      );
+      const containerClasses = cn(
+        "relative rounded-xl bg-muted/40 border border-dashed border-border overflow-hidden",
+        isHorizontal ? "flex" : "flex flex-col"
+      );
+      const mainArea = `<div class="flex-1 flex items-center justify-center p-4 text-xs text-muted-foreground/50">\uD398\uC774\uC9C0 \uC601\uC5ED</div>`;
       const panel = `<div data-slot="sheet-content" data-side="${side}" class="${panelClasses}">${headerHtml}<div data-slot="sheet-body" class="flex-1 p-6 overflow-y-auto"></div></div>`;
       const layout = side === "left" || side === "top" ? `${panel}${mainArea}` : `${mainArea}${panel}`;
       this.innerHTML = `
@@ -1656,16 +1603,19 @@ class BpSheet extends HTMLElement {
       this.querySelector('[data-slot="sheet-body"]').appendChild(fragment);
     }
   }
-}
+};
 define("bp-sheet", BpSheet);
 
 // components/bp-popover.ts
-class BpPopover extends HTMLElement {
+var BpPopover = class extends HTMLElement {
+  constructor() {
+    super(...arguments);
+    this._outsideClick = null;
+  }
   connectedCallback() {
     const trigger = attr(this, "trigger");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     const triggerHtml = trigger ? `<button data-slot="popover-trigger" class="inline-flex shrink-0 items-center justify-center rounded-md border border-border bg-clip-padding text-xs font-medium whitespace-nowrap transition-all outline-none select-none h-7 gap-1 px-2 hover:bg-input/50 hover:text-foreground dark:bg-input/30">${trigger}</button>` : "";
     this.setAttribute("data-slot", "popover");
     this.classList.add(..."relative inline-flex".split(" "));
@@ -1696,17 +1646,15 @@ class BpPopover extends HTMLElement {
       this._outsideClick = null;
     }
   }
-  _outsideClick = null;
-}
+};
 define("bp-popover", BpPopover);
 
 // components/bp-hover-card.ts
-class BpHoverCard extends HTMLElement {
+var BpHoverCard = class extends HTMLElement {
   connectedCallback() {
     const trigger = attr(this, "trigger");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     this.setAttribute("data-slot", "hover-card");
     this.classList.add(..."relative inline-flex".split(" "));
     this.style.display = "inline-flex";
@@ -1726,8 +1674,7 @@ class BpHoverCard extends HTMLElement {
     triggerEl.addEventListener("mouseleave", () => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        if (!content.matches(":hover"))
-          content.style.display = "none";
+        if (!content.matches(":hover")) content.style.display = "none";
       }, 100);
     });
     content.addEventListener("mouseleave", () => {
@@ -1739,16 +1686,15 @@ class BpHoverCard extends HTMLElement {
       clearTimeout(timeout);
     });
   }
-}
+};
 define("bp-hover-card", BpHoverCard);
 
 // components/bp-tooltip.ts
-class BpTooltip extends HTMLElement {
+var BpTooltip = class extends HTMLElement {
   connectedCallback() {
     const content = attr(this, "content");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
     this.setAttribute("data-slot", "tooltip");
     this.classList.add(..."relative inline-flex".split(" "));
     this.style.display = "inline-flex";
@@ -1768,15 +1714,17 @@ class BpTooltip extends HTMLElement {
       tooltipEl.style.display = "none";
     });
   }
-}
+};
 define("bp-tooltip", BpTooltip);
 
 // components/bp-command.ts
-class BpCommand extends HTMLElement {
+var BpCommand = class extends HTMLElement {
   connectedCallback() {
     const placeholder = attr(this, "placeholder", "Search...");
     const groups = Array.from(this.querySelectorAll("bp-command-group"));
-    const topLevelItems = Array.from(this.children).filter((el) => el.tagName.toLowerCase() === "bp-command-item");
+    const topLevelItems = Array.from(this.children).filter(
+      (el) => el.tagName.toLowerCase() === "bp-command-item"
+    );
     let groupsHTML = "";
     if (topLevelItems.length > 0) {
       groupsHTML += renderItems(topLevelItems);
@@ -1812,7 +1760,7 @@ class BpCommand extends HTMLElement {
           ${groupsHTML || `<div data-slot="command-empty" class="${emptyClasses}">No results found.</div>`}
         </div>`;
   }
-}
+};
 function renderItems(items) {
   let out = "";
   const itemClasses = "group/command-item relative flex min-h-7 cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-xs/relaxed outline-hidden select-none in-data-[slot=dialog-content]:rounded-md data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-selected:bg-muted data-selected:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5 data-selected:*:[svg]:text-foreground";
@@ -1823,12 +1771,10 @@ function renderItems(items) {
   });
   return out;
 }
-
-class BpCommandGroup extends HTMLElement {
-}
-
-class BpCommandItem extends HTMLElement {
-}
+var BpCommandGroup = class extends HTMLElement {
+};
+var BpCommandItem = class extends HTMLElement {
+};
 define("bp-command", BpCommand);
 define("bp-command-group", BpCommandGroup);
 define("bp-command-item", BpCommandItem);
@@ -1853,8 +1799,7 @@ function toastHtml(title, description, icon) {
       </button>
     </div>`;
 }
-
-class BpSonner extends HTMLElement {
+var BpSonner = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const description = attr(this, "description");
@@ -1871,14 +1816,14 @@ class BpSonner extends HTMLElement {
       const closeBtn = this.querySelector("[data-slot=sonner-close]");
       triggerBtn.addEventListener("click", () => {
         container.style.display = "";
-        setTimeout(() => container.style.display = "none", 3000);
+        setTimeout(() => container.style.display = "none", 3e3);
       });
       closeBtn.addEventListener("click", () => container.style.display = "none");
     } else {
       this.innerHTML = toast;
     }
   }
-}
+};
 define("bp-sonner", BpSonner);
 
 // components/bp-alert.ts
@@ -1889,8 +1834,7 @@ var variants3 = {
 };
 var titleClasses = "font-heading font-medium group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground";
 var descriptionClasses = "text-xs/relaxed text-balance text-muted-foreground md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4";
-
-class BpAlert extends HTMLElement {
+var BpAlert = class extends HTMLElement {
   connectedCallback() {
     const title = attr(this, "title");
     const description = attr(this, "description");
@@ -1902,7 +1846,7 @@ class BpAlert extends HTMLElement {
     this.style.display = "grid";
     this.innerHTML = `${title ? `<div data-slot="alert-title" class="${titleClasses}">${title}</div>` : ""}${description ? `<div data-slot="alert-description" class="${descriptionClasses}">${description}</div>` : ""}`;
   }
-}
+};
 define("bp-alert", BpAlert);
 
 // components/bp-page.ts
@@ -1927,47 +1871,108 @@ function buildMetaBar(meta) {
     ["viewport", meta.viewport],
     ["purpose", meta.purpose]
   ];
-  const metaItems = fields.filter(([, v]) => v).map(([k, v]) => `<span class="text-muted-foreground text-[0.625rem]">${k}</span> <span class="text-foreground text-xs font-medium">${v}</span>`).join(`<span class="text-border">·</span>`);
+  const metaItems = fields.filter(([, v]) => v).map(
+    ([k, v]) => `<span class="text-muted-foreground text-[0.625rem]">${k}</span> <span class="text-foreground text-xs font-medium">${v}</span>`
+  ).join(`<span class="text-border">\xB7</span>`);
   return metaItems ? `<div class="sticky top-0 z-10 flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-2 border-b border-border bg-background">${metaItems}</div>` : "";
 }
 function buildAside(meta) {
   const allElements = meta.features ? collectElements(meta.features) : [];
-  if (allElements.length === 0)
-    return "";
-  const items = allElements.map(({ el }, i) => `<li data-target-el="${esc(el.id)}" class="flex flex-col gap-1.5 rounded-lg border border-border bg-background px-3 py-2.5 cursor-default transition-all hover:border-primary/40 hover:ring-1 hover:ring-primary/20">
+  if (allElements.length === 0) return "";
+  const items = allElements.map(
+    ({ el }, i) => `<li data-target-el="${esc(el.id)}" class="flex flex-col gap-1.5 rounded-lg border border-border bg-background px-3 py-2.5 cursor-default transition-all hover:border-primary/40 hover:ring-1 hover:ring-primary/20">
           <div class="flex items-center gap-1.5">
             <span class="flex items-center justify-center size-4 rounded-full bg-muted text-[0.5625rem] font-medium text-muted-foreground">${i + 1}</span>
             <span class="inline-flex items-center rounded-md bg-primary/10 px-1.5 py-0.5 text-[0.5625rem] font-medium text-primary">${esc(el.type)}</span>
             <span class="font-semibold text-foreground text-xs">${esc(el.label)}</span>
           </div>
           <div class="text-[0.6875rem] leading-relaxed text-muted-foreground whitespace-pre-line pl-[1.375rem]">${esc(el.description)}</div>
-        </li>`).join("");
+        </li>`
+  ).join("");
   return `
     <aside data-slot="bp-page-aside" class="sticky top-0 h-screen w-80 shrink-0 border-l border-border bg-muted/30 overflow-y-auto">
       <ol class="flex flex-col gap-2 list-none p-3 m-0">${items}</ol>
     </aside>`;
 }
+function isVisible(el) {
+  return el.getClientRects().length > 0;
+}
+function getActiveStateTabIndex(stateTab) {
+  const visiblePanel = stateTab.querySelector(
+    '[data-slot="state-tab-panel"]:not([style*="display:none"])'
+  );
+  return visiblePanel?.dataset.tabIndex ?? null;
+}
+function setStateTabIndex(stateTab, index) {
+  const button = stateTab.querySelector(
+    `[data-slot="state-tab-btn"][data-tab-index="${index}"]`
+  );
+  button?.click();
+}
+function ensureElementVisible(target) {
+  const restoreStates = [];
+  const panel = target.closest('[data-slot="state-tab-panel"]');
+  if (!panel || panel.style.display !== "none") {
+    return { target, restoreStates };
+  }
+  const stateTab = panel.closest('[data-slot="bp-state-tab"]');
+  const tabIndex = panel.dataset.tabIndex;
+  if (!stateTab || tabIndex == null) {
+    return { target, restoreStates };
+  }
+  const previousIndex = getActiveStateTabIndex(stateTab);
+  if (previousIndex != null && previousIndex !== tabIndex) {
+    restoreStates.push({ stateTab, previousIndex, activatedIndex: tabIndex });
+  }
+  setStateTabIndex(stateTab, tabIndex);
+  const targetEl = target.dataset.el;
+  if (!targetEl) return { target, restoreStates };
+  const visibleMatch = Array.from(
+    stateTab.querySelectorAll(`[data-el="${targetEl}"]`)
+  ).find((el) => isVisible(el));
+  return { target: visibleMatch ?? target, restoreStates };
+}
+function findHighlightTarget(content, targetEl) {
+  const matches = Array.from(
+    content.querySelectorAll(`[data-el="${targetEl}"]`)
+  );
+  if (matches.length === 0) return { target: null, restoreStates: [] };
+  const visibleMatch = matches.find((el) => isVisible(el));
+  if (visibleMatch) return { target: visibleMatch, restoreStates: [] };
+  return ensureElementVisible(matches[0]);
+}
 function bindHoverHighlight(content, aside) {
+  const hoverRestoreStates = /* @__PURE__ */ new WeakMap();
   aside.addEventListener("mouseover", (e) => {
     const li = e.target.closest("[data-target-el]");
-    if (!li)
-      return;
-    const target = content.querySelector(`[data-el="${li.dataset.targetEl}"]`);
-    if (target)
-      target.setAttribute("data-highlight", "");
+    if (!li) return;
+    const targetEl = li.dataset.targetEl;
+    if (!targetEl) return;
+    const { target, restoreStates } = findHighlightTarget(content, targetEl);
+    hoverRestoreStates.set(li, restoreStates);
+    if (target) target.setAttribute("data-highlight", "");
   });
   aside.addEventListener("mouseout", (e) => {
     const li = e.target.closest("[data-target-el]");
-    if (!li)
-      return;
-    const target = content.querySelector(`[data-el="${li.dataset.targetEl}"]`);
-    if (target)
+    if (!li) return;
+    const targetEl = li.dataset.targetEl;
+    if (!targetEl) return;
+    const targets = content.querySelectorAll(`[data-el="${targetEl}"]`);
+    for (const target of targets) {
       target.removeAttribute("data-highlight");
+    }
+    const restoreStates = hoverRestoreStates.get(li) ?? [];
+    for (const restore of restoreStates) {
+      const activeIndex = getActiveStateTabIndex(restore.stateTab);
+      if (activeIndex === restore.activatedIndex) {
+        setStateTabIndex(restore.stateTab, restore.previousIndex);
+      }
+    }
+    hoverRestoreStates.delete(li);
   });
   content.addEventListener("mouseover", (e) => {
     const el = e.target.closest("[data-el]");
-    if (!el)
-      return;
+    if (!el) return;
     el.setAttribute("data-highlight", "");
     const li = aside.querySelector(`[data-target-el="${el.dataset.el}"]`);
     if (li) {
@@ -1976,8 +1981,7 @@ function bindHoverHighlight(content, aside) {
   });
   content.addEventListener("mouseout", (e) => {
     const el = e.target.closest("[data-el]");
-    if (!el)
-      return;
+    if (!el) return;
     el.removeAttribute("data-highlight");
     const li = aside.querySelector(`[data-target-el="${el.dataset.el}"]`);
     if (li) {
@@ -1985,8 +1989,7 @@ function bindHoverHighlight(content, aside) {
     }
   });
 }
-
-class BpPage extends HTMLElement {
+var BpPage = class extends HTMLElement {
   connectedCallback() {
     const showDescription = boolAttr(this, "description");
     const fragment = document.createDocumentFragment();
@@ -1998,15 +2001,16 @@ class BpPage extends HTMLElement {
     if (metaScript) {
       try {
         meta = JSON.parse(metaScript.textContent || "{}");
-      } catch {}
+      } catch {
+      }
     }
     const metaBarHtml = buildMetaBar(meta);
     const asideHtml = showDescription ? buildAside(meta) : "";
     this.innerHTML = `
-      <div data-slot="bp-page" class="flex min-h-screen bg-background text-foreground">
+      <div data-slot="bp-page" class="flex min-h-screen min-w-[1520px] bg-background text-foreground">
         <div class="flex-1 min-w-0">
           ${metaBarHtml}
-          <div data-slot="bp-page-content" class="p-6 bg-muted"></div>
+          <div data-slot="bp-page-content" class="p-6 bg-muted min-w-[1200px]"></div>
         </div>
         ${asideHtml}
       </div>`;
@@ -2017,12 +2021,9 @@ class BpPage extends HTMLElement {
     const children = Array.from(fragment.childNodes);
     for (const child of children) {
       const slot = child.getAttribute?.("slot");
-      if (slot === "header")
-        headerSlot.appendChild(child);
-      else if (slot === "footer")
-        footerSlot.appendChild(child);
-      else
-        mainSlot.appendChild(child);
+      if (slot === "header") headerSlot.appendChild(child);
+      else if (slot === "footer") footerSlot.appendChild(child);
+      else mainSlot.appendChild(child);
     }
     content.innerHTML = `
       <div data-slot="bp-page-body" class="flex flex-col min-h-[calc(100vh-3rem)] rounded-lg ring-1 ring-border overflow-hidden bg-background">
@@ -2035,36 +2036,33 @@ class BpPage extends HTMLElement {
     content.querySelector('[data-slot="bp-page-footer"]').appendChild(footerSlot);
     if (showDescription) {
       const aside = this.querySelector('[data-slot="bp-page-aside"]');
-      if (aside)
-        bindHoverHighlight(content, aside);
+      if (aside) bindHoverHighlight(content, aside);
     }
   }
-}
+};
 define("bp-page", BpPage);
 
 // components/bp-section.ts
-class BpSection extends HTMLElement {
+var BpSection = class extends HTMLElement {
   connectedCallback() {
     const feature = attr(this, "data-feature");
     const label = attr(this, "data-label");
     const fragment = document.createDocumentFragment();
-    while (this.firstChild)
-      fragment.appendChild(this.firstChild);
+    while (this.firstChild) fragment.appendChild(this.firstChild);
+    this.style.display = "block";
     this.innerHTML = `
       <div data-slot="bp-section" class="relative flex flex-col gap-3">
         <div data-slot="bp-section-content"></div>
       </div>`;
     this.querySelector('[data-slot="bp-section-content"]').appendChild(fragment);
-    if (feature)
-      this.setAttribute("data-feature", feature);
-    if (label)
-      this.setAttribute("data-label", label);
+    if (feature) this.setAttribute("data-feature", feature);
+    if (label) this.setAttribute("data-label", label);
   }
-}
+};
 define("bp-section", BpSection);
 
 // components/bp-state-tab.ts
-class BpStateTab extends HTMLElement {
+var BpStateTab = class extends HTMLElement {
   connectedCallback() {
     const panels = [];
     const children = Array.from(this.children);
@@ -2074,14 +2072,17 @@ class BpStateTab extends HTMLElement {
         panels.push({ name, content: child.innerHTML });
       }
     }
-    if (panels.length === 0)
-      return;
-    const tabButtons = panels.map((p, i) => `<button
+    if (panels.length === 0) return;
+    const tabButtons = panels.map(
+      (p, i) => `<button
             data-slot="state-tab-btn"
             data-tab-index="${i}"
             class="inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-full px-1.5 py-0.5 text-xs font-medium whitespace-nowrap transition-all ${i === 0 ? "bg-background text-foreground dark:bg-input/30" : "text-foreground/60 hover:text-foreground"}"
-          >${p.name}</button>`).join("");
-    const tabPanels = panels.map((p, i) => `<div data-slot="state-tab-panel" data-tab-index="${i}" style="${i > 0 ? "display:none" : ""}">${p.content}</div>`).join("");
+          >${p.name}</button>`
+    ).join("");
+    const tabPanels = panels.map(
+      (p, i) => `<div data-slot="state-tab-panel" data-tab-index="${i}" style="${i > 0 ? "display:none" : ""}">${p.content}</div>`
+    ).join("");
     this.innerHTML = `
       <div data-slot="bp-state-tab" class="relative flex flex-col rounded-md transition-all">
         <div data-slot="state-tab-bar" class="absolute -top-4 right-1 z-20 inline-flex items-center justify-center rounded-full p-[3px] text-muted-foreground bg-muted outline outline-1 outline-dashed outline-offset-0 outline-[color-mix(in_oklch,var(--muted-foreground)_40%,transparent)] opacity-0 transition-opacity">${tabButtons}</div>
@@ -2115,9 +2116,10 @@ class BpStateTab extends HTMLElement {
     const bar = this.querySelector("[data-slot='state-tab-bar']");
     if (bar) {
       bar.addEventListener("click", (e) => {
-        const btn = e.target.closest("[data-slot='state-tab-btn']");
-        if (!btn)
-          return;
+        const btn = e.target.closest(
+          "[data-slot='state-tab-btn']"
+        );
+        if (!btn) return;
         const idx = btn.dataset.tabIndex;
         const allBtns = this.querySelectorAll("[data-slot='state-tab-btn']");
         for (const b of allBtns) {
@@ -2138,7 +2140,7 @@ class BpStateTab extends HTMLElement {
       });
     }
   }
-}
+};
 define("bp-state-tab", BpStateTab);
 
 // components/bp-stat.ts
@@ -2152,8 +2154,7 @@ var trendIcons = {
   down: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
   neutral: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>`
 };
-
-class BpStat extends HTMLElement {
+var BpStat = class extends HTMLElement {
   connectedCallback() {
     const label = attr(this, "label");
     const value = attr(this, "value");
@@ -2176,13 +2177,12 @@ class BpStat extends HTMLElement {
         ${description ? `<div class="text-[0.6875rem] text-muted-foreground">${description}</div>` : ""}
       </div>`;
   }
-}
+};
 define("bp-stat", BpStat);
 
 // components/bp-image.ts
 var IMAGE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="size-8 text-muted-foreground/50"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>`;
-
-class BpImage extends HTMLElement {
+var BpImage = class extends HTMLElement {
   connectedCallback() {
     this.classList.add("block");
     const width = attr(this, "width");
@@ -2190,10 +2190,8 @@ class BpImage extends HTMLElement {
     const ratio = attr(this, "ratio", "16/9");
     const label = attr(this, "label");
     const styles = [];
-    if (width)
-      styles.push(`width:${width}`);
-    if (height)
-      styles.push(`height:${height}`);
+    if (width) styles.push(`width:${width}`);
+    if (height) styles.push(`height:${height}`);
     if (!height && ratio) {
       const parts = ratio.split("/");
       if (parts.length === 2) {
@@ -2208,14 +2206,14 @@ class BpImage extends HTMLElement {
         </div>
       </div>`;
   }
-}
+};
 define("bp-image", BpImage);
 export {
-  safeAttr,
-  html,
-  esc,
-  define,
-  cn,
+  attr,
   boolAttr,
-  attr
+  cn,
+  define,
+  esc,
+  html,
+  safeAttr
 };

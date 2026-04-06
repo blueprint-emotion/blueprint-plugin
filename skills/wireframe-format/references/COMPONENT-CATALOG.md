@@ -34,7 +34,7 @@ CDN 참조:
 |------|--------|------|
 | `bp-badge` | Badge | variant (default/secondary/destructive/outline/ghost/link) |
 | `bp-avatar` | Avatar | src, fallback, size (sm/md/lg) |
-| `bp-separator` | Separator | orientation (horizontal/vertical), label |
+
 | `bp-progress` | Progress | value (0–100), label |
 | `bp-skeleton` | Skeleton | width, height |
 | `bp-spinner` | — | 속성 없음. 로딩 회전 아이콘 |
