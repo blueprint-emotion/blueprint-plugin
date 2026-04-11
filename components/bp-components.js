@@ -1850,6 +1850,9 @@ var BpAlert = class extends HTMLElement {
 define("bp-alert", BpAlert);
 
 // components/bp-page.ts
+function renderMd(text) {
+  return esc(text).replace(/\*\*(.+?)\*\*/g, '<strong class="text-foreground">$1</strong>').replace(/^- (.+)$/gm, '<span class="flex gap-1.5"><span class="text-muted-foreground/60">\u2022</span><span>$1</span></span>').replace(/\n/g, "<br>");
+}
 function collectElements(features, result = []) {
   for (const f of features) {
     if (f.elements) {
@@ -1886,7 +1889,7 @@ function buildAside(meta) {
             <span class="inline-flex items-center rounded-md bg-primary/10 px-1.5 py-0.5 text-[0.5625rem] font-medium text-primary">${esc(el.type)}</span>
             <span class="font-semibold text-foreground text-xs">${esc(el.label)}</span>
           </div>
-          <div class="text-[0.6875rem] leading-relaxed text-muted-foreground whitespace-pre-line pl-[1.375rem]">${esc(el.description)}</div>
+          <div class="text-[0.6875rem] leading-relaxed text-muted-foreground pl-[1.375rem]">${renderMd(el.description)}</div>
         </li>`
   ).join("");
   return `
