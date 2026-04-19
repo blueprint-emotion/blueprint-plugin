@@ -1,0 +1,300 @@
+<!--
+---
+type: wireframe
+screenId: SHOP-PRODUCT-DETAIL
+title: 상품 상세 (샘플)
+---
+-->
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SHOP — 상품 상세 (보드 패턴 샘플)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://blueprint-platform-pink.vercel.app/blueprint/v1/tailwind-config.js"></script>
+    <script src="https://blueprint-platform-pink.vercel.app/blueprint/v1/bp-components.js" defer></script>
+    <link rel="stylesheet" href="https://blueprint-platform-pink.vercel.app/blueprint/v1/base.css" />
+
+    <!--
+      SHOP / 상품 상세 (와이어프레임 보드 패턴 샘플)
+      - 보드: <bp-board> 안에 정상 프레임 1개 + 영역 컬럼 2개 (갤러리, 구매)
+      - 기능 설명은 <script type="application/bp-description+json">에 임베드 → 우측 rail 자동 렌더
+      - 메인 페이지 트리의 bp-section은 data-feature-key로 슬롯을 구분한다
+      - 상태 변형(이미지 없음, 품절, 옵션 미선택 에러 등)은 section.elements로 흡수하고
+        시각 조각은 <bp-area> 안의 <bp-fragment>로 분리
+    -->
+
+    <script type="application/bp-description+json">
+    {
+      "purpose": "사용자가 상품의 이미지·정보·옵션을 확인하고 장바구니에 담거나 즉시 구매한다.",
+      "rules": [
+        "재고가 0이면 구매/장바구니 버튼 비활성",
+        "옵션이 여러 개일 때 모든 옵션 선택 전에는 구매 불가",
+        "브랜드 로고 미등록 시 기본 이미지 또는 영역 비노출"
+      ],
+      "sections": [
+        {
+          "feature": "BRAND__BOX",
+          "label": "브랜드 소개",
+          "elements": [
+            { "name": "브랜드 로고", "description": "Admin에 업로드된 로고. 미등록 시 기본 이미지" },
+            { "name": "브랜드 샵명", "description": "Admin에 입력한 브랜드명. 최대 50자" },
+            { "name": "브랜드 홈 이동 버튼", "description": "클릭 시 해당 브랜드의 미니샵 페이지로 이동" }
+          ]
+        },
+        {
+          "feature": "PRODUCT__GALLERY",
+          "label": "상품 이미지 뷰어",
+          "elements": [
+            { "name": "메인 이미지", "description": "대표 이미지 1장. 썸네일 클릭 시 전환. 최대 10장" },
+            { "name": "썸네일 목록", "description": "하단 최대 5개 노출. 초과 시 우측 슬라이드" },
+            { "name": "이미지 없음", "description": "상품에 등록된 이미지가 없을 때 플레이스홀더" }
+          ],
+          "notes": ["이미지 확대/축소 미지원 — 정책 확정 필요"]
+        },
+        {
+          "feature": "PRODUCT__INFO",
+          "label": "상품 기본 정보",
+          "elements": [
+            { "name": "상품명", "description": "최대 2줄까지 노출. 초과 시 ellipsis" },
+            { "name": "판매가", "description": "정가/할인가 표기. 할인 시 할인율 배지" },
+            { "name": "재고 상태", "description": "재고 수량 > 0 → 노출 생략. 0이면 '품절' 배지" }
+          ]
+        },
+        {
+          "feature": "PRODUCT__OPTION",
+          "label": "옵션 선택",
+          "elements": [
+            { "name": "옵션 셀렉터", "description": "옵션 그룹별 select. 전체 선택 전 구매 불가" },
+            { "name": "수량 입력", "description": "최소 1, 재고 수량까지" },
+            { "name": "구매 버튼", "description": "primary. 옵션 미선택·품절 시 비활성" },
+            { "name": "장바구니 버튼", "description": "outline. 동일 제약" },
+            { "name": "품절", "description": "재고 0일 때 버튼 영역을 '일시 품절' 안내로 대체" },
+            { "name": "옵션 미선택 에러", "description": "구매 버튼 클릭 시 미선택 옵션을 빨간 border + 메시지로 표시" }
+          ]
+        }
+      ]
+    }
+    </script>
+  </head>
+  <body>
+    <bp-board>
+      <!-- ============================================================
+           정상 상태 프레임 (PC)
+           ============================================================ -->
+      <bp-frame viewport="pc">
+        <bp-page>
+          <bp-page-header>header</bp-page-header>
+
+          <bp-page-content>
+            <!-- 1) 브랜드 소개 -->
+            <bp-section data-feature="BRAND__BOX" data-feature-key="brand" data-label="브랜드 소개">
+              <bp-card size="sm" class="!flex-row items-center gap-4 px-4">
+                <bp-image
+                  data-element="브랜드 로고"
+                  aspect-ratio="1/1"
+                  fit="cover"
+                  rounded
+                  class="w-14 h-14 shrink-0"
+                ></bp-image>
+                <bp-card-header class="flex-1 min-w-0 !p-0">
+                  <bp-card-title data-element="브랜드 샵명">샘플 브랜드</bp-card-title>
+                  <bp-card-description>브랜드 한 줄 소개 텍스트</bp-card-description>
+                </bp-card-header>
+                <bp-card-action class="!static">
+                  <bp-button data-element="브랜드 홈 이동 버튼" variant="outline" size="sm">
+                    브랜드 홈
+                    <bp-icon name="chevron-right" size="xs"></bp-icon>
+                  </bp-button>
+                </bp-card-action>
+              </bp-card>
+            </bp-section>
+
+            <!-- 2) 본문: 갤러리 + 정보/옵션 2열 -->
+            <div class="grid grid-cols-2 gap-8 mt-6">
+              <!-- 좌: 갤러리 -->
+              <bp-section data-feature="PRODUCT__GALLERY" data-feature-key="gallery" data-label="상품 이미지 뷰어">
+                <div class="flex flex-col gap-3">
+                  <bp-image data-element="메인 이미지" aspect-ratio="1/1" rounded></bp-image>
+                  <div data-element="썸네일 목록" class="grid grid-cols-5 gap-2">
+                    <bp-image aspect-ratio="1/1" rounded></bp-image>
+                    <bp-image aspect-ratio="1/1" rounded></bp-image>
+                    <bp-image aspect-ratio="1/1" rounded></bp-image>
+                    <bp-image aspect-ratio="1/1" rounded></bp-image>
+                    <bp-image aspect-ratio="1/1" rounded></bp-image>
+                  </div>
+                </div>
+              </bp-section>
+
+              <!-- 우: 상품 정보 + 옵션 -->
+              <div class="flex flex-col gap-6">
+                <bp-section data-feature="PRODUCT__INFO" data-feature-key="summary" data-label="상품 기본 정보">
+                  <div class="flex flex-col gap-2">
+                    <h1 data-element="상품명" class="text-2xl font-semibold">
+                      샘플 상품명이 두 줄까지 노출됩니다
+                    </h1>
+                    <div data-element="판매가" class="flex items-baseline gap-2">
+                      <span class="text-muted-foreground line-through text-sm">45,000원</span>
+                      <bp-badge variant="destructive">20%</bp-badge>
+                      <span class="text-2xl font-bold">36,000원</span>
+                    </div>
+                    <div data-element="재고 상태" class="text-xs text-muted-foreground">
+                      재고 12개 남음
+                    </div>
+                  </div>
+                </bp-section>
+
+                <bp-separator></bp-separator>
+
+                <bp-section data-feature="PRODUCT__INFO" data-feature-key="detail" data-label="상품 기본 정보">
+                  <bp-card>
+                    <bp-card-header>
+                      <bp-card-title>상품 요약/상세 슬롯 예시</bp-card-title>
+                      <bp-card-description>
+                        같은 <code>PRODUCT__INFO</code> feature를 페이지 안에서 두 번 쓰더라도
+                        <code>summary</code> / <code>detail</code> key로 위치를 구분한다.
+                      </bp-card-description>
+                    </bp-card-header>
+                    <bp-card-content class="grid grid-cols-2 gap-3 text-sm">
+                      <div data-element="상품명" class="rounded-md border border-border bg-muted/30 p-3">
+                        소재: 면 100%
+                      </div>
+                      <div data-element="판매가" class="rounded-md border border-border bg-muted/30 p-3">
+                        배송: 무료 / 제주 3,000원
+                      </div>
+                    </bp-card-content>
+                  </bp-card>
+                </bp-section>
+
+                <bp-section data-feature="PRODUCT__OPTION" data-feature-key="option" data-label="옵션 선택">
+                  <bp-field-group>
+                    <bp-field>
+                      <bp-label for="opt-color">색상</bp-label>
+                      <bp-native-select id="opt-color" class="w-full" data-element="옵션 셀렉터">
+                        <option value="" disabled selected>색상 선택</option>
+                        <option value="black">블랙</option>
+                        <option value="white">화이트</option>
+                      </bp-native-select>
+                    </bp-field>
+
+                    <bp-field>
+                      <bp-label for="opt-size">사이즈</bp-label>
+                      <bp-native-select id="opt-size" class="w-full" data-element="옵션 셀렉터">
+                        <option value="" disabled selected>사이즈 선택</option>
+                        <option value="s">S</option>
+                        <option value="m">M</option>
+                        <option value="l">L</option>
+                      </bp-native-select>
+                    </bp-field>
+
+                    <bp-field>
+                      <bp-label for="opt-qty">수량</bp-label>
+                      <bp-input id="opt-qty" data-element="수량 입력" type="number" value="1"></bp-input>
+                    </bp-field>
+
+                    <div class="flex gap-2 mt-2">
+                      <bp-button data-element="장바구니 버튼" variant="outline" class="flex-1">
+                        장바구니
+                      </bp-button>
+                      <bp-button data-element="구매 버튼" variant="default" class="flex-1">
+                        바로 구매
+                      </bp-button>
+                    </div>
+                  </bp-field-group>
+                </bp-section>
+              </div>
+            </div>
+          </bp-page-content>
+          <bp-page-footer>footer</bp-page-footer>
+        </bp-page>
+      </bp-frame>
+
+      <!-- ============================================================
+           영역: 갤러리
+           ============================================================ -->
+      <bp-area>
+        <bp-fragment
+          id="gallery-empty"
+          title="이미지 없음"
+          description="상품에 등록된 이미지가 0장일 때"
+        >
+          <bp-section data-feature="PRODUCT__GALLERY" data-label="상품 이미지 뷰어">
+            <bp-empty data-element="이미지 없음">
+              <bp-empty-media>
+                <bp-icon name="image-off" size="xl"></bp-icon>
+              </bp-empty-media>
+              <bp-empty-title>등록된 이미지가 없습니다</bp-empty-title>
+              <bp-empty-description>
+                관리자가 이미지를 업로드하면 여기에 표시됩니다.
+              </bp-empty-description>
+            </bp-empty>
+          </bp-section>
+        </bp-fragment>
+      </bp-area>
+
+      <!-- ============================================================
+           영역: 구매
+           ============================================================ -->
+      <bp-area>
+        <bp-fragment
+          id="purchase-sold-out"
+          title="품절"
+          description="재고 수량 0"
+        >
+          <bp-section data-feature="PRODUCT__OPTION" data-label="옵션 선택">
+            <div class="flex flex-col gap-3">
+              <bp-badge variant="destructive" data-element="품절">일시 품절</bp-badge>
+              <bp-alert>
+                <bp-alert-title>현재 판매가 일시 중단된 상품입니다</bp-alert-title>ㅇ
+                <bp-alert-description>
+                  재입고 시 알림을 받으시려면 아래 버튼을 눌러주세요.
+                </bp-alert-description>
+              </bp-alert>
+              <bp-button variant="outline">
+                <bp-icon name="bell" size="sm"></bp-icon>
+                재입고 알림 신청
+              </bp-button>
+            </div>
+          </bp-section>
+        </bp-fragment>
+
+        <bp-fragment
+          id="purchase-option-error"
+          title="옵션 미선택 에러"
+          description="모든 옵션을 선택하지 않고 구매 버튼 클릭"
+        >
+          <bp-section data-feature="PRODUCT__OPTION" data-label="옵션 선택">
+            <bp-field-group>
+              <bp-field data-invalid="true">
+                <bp-label for="err-color">색상</bp-label>
+                <bp-native-select id="err-color" class="w-full" aria-invalid="true" data-element="옵션 셀렉터">
+                  <option value="" disabled selected>색상 선택</option>
+                  <option value="black">블랙</option>
+                  <option value="white">화이트</option>
+                </bp-native-select>
+                <bp-field-error data-element="옵션 미선택 에러">
+                  색상을 선택해주세요.
+                </bp-field-error>
+              </bp-field>
+
+              <bp-field>
+                <bp-label for="err-size">사이즈</bp-label>
+                <bp-native-select id="err-size" class="w-full" data-element="옵션 셀렉터">
+                  <option value="s">S</option>
+                  <option value="m" selected>M</option>
+                  <option value="l">L</option>
+                </bp-native-select>
+              </bp-field>
+
+              <div class="flex gap-2 mt-2">
+                <bp-button variant="outline" class="flex-1">장바구니</bp-button>
+                <bp-button variant="default" class="flex-1">바로 구매</bp-button>
+              </div>
+            </bp-field-group>
+          </bp-section>
+        </bp-fragment>
+      </bp-area>
+    </bp-board>
+  </body>
+</html>
