@@ -2,12 +2,19 @@
 
 이 폴더의 스킬은 `bp` 플러그인이 사용자 프로젝트에서 산출물을 생성할 때 참조하는 스킬이다. 이 프로젝트 자체에서도 도그푸딩 목적으로 `.claude/skills/`에 심링크로 연결해 사용한다.
 
-스킬은 4개로 구성된다:
+스킬은 6개로 구성된다:
 
-- **intake** — `planner` agent의 작업 노트(`intake.md`) 형식·인터뷰 흐름·재실행 정책
+**산출물 규약** (4개, `user-invocable: false` — command/agent 가 참조하는 규약 스킬):
+
+- **intake** — `intake.md` 형식·슬롯 9개·`## _pending_decisions` 메타 섹션·재실행 정책
 - **feature-spec** — 기능명세(`docs/features/{DOMAIN}.md`) 도메인 SSOT
 - **screen-spec** — 화면명세(`docs/screens/**/*.md`) 페이지·시트·다이얼로그·영역
 - **wireframe** — 와이어프레임 HTML(`docs/screens/**/*.html`) bp-* Web Components
+
+**오케스트레이션** (2개, `user-invocable: false`, command/agent preload 전용):
+
+- **plan-harness** — `/bp:plan` 워크플로. 기획자 UX 원칙 + 인터뷰 흐름 + 통합 확인 게이트 + 수렴 루프 + α 재진입 프로토콜
+- **wireframe-harness** — `/bp:wireframe` 워크플로. viewport 예고 + 덮어쓰기 분기 + 수렴 루프 + 명세 결함 `/bp:plan` 회송
 
 ## 버전·변경 이력 관리 (필독)
 
@@ -28,19 +35,26 @@
 
 | 스킬 | 역할 | 산출물 |
 |------|------|--------|
-| `intake` | 화면 작업 노트 (planner agent가 사용) | `docs/screens/**/intake.md` |
+| `intake` | 화면 작업 노트 (오케스트레이터·planner 가 사용) | `docs/screens/**/intake.md` |
 | `feature-spec` | 기능명세 생성 | `docs/features/{DOMAIN}.md` |
 | `screen-spec` | 화면명세 생성 | `docs/screens/**/{screen,area_*,sheet_*,dialog_*}.md` |
 | `wireframe` | 와이어프레임 생성 | `docs/screens/**/*.html` |
+| `plan-harness` | /bp:plan 오케스트레이션 규약 (user-invocable: false) | — (규약만, 직접 산출물 없음) |
+| `wireframe-harness` | /bp:wireframe 오케스트레이션 규약 (user-invocable: false) | — (규약만) |
 
 ## 설계 원칙
 
-### 기능명세 = 도메인 규칙, 화면명세 = 화면 요소
+### 기능명세 = 도메인 규칙, 화면명세 = 화면 요소, 와이어프레임 = 사람이 보는 결과물
 
-- **기능명세** (rules): "이 도메인은 무엇을 가지고 있고, 어떤 규칙이 적용되는가"
-- **화면명세** (elements): "이 화면에서 사용자가 무엇을 보고, 어떻게 표현되는가"
+산출물은 세 층으로 나뉘고 각자 역할이 다르다:
 
-같은 도메인 속성도 화면마다 다르게 표현되므로, elements는 화면명세에 둔다. 기능명세에는 화면에 무관한 비즈니스 규칙만 둔다. **elements에는 기능명세의 구체적 속성명을 쓰지 않고, featureId로 영역만 참조하고 표현 패턴을 기술한다.** 기능명세에서 속성명이 바뀌어도 화면명세를 수정할 필요가 없다.
+- **기능명세** (rules): "이 도메인은 무엇을 가지고 있고, 어떤 규칙이 적용되는가" — 비즈니스 규칙 SSOT
+- **화면명세** (elements): "이 화면에서 사용자가 무엇을 보고, 어떻게 표현되는가" — **기계 읽기용 SSOT**. featureId 로 기능명세를 참조하고 표현 패턴을 기술한다
+- **와이어프레임** (`wireframe.html`): "실제로 어떻게 생겼는가" — **사람이 보는 결과물**. 기획자·디자이너·리뷰어가 화면을 직관적으로 이해하는 창구
+
+같은 도메인 속성도 화면마다 다르게 표현되므로 elements 는 화면명세에 둔다. 기능명세에는 화면에 무관한 비즈니스 규칙만 둔다. **elements 에는 기능명세의 구체적 속성명을 쓰지 않고, featureId 로 영역만 참조하고 표현 패턴을 기술한다.** 기능명세에서 속성명이 바뀌어도 화면명세를 수정할 필요가 없다.
+
+> **왜 화면명세만 읽으면 "뭐가 보이는지" 덜 선명한가?** 의도된 설계다. screen.md 는 기계가 읽는 SSOT 고, 사람이 읽는 건 wireframe.html 이다. 둘 다 같이 커밋되므로 "보이는 모습" 이 궁금하면 와이어를 연다. 속성명을 직접 쓰게 허용하면 SSOT 가 깨져 기능명세와 drift 가 나고, 이는 reviewer 가 잡는 대표 위반이다.
 
 ### 기획자가 쓰고 읽는 문서
 
@@ -107,7 +121,7 @@
 - frontmatter: `screenId`, `title`, `type: page`, `purpose`, `viewport`, `features` (도메인명 배열), `group`
 - 필수 섹션: `## 화면 구성` (레이아웃 + 영역/오버레이 링크), `## 상태`
 - 선택 섹션: `## 인수조건` (영역 간/화면 간 규칙만), `## 진입 경로`, `## 비즈니스 규칙`
-- 유저스토리는 루트에 두지 않는다 — `purpose` 프론트매터로 충분, 상세는 영역 파일에
+- 유저스토리는 **단일 영역 화면이면 루트 `screen.md` 에 필수** (영역 파일이 없어 인라인 작성), **영역 분할 화면이면 루트에서는 선택** — 상세 시나리오는 각 영역 파일에. 우선순위 라벨 `[Must]`/`[Should]`/`[Could]` 필수. 자세한 규약은 [screen-spec SKILL.md](screen-spec/SKILL.md)
 
 **시트·다이얼로그(`sheet_*.md`, `dialog_*.md`)**:
 - frontmatter: 페이지와 동일하되 `type: sheet | dialog`

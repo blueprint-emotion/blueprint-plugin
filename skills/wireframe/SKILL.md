@@ -1,6 +1,6 @@
 ---
 name: wireframe
-version: 4.1.2
+version: 4.2.1
 user-invocable: false
 description: >
   와이어프레임 HTML을 생성한다. bp-* Web Components(shadcn/ui 포팅 51종 + bp-icon)를 사용.
@@ -47,6 +47,8 @@ viewport: [pc, mobile]
 ```
 
 → 두 개의 와이어프레임 파일을 만들고, 각각 `<bp-frame viewport="pc">` / `<bp-frame viewport="mobile">`을 쓴다. 한 파일에 두 viewport를 섞지 않는다 (파일 분리가 원칙).
+
+**오버레이(`sheet_*.md`, `dialog_*.md`) 도 동일 규약**: 각 overlay 파일의 `viewport` 배열을 독립적으로 따라 pc/mobile 별 파일을 만든다. suffix 규약은 `wireframe_sheet_{name}.html` (pc) + `wireframe_sheet_{name}_mobile.html` (mobile). page 의 viewport 와 overlay 의 viewport 는 독립이다.
 
 파일명 규칙은 이 스킬의 관심사가 아니다 — 플랫폼·화면명세 측에서 정한다. 와이어프레임 스킬은 입력받은 viewport에 맞춰 프레임을 그린다.
 
@@ -486,11 +488,18 @@ bp-area                        → wrapper only
 | [`bp-empty` 패밀리](references/components/bp-empty.md) | media/title/description/content |
 
 ### 오버레이 (`open` boolean으로 정적 표현)
+
+오버레이 컴포넌트 (`bp-dialog`, `bp-sheet`, `bp-alert-dialog`) 는 **와이어프레임 전용 정적 카드**로 렌더된다. viewport 중앙에 고정되는 진짜 모달이 아니라, 부모 `bp-fragment` body 흐름 안에서 `mx-auto` 로 가로 중앙 정렬된 카드처럼 그려진다. 따라서:
+
+- `<bp-fragment>` body 에 `<bp-dialog open>` 을 **직접** 배치한다. backdrop 흉내 용 `<div class="absolute inset-0 bg-black/20">` 같은 wrapper 로 감싸지 말 것 — 구 패턴 (컴포넌트가 `position: fixed` 였을 때 필요하던 우회) 이고 이제는 이중 박스만 만든다
+- 한 페이지에 여러 오버레이를 동시에 `open` 해도 서로 겹치지 않고 각자 자기 fragment 안에 독립적으로 렌더된다
+- 원칙: **1 fragment = 1 오버레이 상태**. 초기·전송중·에러 등 상태를 보이려면 fragment 를 분리한다 (같은 fragment 안에 같은 오버레이 2개 넣으면 grid-col 로 나란히는 보이지만 의미상 혼란)
+
 | bp 태그 | 주요 prop |
 |---------|-----------|
 | `bp-dialog` 패밀리 | content: `show-close-button` |
 | [`bp-alert-dialog` 패밀리](references/components/bp-alert-dialog.md) | content: `size`. action/cancel: `variant`. 닫기 X 없음 |
-| [`bp-sheet` 패밀리](references/components/bp-sheet.md) | content: `side` |
+| [`bp-sheet` 패밀리](references/components/bp-sheet.md) | content: `side` (와이어프레임에서는 side 에 따라 `ml-auto` / `mr-auto` 등 부모폭 안 정렬로 표현됨) |
 | [`bp-drawer` 패밀리](references/components/bp-drawer.md) | `direction` (vaul 드래그 미지원) |
 | `bp-popover` 패밀리 | content: `side`, `align` |
 | `bp-hover-card` 패밀리 | content: `side`, `align` |
@@ -525,7 +534,7 @@ bp-area                        → wrapper only
 
 ## 실전 팁
 
-1. **오버레이 정적 표현**: `open` 속성만 추가하면 열린 상태 고정. trigger 불필요
+1. **오버레이 정적 표현**: `open` 속성만 추가하면 열린 상태 고정. trigger 불필요. 컴포넌트가 부모 흐름 안에 정적 카드로 렌더되므로 backdrop·중앙정렬 흉내용 wrapper div 는 **만들지 말 것** (이중 박스)
 2. **bp-image 플레이스홀더**: `src` 생략 → 자동 플레이스홀더
 3. **폼은 bp-field로 감싸기**: label + input은 항상 `<bp-field>` 안에
 4. **Tailwind는 레이아웃만**: 컴포넌트 스타일링은 `bp-*`가 담당
@@ -551,3 +560,5 @@ bp-area                        → wrapper only
 | 한 영역의 상태 변형을 각각 별도 `<bp-section>`·`feature`·`section`으로 분리 | 같은 feature가 여러 번 등장해 rail이 중복되고 `data-feature` 매칭이 깨진다. **같은 영역의 변형은 하나의 section.elements로 흡수**하고, 시각 조각만 `<bp-area>`의 `<bp-fragment>`로 분리 |
 | 정상 프레임에 `<bp-area>`나 `<bp-fragment>` 섞기 | 보드 구조 위반. 정상은 `<bp-frame>` 안 `<bp-page>`, 상태 조각은 `<bp-area>` 안 `<bp-fragment>`로 명확히 분리 |
 | 한 파일에 `<bp-frame viewport="pc">`와 `<bp-frame viewport="mobile">` 둘 다 배치 | 한 파일 = 한 viewport. 화면명세 viewport가 둘 다면 파일 두 개를 만든다 |
+| `<bp-dialog open>` / `<bp-sheet open>` / `<bp-alert-dialog open>` 을 `<div class="absolute inset-0 ... bg-black/20">` 같은 wrapper 로 감쌈 | 오버레이 컴포넌트는 부모 흐름 안에 정적 카드로 렌더된다 (viewport-fixed 아님). backdrop 흉내용 wrapper 는 이중 박스만 만들고, `bp-fragment` body 의 기본 보더·패딩과 시각 충돌을 일으킨다. fragment body 에 **직접** 배치할 것 |
+| 한 `<bp-fragment>` 안에 `<bp-dialog open>` 을 여러 개 중첩 | 1 fragment = 1 오버레이 상태 원칙. 상태별(초기·전송중·에러) 이나 분기별 다이얼로그는 각자 별도 fragment (`edit-request-dialog`, `edit-request-dialog-submitting` 식) 로 분리 |

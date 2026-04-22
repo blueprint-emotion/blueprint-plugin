@@ -6,6 +6,44 @@
 - **MINOR**: 새 컴포넌트·새 패턴·새 옵션 추가 (호환성 유지)
 - **PATCH**: 문서 명료화·예제 보강·오타 수정
 
+## [4.2.1] - 2026-04-22
+
+### Added
+
+- `references/example-product-detail.html` 에 4종 오버레이 fragment 예제 보강:
+  - `gallery-context-menu` — `bp-context-menu` (메인 이미지 우클릭 메뉴; 컨텍스트 메뉴는 fixed 좌표라 정적 미리보기는 mock 카드로 항목 구성을 노출)
+  - `info-shipping-sheet` — `bp-sheet` (배송/교환 정책 시트, side="right")
+  - `option-size-guide-dialog` — `bp-dialog` (사이즈 가이드, 자동 X 버튼 + table 본문)
+  - `purchase-already-in-cart-alert` — `bp-alert-dialog` (장바구니 중복 확인, X 없는 cancel/action 강제)
+- 각 오버레이 element 가 해당 feature `sections[].elements` 에 흡수됨 (오버레이를 별도 feature 로 분리하지 않는 SSOT 원칙 시연)
+
+### Fixed
+
+- 기존 `purchase-sold-out` fragment 의 `</bp-alert-title>ㅇ` 잔여 한글 오타 제거
+
+### Removed
+
+- `PRODUCT__INFO` 의 `data-feature-key="detail"` 두 번째 섹션 (자기참조 메타 카드 — "같은 feature 를 두 번 쓸 때 summary/detail key 로 슬롯 구분" 규약을 와이어프레임 본문에 자기설명으로 박아둔 노이즈). example 파일은 실제 화면을 흉내내는 본보기여야 하므로 제거. `data-feature-key` 슬롯 분리 규약은 SKILL.md 본문에서만 설명
+
+## [4.2.0] - 2026-04-21
+
+### Changed
+
+- **오버레이 컴포넌트 정적 렌더링 전환**: `bp-dialog`, `bp-sheet`, `bp-alert-dialog` 가 `position: fixed` → `position: relative` 로 변경됨. 이제 부모 `bp-fragment` body 흐름 안에서 `mx-auto` 로 가로 중앙 정렬된 정적 카드로 렌더됨. 한 페이지에 여러 오버레이가 `open` 이어도 viewport 중앙에 겹치지 않음 (기존 이슈: 3개 이상 `<bp-dialog open>` 시 모두 viewport 중앙 stack). overlay backdrop (`bg-black/10 backdrop-blur`) 은 wireframe 컨텍스트에서 시각 효과 없이 marker 역할만.
+- 오버레이 섹션에 "1 fragment = 1 오버레이 상태" 원칙 + backdrop 흉내용 wrapper div 금지 명시
+- "자주 하는 실수" 표에 두 항목 추가: (a) 오버레이를 `absolute inset-0 bg-black/20` wrapper 로 감싸는 구 패턴, (b) 한 fragment 안에 `<bp-dialog open>` 중첩 사용
+- "실전 팁" #1 의 "오버레이 정적 표현" 에 "wrapper div 만들지 말 것" 단서 추가
+
+### Migration
+
+기존 와이어프레임에서 `<bp-dialog open>` / `<bp-sheet open>` / `<bp-alert-dialog open>` 주변에 수동 wrapper (`<div class="relative min-h-... rounded border" style="background: var(--muted);">` + `<div class="absolute inset-0 flex items-center justify-center bg-black/20 p-6">`) 를 둬서 모달 위치를 시뮬레이션했다면 → wrapper 모두 제거하고 fragment body 에 `<bp-dialog open>` 직접 배치. 같은 fragment 에 두 상태 카드(초기·전송중 등) 를 grid-cols 로 나란히 놓았다면 → 두 fragment 로 분리.
+
+## [4.1.3] - 2026-04-21
+
+### Changed
+
+- **Overlay viewport 분기 규약 명시화**: `viewport 분기` 섹션에 `sheet_*.md`, `dialog_*.md` 도 각자의 `viewport` 를 독립적으로 따라 pc/mobile 파일을 분리 생성한다는 한 줄 추가. suffix 규약 (`wireframe_sheet_{name}_mobile.html`) 언급. 기존 동작의 문서화 (PATCH)
+
 ## [4.1.2] - 2026-04-20
 
 ### Added

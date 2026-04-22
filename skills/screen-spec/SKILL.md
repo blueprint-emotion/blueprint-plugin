@@ -1,6 +1,6 @@
 ---
 name: screen-spec
-version: 1.6.1
+version: 1.6.2
 user-invocable: false
 description: >
   화면명세(*screen*.md)를 생성·수정한다. 유저스토리·인수조건·elements·상태·인터랙션·예외 케이스를 기술하고, 기능명세를 도메인 단위로 참조.
@@ -50,6 +50,7 @@ description: >
 
 - 페이지 1개/폴더가 원칙. 시트·다이얼로그·영역은 복수 가능
 - frontmatter `type`은 파일명과 일치시킨다
+- **`viewport` 필드는 page·sheet·dialog 모두 필수** (panel 은 부모 page 를 따르므로 불필요). overlay 의 `viewport` 는 page 와 **독립** — page 가 `[pc]` 만 지원해도 overlay 를 `[pc, mobile]` 로 둘 수 있고, 그 반대도 가능하다. 와이어프레임 생성기는 각 파일의 viewport 를 독립적으로 따라 pc/mobile suffix 파일을 각각 만든다 (`wireframe_sheet_{name}.html` + `wireframe_sheet_{name}_mobile.html`)
 
 ### 분할 기준: 기능 영역 2개 이상이면 분할
 

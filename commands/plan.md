@@ -5,52 +5,65 @@ argument-hint: <요구사항.md 경로 또는 자연어>
 
 # /bp:plan
 
-기획자가 자유형식으로 적어둔 요구사항 md를 받아, 화면 한 장(또는 후보 여러 장)을 식별하고 명세 작성까지 끝낸다. **와이어프레임은 만들지 않는다** — 명세 검토 후 사용자가 명시적으로 `/bp:wireframe`을 호출해야 그려진다.
+기획자가 자유형식으로 적어둔 요구사항 md를 받아, 화면 한 장(또는 후보 여러 장)을 식별하고 명세 작성까지 끝낸다. **와이어프레임은 만들지 않는다** — 명세 검토 후 기획자가 명시적으로 `/bp:wireframe` 을 호출해야 그려진다.
 
 ## 사용법
 
 ```
 /bp:plan docs/requirements/product-detail.md     # 요구사항 파일 지정
 /bp:plan                                         # 인자 없이 시작 → 인터뷰
-/bp:plan 상품 상세 화면 만들어줘                    # 자연어 인자 → planner가 해석
+/bp:plan 상품 상세 화면 만들어줘                    # 자연어 인자 → 오케스트레이터가 해석
 ```
-
-## 동작
 
 사용자가 다음 인자로 호출함: $ARGUMENTS
 
-**중요**: 이 명령의 작업은 반드시 Task tool로 `subagent_type: "bp:planner"`를 호출하여 위임한다. **직접 요구사항을 파싱하거나 명세를 작성하지 말 것** — 모든 작업은 planner agent가 수행한다. 이 명령은 인자 검증 후 dispatch하는 얇은 wrapper일 뿐이다.
+## 인자 검증
 
-호출 전 다음을 점검:
+| 상황 | 처리 |
+|---|---|
+| 파일 경로 + 존재 | 해당 md 를 Read 로 읽고 진입 |
+| 자연어 | 해당 내용을 초기 컨텍스트로 삼고 인터뷰 시작 |
+| 비어 있음 | "어떤 화면을 만들까요?" 로 인터뷰 시작 |
+| 파일이 존재하지 않음 | "파일을 찾을 수 없어요: {경로}" 출력 후 종료 |
+| 디렉토리 | "파일 경로를 주세요. 디렉토리는 지원하지 않아요" 출력 후 종료 |
 
-1. **인자가 파일 경로인가** — 존재하는 md 파일이면 planner에 경로 그대로 전달
-2. **인자가 자연어인가** — planner에게 "사용자가 다음 자연어 요청을 했어: ..." 형태로 전달, planner가 인터뷰로 시작
-3. **인자가 비어 있는가** — planner를 인터뷰 모드로 시작 ("어떤 화면을 만들까요?")
-4. **경로가 존재하지 않는가** — 사용자에게 알리고 종료 (planner 호출하지 않음)
+## 실행
 
-planner를 호출할 때 다음을 명확히 전달:
+인자 검증이 끝나면 이 커맨드는 **`plan-harness` 스킬의 SKILL.md 를 SSOT 로 삼아** 다음 흐름을 수행한다:
 
-- 입력 종류 (파일 / 자연어 / 빈 인자)
-- 작업 범위: intake.md → 인터뷰 → 컨펌 → feature spec + screen spec까지. **와이어프레임은 만들지 말 것**
-- 종료 후 reviewer 자동 호출
-- 종료 시 사용자에게 "/bp:wireframe {screen.md 경로}" 다음 단계 안내
+1. `intake` 스킬 로드 + 기존 intake.md 상태 분기
+2. 요구사항 파싱 → intake.md 초안
+3. 대화형 인터뷰 (빈 부분 단계별로)
+4. 통합 확인 게이트 (intake + 산출물 목록)
+5. `bp:planner` 에 명세 작성 위임 (Task)
+6. Producer-Reviewer 수렴 루프 (오케스트레이터 주도, Task(bp:reviewer) + SendMessage(planner))
+7. α 재진입 (수동 결정 필요 시)
+8. 최종 보고 + `/bp:wireframe` 안내
+
+**세부 알고리즘·프롬프트 템플릿·기획자 UX 원칙은 `plan-harness` 스킬** — 여기선 요약만.
+
+참조:
+- 전체 흐름·원칙: `plan-harness/SKILL.md`
+- 인터뷰 전략: `plan-harness/references/interview-flow.md`
+- 기획자 언어 번역: `plan-harness/references/planner-ux.md`
+- 확인 게이트: `plan-harness/references/confirm-gates.md`
+- 수렴 루프·α 프로토콜: `plan-harness/references/convergence-loop.md`, `plan-harness/references/α-pending-to-question.md`
+- Task/SendMessage 템플릿: `plan-harness/references/task-tool-invocation.md`
+- 재진입·중단 복기: `plan-harness/references/resume.md`
 
 ## 엣지 케이스
 
 | 상황 | 처리 |
 |---|---|
-| 인자 파일이 존재하지 않음 | "파일을 찾을 수 없어요: {경로}" 출력 후 종료 |
-| 인자가 디렉토리 | "파일 경로를 주세요. 디렉토리는 지원하지 않아요" 출력 후 종료 |
-| 화면 폴더에 이미 intake.md 존재 | planner가 "신규/부분수정/전체재검토" 분기 인터뷰 |
-| 요구사항 md에 여러 화면이 섞임 | planner가 화면 후보 리스트 컨펌 → 1순위 1개부터 권장 |
-| 사용자가 인터뷰 도중 중단 | intake.md를 status: `interviewing` 그대로 두고 종료. 다음 호출 시 이어감 |
+| 요구사항 md 에 여러 화면이 섞임 | 화면 후보 리스트 확인 → 1순위 1개부터 권장 (single screen first) |
+| 인터뷰 도중 기획자가 중단 | intake.md 상태 그대로 두고 종료. 다음 호출 시 `resume.md` 따라 이어감 |
+| 기획자가 인터뷰 중 맥락을 크게 바꿈 | 기존 초안 건드리지 않고 "새 화면으로 만들까요?" 확인 |
+| 수렴 루프 한계 초과 | 남은 위반 자연어 요약 + 기획자에게 같이 보자고 안내 (`plan-harness/SKILL.md` 보고 C) |
 
 ## 산출물
-
-(planner agent가 생성)
 
 - `docs/screens/{그룹}/{화면폴더}/intake.md`
 - `docs/features/{DOMAIN}.md` (필요 시 신설·보강)
 - `docs/screens/{그룹}/{화면폴더}/screen.md` + `area_*.md` + `sheet_*.md` + `dialog_*.md`
 
-와이어프레임(`*.html`)은 만들지 않는다.
+와이어프레임(`*.html`) 은 만들지 않는다 — 다음 단계에서 `/bp:wireframe`.

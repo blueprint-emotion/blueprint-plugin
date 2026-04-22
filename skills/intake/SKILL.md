@@ -1,17 +1,18 @@
 ---
 name: intake
-version: 0.1.1
+version: 0.3.0
 user-invocable: false
 description: >
   화면 폴더에 작성하는 intake.md(작업 노트) 형식과 작성·인터뷰 가이드.
   /bp:plan 명령이 자유형식 요구사항 md를 받아 화면 폴더별로 intake.md를 생성·갱신할 때 이 스킬을 사용한다.
-  planner agent가 빈 슬롯을 식별해 단계별 인터뷰를 진행하고, 답변을 intake.md에 역기록할 때도 이 스킬의 슬롯 규약을 따른다.
+  오케스트레이터(Claude Code 본인) 가 요구사항을 파싱해 초안을 작성하고, 빈 슬롯을 식별해 단계별 인터뷰를 진행하고, 답변을 intake.md에 역기록할 때 이 스킬의 슬롯 규약을 따른다.
+  planner subagent 는 명세 작성 단계 + 수렴 루프의 α 재진입 단계에서 이 스킬의 `## _pending_decisions` 메타 섹션 규약(payload 기록 전용)을 따른다.
   "intake", "intake.md", "요구사항", "화면 작성 시작", "기획 인터뷰" 키워드에 트리거.
 ---
 
 # intake.md 작성 가이드
 
-`intake.md`는 한 화면을 만들기 위한 **작업 노트**다. 기획자의 자유형식 요구사항을 planner agent가 정형화한 결과이자, 이후 feature/screen 명세 생성의 입력이 된다.
+`intake.md`는 한 화면을 만들기 위한 **작업 노트**다. 기획자의 자유형식 요구사항을 오케스트레이터가 정형화한 결과이자, 이후 feature/screen 명세 생성의 입력이 된다.
 
 ## 위치
 
@@ -25,7 +26,7 @@ docs/screens/{그룹}/{화면폴더}/intake.md   ← 산출물 폴더와 같은 
 
 ```yaml
 ---
-status: drafting | interviewing | ready | done
+status: drafting | interviewing | ready | awaiting_decision | needs_attention | done
 source: ../../../requirements.md          # 어느 요구사항 md에서 파생됐나 (상대 경로)
 target: .                                 # 산출물 목적지 (자기 폴더 = ".")
 ---
@@ -33,13 +34,26 @@ target: .                                 # 산출물 목적지 (자기 폴더 =
 
 | 필드 | 필수 | 설명 |
 |------|:---:|------|
-| `status` | Y | 작업 단계. `drafting`(초안) → `interviewing`(인터뷰 중) → `ready`(명세 작성 가능) → `done`(산출물 완료) |
+| `status` | Y | 작업 단계. 아래 표 참조 |
 | `source` | Y | 입력 요구사항 md 경로. 재실행 시 추적용 |
 | `target` | N | 산출물 폴더. 보통 자기 폴더(`.`) |
 
+### status 값
+
+| status | 의미 | 다음 단계 주체 |
+|---|---|---|
+| `drafting` | 요구사항 파싱 직후. 초안만 있는 상태 | 오케스트레이터 (인터뷰 진입) |
+| `interviewing` | 빈 슬롯 인터뷰 진행 중 | 오케스트레이터 (인터뷰 계속) |
+| `ready` | 9개 슬롯 모두 채워짐. 명세 작성 가능 | 오케스트레이터 → planner subagent 위임 |
+| `awaiting_decision` | planner 수렴 루프 중 수동 결정 대기. `## _pending_decisions` 섹션에 payload 있음 | 오케스트레이터 (기획자 응답 수집 → planner 재호출) |
+| `needs_attention` | 루프 한계(3회) 초과 또는 연쇄 실패. 같이 보기 단계 | 기획자 수동 확인 |
+| `done` | 명세 산출물 완료 | (와이어프레임 단계로 넘어감) |
+
+`awaiting_decision`·`needs_attention` 은 0.2.0 에서 추가. planner subagent 가 α 재진입 프로토콜로 자동 기록한다 — 기획자가 직접 설정할 일은 없다.
+
 ## 슬롯 9개
 
-본문은 다음 9개 `##` 섹션으로 구성한다. **빈 섹션은 인터뷰 트리거**가 된다 — planner agent가 빈 섹션을 발견하면 해당 슬롯에 대해 사용자에게 질문하고, 답변을 그 섹션에 기록한다.
+본문은 다음 9개 `##` 섹션으로 구성한다. **빈 섹션은 인터뷰 트리거**가 된다 — 오케스트레이터가 빈 섹션을 발견하면 해당 슬롯에 대해 기획자에게 질문하고, 답변을 그 섹션에 기록한다.
 
 ### 1. `## 무엇을·누가·왜`
 
@@ -160,18 +174,100 @@ featureId 매핑이 한 줄로 안 잡히면 인터뷰 대상.
 - 디자이너 스케치: figma.com/... (TBD, 디자인 확정 전)
 ```
 
+## `## _pending_decisions` 메타 섹션
+
+0.2.0 에서 추가, 0.3.0 에서 payload 스키마 확장된 **메타 섹션**. 슬롯이 아니다 — 인터뷰로 채우는 본문 9개 슬롯과 완전히 별개.
+
+### 용도 (옵션 B — 책임 분리)
+
+planner subagent 가 수렴 루프(Producer-Reviewer 패턴) 중 reviewer 가 "자동 수정 불가" 로 분류한 위반을 만나면, 기획자 결정을 기다리기 위해 turn 을 종료한다. 이때 **payload 기록만** 담당한다 — 기획자-facing 자연어 질문은 planner 가 아니라 오케스트레이터가 이 payload 를 읽고 생성한다.
+
+- planner: payload 기록 (아래 필드 전체) + 짧은 handoff note 만 출력 후 종료
+- 오케스트레이터: payload 읽고 `plan-harness/references/α-pending-to-question.md` 규약으로 기획자 언어로 질문 → 응답을 `decision:` 필드에 기록 → **SendMessage 로 기존 planner 세션 재진입** (같은 `/bp:plan` 호출 안에서). 세션 종료 후 resume 시나리오면 새 Task — `resume.md` 참조
+
+### 포맷 (0.3.0 스키마)
+
+```markdown
+## _pending_decisions
+
+<!-- 이 섹션은 planner 가 payload 를 기록하고 오케스트레이터가 기획자 질문으로 번역하기 위한 내부 통로입니다. 기획자가 직접 편집하지 않습니다. -->
+
+### round 2 — 2026-04-21 15:42
+
+- id: v1
+  category: [SSOT]
+  location: area_option.md:45
+  summary: 옵션 조합 규칙의 귀속 위치 판단 필요
+  planner_context: area_option 인수조건을 정리하던 중, 이 규칙이 화면 고유 조건인지 PRODUCT 공통 rule 인지 확정되지 않아 명세 진행이 멈춤
+  user_facing_why: 같은 규칙을 두 군데에 쓰지 않고 명세를 마무리하려면 위치를 정해야 함
+  source_slots:
+    - 유저스토리
+    - 동작·인터랙션
+  conversation_hint: 기획자가 앞서 "옵션 다 고르면 장바구니 가능" 과 "같은 옵션은 합쳐진다" 를 같이 언급함
+  priority: blocking           # blocking | important | optional
+  recommendation: PRODUCT.md#OPTION 링크로 대체 (리뷰어 권장)
+  alternatives:
+    - label: 영역 고유 인수조건으로 유지
+      trade_off: 이 화면 맥락은 선명하지만 다른 화면에서 같은 규칙을 다시 써야 할 수 있음
+      recommended: false
+    - label: PRODUCT 도메인 rule 로 승격
+      trade_off: 중복은 줄지만 상품 전체 공통 규칙으로 봐도 되는지 확정이 필요함
+      recommended: true
+  decision: _pending_
+
+- id: v2
+  ...
+```
+
+### 필드 설명
+
+| 필드 | 필수 | 주체 | 설명 |
+|---|:---:|---|---|
+| `id` | Y | planner | 라운드 내 고유 (v1, v2 …) |
+| `category` | Y | planner | reviewer 위반 분류 ([SSOT]/[잔재]/[교차]/[링크]/[구조] 등) |
+| `location` | Y | planner | `파일:라인` — reviewer 위반 위치 |
+| `summary` | Y | planner | 한 줄 위반 요약 (reviewer 리포트 기반) |
+| `planner_context` | Y | planner | 왜 이 결정이 지금 명세 진행을 막는지 (1-2문장) |
+| `user_facing_why` | Y | planner | 기획자가 왜 결정해야 하는지 자연어 힌트 (오케스트레이터가 질문 베이스로 사용) |
+| `source_slots` | N | planner | 인터뷰 슬롯 이름 배열 — 이 결정이 어느 슬롯 답변과 연결되는지 |
+| `conversation_hint` | N | planner | 이전 대화에서 기획자가 언급한 관련 문장·맥락 (대화 흐름 연결용) |
+| `priority` | Y | planner | `blocking` / `important` / `optional` — 오케스트레이터가 한 턴 묶음 크기 결정에 사용 |
+| `recommendation` | Y | planner | reviewer 권장안을 인용 |
+| `alternatives` | Y | planner | 각 대안 객체: `label` (필수), `trade_off` (필수), `recommended` (bool) |
+| `decision` | Y | **오케스트레이터** | 초기값 `_pending_`. 기획자 응답 후 오케가 선택 결과 기록 |
+
+상세 포맷·재진입 절차는 `plan-harness/references/convergence-loop.md` 의 α-1 ~ α-5, 질문 번역 규약은 `plan-harness/references/α-pending-to-question.md` 참조.
+
+### 원칙
+
+- **기획자는 이 섹션을 직접 읽거나 편집하지 않는다**. 필요한 내용은 오케스트레이터가 기획자 언어로 번역해 질문한다
+- **planner 는 기획자-facing 자연어 질문을 이 섹션에 쓰거나 최종 출력에 포함하지 않는다** — payload 필드만 기록, 오케스트레이터가 번역권 소유
+- **슬롯이 아니므로 비어 있음이 인터뷰 트리거가 되지 않는다**. 오케스트레이터는 이 섹션을 인터뷰 대상으로 삼지 않는다
+- **이력 보존**: round 가 쌓여도 이전 round 를 지우지 않는다. `resolved: true` 플래그로 마크
+- **기획자 facing 메시지에 `_pending_decisions` / `awaiting_decision` / `blocking` / 필드명 등 시스템 언어를 노출하지 않는다**
+
 ---
 
-## planner agent의 인터뷰 흐름
+## 오케스트레이터의 인터뷰 흐름 (B1 모델)
 
-planner는 다음 순서로 동작한다:
+0.2.0 부터 인터뷰는 **planner subagent 가 아니라 오케스트레이터(Claude Code 본인)** 가 진행한다. subagent 왕복의 답답함을 없애기 위함. 명세 작성만 planner 에게 위임.
 
-1. **요구사항 md 파싱** — 자유형식 입력에서 슬롯 9개에 매핑되는 정보를 추출해 intake.md 초안 작성
+오케스트레이터는 다음 순서로 동작:
+
+1. **요구사항 md 파싱** — 자유형식 입력에서 슬롯 9개에 매핑되는 정보를 추출해 intake.md 초안 작성 (`status: drafting`)
 2. **빈 슬롯 식별** — 추출 후 비어있거나 정보가 부족한 슬롯을 인터뷰 대상으로 표시
-3. **단계별 인터뷰** — 한 번에 모든 슬롯을 묻지 않는다. 슬롯 단위로 3~5개 질문 묶음
-4. **답변 역기록** — 사용자 답변을 해당 슬롯 본문에 추가. status: `drafting` → `interviewing` → `ready`
-5. **컨펌 게이트** — 모든 슬롯이 `ready` 상태가 되면 사용자에게 intake.md 전체 검토 요청
-6. **명세 dispatch** — 컨펌 후 feature-spec / screen-spec 스킬 호출. 끝나면 status: `done`
+3. **단계별 인터뷰** — 한 번에 모든 슬롯을 묻지 않는다. 슬롯 단위로 3~5개 질문 묶음 (`status: interviewing`)
+4. **답변 역기록** — 기획자 답변을 해당 슬롯 본문에 추가
+5. **통합 확인 게이트** — 모든 슬롯이 채워지면 `status: ready` 로 바꾸고 "intake + 만들 산출물 목록" 을 한 턴에 보여주며 검토 요청
+6. **planner subagent 위임** — 컨펌 후 Task tool 로 `bp:planner` 에 intake.md 경로 전달. planner 는 feature-spec / screen-spec 호출 + 수렴 루프만 담당
+7. **α 재진입 (필요 시)** — planner 가 `status: awaiting_decision` 으로 턴 종료하면 오케스트레이터가 `## _pending_decisions` 읽고 기획자 언어로 질문 → 응답 받아 `decision:` 필드에 기록 → **SendMessage 로 기존 planner 세션 재진입** (같은 `/bp:plan` 호출 안에서. resume 시나리오면 새 Task — `plan-harness/references/resume.md` 참조)
+8. **완료** — planner 가 수렴 완료 보고하면 `status: done`
+
+상세 규약은 `plan-harness/` 스킬 참조:
+- 인터뷰 패턴 → `plan-harness/references/interview-flow.md`
+- 기획자 언어 번역 → `plan-harness/references/planner-ux.md`
+- 통합 확인 게이트 → `plan-harness/references/confirm-gates.md`
+- α 재진입 → `plan-harness/references/convergence-loop.md`
 
 ## 재실행 정책
 
@@ -214,3 +310,7 @@ intake는 git에 커밋한다. 재실행·디버깅·산출물 추적의 단일 
 | `## 상태`와 `## 예외 케이스`를 한 슬롯에 섞기 | 상태(정상 흐름의 UI 뷰)와 예외(외부 실패)는 책임이 다르다. screen-spec 단계에서 분리되므로 intake에서도 분리 |
 | viewport를 자연어로 ("PC하고 모바일") | 배열 형식(`[pc, mobile]`)으로 적어야 wireframer가 그대로 사용 가능 |
 | 같은 요구사항 md로 재실행 시 기존 intake.md 무시 | 재실행 정책(신규/부분수정/전체재검토)을 항상 사용자에게 묻고 진행 |
+| `_pending_decisions` 섹션을 10번째 슬롯처럼 취급 | 메타 섹션이라 인터뷰로 채우지 않음. planner 가 α 재진입 프로토콜로 자동 기록 |
+| 기획자 facing 메시지에 `awaiting_decision` / `_pending_decisions` / `priority: blocking` 등 노출 | 시스템 언어는 기획자에게 보이지 않게. 결정이 필요하면 기획자 언어로 번역해 질문 |
+| planner 가 `_pending_decisions` 에 자연어 질문을 직접 쓰거나 최종 출력에 질문 문장을 담음 | 0.3.0 옵션 B: 번역은 오케스트레이터 소유. planner 는 payload 필드만 기록 |
+| payload 에 `planner_context` / `user_facing_why` / `priority` 생략 | 오케스트레이터가 기획자 질문을 자연스럽게 만들 수 없음. 스키마 필수 필드는 반드시 채움 |

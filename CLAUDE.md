@@ -22,72 +22,55 @@ blueprint-plugin/
 ├── commands/                    ← /bp:* 슬래시 명령
 │   ├── plan.md                  ← /bp:plan
 │   └── wireframe.md             ← /bp:wireframe
-├── agents/                      ← bp:* 서브에이전트
+├── agents/                      ← bp:* 서브에이전트 (skills: frontmatter 로 스킬 preload)
 │   ├── planner.md               ← 요구사항 → 명세 (와이어 X)
 │   ├── wireframer.md            ← screen.md → 와이어 HTML
-│   └── reviewer.md              ← 산출물 검증 (자동 호출)
-├── skills/                      ← 모델 자동 트리거 스킬
-│   ├── CLAUDE.md                ← 스킬 폴더 가이드
-│   ├── intake/                  ← intake.md 형식·인터뷰 흐름
-│   ├── feature-spec/            ← 기능명세 SSOT
-│   ├── screen-spec/             ← 화면명세
-│   └── wireframe/               ← 와이어프레임 HTML + bp-* 컴포넌트
-└── .claude/skills/              ← 도그푸딩 심링크 (skills/로)
+│   └── reviewer.md              ← 산출물 검증 (오케스트레이터가 Task 로 호출, 공식 제약상 subagent 는 Task 없음)
+└── skills/                      ← 플러그인 스킬
+    ├── CLAUDE.md                ← 스킬 폴더 가이드
+    ├── plan-harness/            ← /bp:plan 오케스트레이션 + 기획자 UX 원칙 (user-invocable: false)
+    ├── wireframe-harness/       ← /bp:wireframe 오케스트레이션 (user-invocable: false)
+    ├── intake/                  ← intake.md 형식·슬롯·_pending_decisions 메타 섹션
+    ├── feature-spec/            ← 기능명세 SSOT
+    ├── screen-spec/             ← 화면명세
+    └── wireframe/               ← 와이어프레임 HTML + bp-* 컴포넌트
 ```
+
+> 참고: 플러그인 내부에서 `.claude/` 디렉터리는 사용하지 않는다 (이전 구조의 `.claude/skills/` 도그푸딩 심링크는 제거됨). 모노레포 루트(`blueprint-emotion/`)에 `.claude/` 를 두고 루트 `.claude/{skills,agents,commands}` 를 `blueprint-plugin/{skills,agents,commands}` 로 심링크하는 구조.
 
 ## 호출 흐름
 
 ```
-기획자: /bp:plan docs/requirements/product-detail.md
-   ↓
-[command plan.md]
-   - 인자 검증 (파일 존재? 자연어?)
-   - bp:planner agent를 Task tool로 호출
-   ↓
-[agent planner]
-   - 요구사항 파싱 → 화면 후보 식별
-   - intake 스킬 따라 intake.md 초안 생성
-   - 빈 슬롯 단계별 인터뷰
-   - 컨펌 게이트 (intake 완료 후 + 작업 트리 후)
-   - feature-spec 스킬 호출 → docs/features/*.md
-   - screen-spec 스킬 호출 → docs/screens/**/*.md
-   - bp:reviewer agent를 Task tool로 호출 (자동)
-   ↓
-[agent reviewer]
-   - SSOT/featureId/링크/frontmatter/교차 검증
-   - 위반 리포트 + 자동 수정 제안
-   ↓
-사용자에게 안내: "/bp:wireframe screen.md 하면 와이어 그려져요"
+/bp:plan → 인자 검증 → [오케스트레이터] 인터뷰·확정 → Task(bp:planner) 명세 작성
+                    → [오케스트레이터] 수렴 루프: Task(bp:reviewer) + SendMessage(planner) 반복
+                    → α 재진입 필요 시 오케스트레이터가 기획자 언어로 질문·수집 → 최종 보고
 
-────────────────────────
-
-기획자: /bp:wireframe docs/screens/상품/product-detail/screen.md
-   ↓
-[command wireframe.md]
-   - 인자 검증 (screen.md frontmatter)
-   - bp:wireframer agent를 Task tool로 호출
-   ↓
-[agent wireframer]
-   - 같은 폴더의 area_*.md, sheet_*.md, dialog_*.md 자동 읽기
-   - features[].ref 따라 기능명세 rules 참조
-   - wireframe 스킬 따라 viewport별 HTML 생성
-   - bp:reviewer agent 자동 호출
-   ↓
-[agent reviewer]
-   - 와이어프레임 + 명세 교차 검증
+/bp:wireframe → 인자 검증 → [오케스트레이터] viewport 예고·덮어쓰기 분기 → Task(bp:wireframer) HTML 생성
+              → [오케스트레이터] 수렴 루프: Task(bp:reviewer) + SendMessage(wireframer) 반복
+              → 명세 결함이면 /bp:plan 회송 안내, 아니면 생성 파일 보고
 ```
 
-## 4개 스킬·3개 에이전트·2개 명령
+**규약 SSOT** — 이 흐름의 알고리즘·프롬프트·기획자 UX 원칙·α 프로토콜은 오케스트레이션 스킬 본문:
 
-| 명령 | 호출 agent | 사용 skill | 산출물 |
+- `skills/plan-harness/SKILL.md` + `references/` (인터뷰·확인 게이트·수렴 루프·α 재진입·Task/SendMessage 템플릿·재진입 복기)
+- `skills/wireframe-harness/SKILL.md` + `references/`
+
+Anthropic 공식 제약상 subagent 는 Task tool 이 없으므로 `Task(bp:reviewer)` 는 **오케스트레이터만** 호출 가능. planner/wireframer 재진입은 SendMessage (Agent Teams `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 활성 필요).
+
+## 6개 스킬·3개 에이전트·2개 명령
+
+| 명령 | 수행 주체 | 사용 skill | 산출물 |
 |---|---|---|---|
-| `/bp:plan {요구사항.md}` | `bp:planner` → `bp:reviewer` | intake, feature-spec, screen-spec | intake.md, features/*.md, screens/**/*.md |
-| `/bp:wireframe {screen.md}` | `bp:wireframer` → `bp:reviewer` | wireframe (screen-spec 검증용) | screens/**/*.html |
+| `/bp:plan {요구사항.md}` | 오케스트레이터(인터뷰·확정) → `bp:planner`(명세 작성·수렴) → `bp:reviewer` | plan-harness, intake, feature-spec, screen-spec | intake.md, features/*.md, screens/**/*.md |
+| `/bp:wireframe {screen.md}` | 오케스트레이터(viewport 예고) → `bp:wireframer`(HTML 생성·수렴) → `bp:reviewer` | wireframe-harness, wireframe, screen-spec | screens/**/*.html |
 
 **책임 분리**:
-- **commands** = 인자 검증 + agent 호출 (얇은 wrapper)
-- **agents** = 워크플로 오케스트레이션 + skill dispatch
-- **skills** = 산출물 형식 규약 + 작성 가이드 (SSOT)
+- **commands** = 인자 검증 + 오케스트레이터 규약 진입점 (harness 스킬 로드)
+- **오케스트레이터(Claude Code 본인)** = 기획자와의 인터뷰·컨펌·α 재진입 결정 수집
+- **agents** = 고유 워크플로 수행 (명세/HTML 생성·수렴 루프·검증)
+- **skills — 두 종류**:
+  - **산출물 규약** (`intake`, `feature-spec`, `screen-spec`, `wireframe`) = "결과물이 어떻게 생겨야 하는가" (SSOT)
+  - **오케스트레이션** (`plan-harness`, `wireframe-harness`) = "실행 흐름이 어떻게 이어져야 하는가" — Producer-Reviewer 수렴 루프·컨펌 게이트·Task 호출·기획자 UX 원칙. `user-invocable: false` 로 사용자 메뉴에서 숨김, command 와 agent `skills:` frontmatter 로 preload
 
 ## 핵심 설계 원칙
 
@@ -115,11 +98,23 @@ blueprint-plugin/
 
 ### 호환성 매트릭스
 
-플러그인 한 버전이 4개 스킬을 한 세트로 pin한다:
+플러그인 한 버전이 6개 스킬을 한 세트로 pin한다:
 
-| 플러그인 버전 | intake | feature-spec | screen-spec | wireframe |
-|---|---|---|---|---|
-| 0.1.0 | 0.1.1 | 1.4.2 | 1.6.1 | 4.1.2 |
+| 플러그인 버전 | plan-harness | wireframe-harness | intake | feature-spec | screen-spec | wireframe |
+|---|---|---|---|---|---|---|
+| 0.1.0 | — | — | 0.1.1 | 1.4.2 | 1.6.1 | 4.1.2 |
+| 0.2.0 | 1.0.0 | 1.0.0 | 0.2.0 | 1.4.2 | 1.6.1 | 4.1.2 |
+| 1.0.0 | 2.0.0 | 1.0.1 | 0.3.0 | 1.4.2 | 1.6.2 | 4.1.3 |
+| 2.0.0 | 3.0.0 | 2.0.0 | 0.3.0 | 1.4.2 | 1.6.2 | 4.1.3 |
+
+> 0.1.0 의 `harness` 스킬은 0.2.0 에서 `plan-harness` + `wireframe-harness` 로 분리됐다. 0.2.0 은 BREAKING — agents 의 `skills:` frontmatter 도 함께 바뀌었다.
+>
+> 2.0.0 은 BREAKING — Anthropic 공식 제약(subagent 는 Task tool 없음, https://code.claude.com/docs/en/sub-agents) 에 맞춰 **Producer-Reviewer 수렴 루프를 subagent 주도 → 오케스트레이터 주도로 이관**. Task(bp:reviewer) 호출은 오케스트레이터만 가능하고, planner/wireframer 재진입은 SendMessage 로 처리 (Agent Teams `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 활성 필요). 이전 설계의 "planner→reviewer Task 호출" / "wireframer→reviewer Task 호출" 은 플랫폼 단에서 작동하지 않던 것이었다. plan-harness 2.0.0 → 3.0.0, wireframe-harness 1.0.1 → 2.0.0 으로 동반 MAJOR. 산출물 규약 스킬(intake, feature-spec, screen-spec, wireframe)은 영향 없음.
+>
+> 1.0.0 은 BREAKING — α 재진입 프로토콜이 **옵션 B** 로 전환됐다. planner subagent 는 `## _pending_decisions` 에 payload 6필드(`planner_context`, `user_facing_why`, `source_slots`, `conversation_hint`, `priority`, 객체화된 `alternatives`) 만 기록하고 기획자-facing 질문을 **최종 출력에 담지 않는다**. 질문 번역·수집은 **오케스트레이터**가 `plan-harness/references/α-pending-to-question.md` 규약으로 수행한다. 기존 `awaiting_decision` 출력 포맷에 의존하던 통합은 모두 업데이트 필요. intake 는 payload 스키마 확장으로 MINOR bump (0.3.0), screen-spec/wireframe 은 overlay viewport 독립 규약·suffix 파일명 명시화로 PATCH bump.
+
+**산출물 규약 스킬** (intake, feature-spec, screen-spec, wireframe): "결과물이 어떻게 생겨야 하는가"
+**오케스트레이션 스킬** (plan-harness, wireframe-harness): "실행 흐름이 어떻게 이어져야 하는가". `user-invocable: false`, command 컨텍스트와 agent `skills:` frontmatter 로 preload
 
 스킬을 개별 bump할 때:
 - **MAJOR (스킬)** = 산출물 호환성 깨짐 → **MAJOR (플러그인)** 같이 bump
@@ -143,23 +138,30 @@ blueprint-plugin/
 
 ### Command 수정
 
-- command는 얇게 유지. 인자 검증 + agent 호출만
+- **command 파일은 오케스트레이터 규약 진입점** (B1 모델). 인자 검증·인터뷰·컨펌 게이트·α 재진입·viewport 예고는 **오케스트레이터(Claude Code 본인)** 가 command 문서를 레퍼런스로 직접 수행한다. subagent 는 명세 작성/HTML 생성/검증 같은 고유 워크플로만 담당
 - $ARGUMENTS placeholder로 사용자 인자 받음
-- 엣지 케이스(파일 없음, 형식 위반)는 command에서 거르고 agent로 안 넘김
+- 엣지 케이스(파일 없음, 형식 위반)는 command 의 "인자 검증" 섹션에서 거르고 subagent 에 위임하지 않음
+- command 문서는 `plan-harness` / `wireframe-harness` 스킬의 references 를 링크로 참조하며, 자체가 과도하게 두꺼워지지 않도록 주의 (SSOT)
 
-### 도그푸딩
+### 도그푸딩 & 테스트
 
-이 저장소에서 `.claude/skills/`가 `skills/`로 심링크되어 있어 **스킬 자동 트리거**는 자기 자신에서 테스트 가능 (예: 화면명세 파일을 만들어보면 screen-spec 스킬이 트리거).
+이 플러그인을 개발·테스트하는 방법은 두 가지:
 
-명령(`/bp:plan`, `/bp:wireframe`)과 에이전트(`bp:planner` 등)를 테스트하려면 namespace 컨텍스트가 필요하므로 **plugin-dir 모드로 Claude Code를 시작**해야 한다:
+**A. 모노레포 루트에서 심링크 경유 사용 (권장 — 현재 구조)**
+
+`blueprint-emotion/` 루트에 `.claude/{skills,agents,commands}` 가 `blueprint-plugin/{skills,agents,commands}` 로 심링크되어 있어, 모노레포 루트에서 Claude Code 를 시작하면 스킬·에이전트·커맨드가 모두 활성화된다. 스킬 자동 트리거도 이 심링크 구조로 동작 (예: 화면명세 파일을 만들면 `screen-spec` 스킬 트리거).
+
+**B. plugin-dir 모드로 직접 로드**
+
+명령·에이전트의 namespace 동작을 격리 검증하려면:
 
 ```bash
 claude --plugin-dir .
 ```
 
-이 저장소 루트에서 실행하면 `bp` 플러그인이 로드되어 `/bp:plan`, `/bp:wireframe` 명령이 활성화된다. 테스트용 화면을 만들고 싶으면 `docs/screens/test/` 같은 임시 폴더를 만들어 돌려보고, 결과 산출물은 git에 커밋하지 않고 정리.
+이 디렉터리(`blueprint-plugin/`)를 플러그인으로 로드해 `/bp:plan`, `/bp:wireframe` 명령이 활성화된다. 테스트용 화면을 만들고 싶으면 `docs/screens/test/` 같은 임시 폴더를 만들어 돌려보고, 결과 산출물은 git에 커밋하지 않고 정리.
 
-심링크와 plugin-dir 모드 둘 다 활성화된 환경에서는 plugin-dir이 우선이라 같은 스킬이 중복 로드되지 않는다.
+> 과거에는 `blueprint-plugin/.claude/skills/` 가 `blueprint-plugin/skills/` 로 심링크되어 있었으나, 모노레포 루트 `.claude/` 로 통합하면서 플러그인 내부 `.claude/` 는 제거됨.
 
 ## 사용자 프로젝트와 이 저장소의 차이
 

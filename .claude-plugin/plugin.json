@@ -1,6 +1,6 @@
 {
   "name": "bp",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "description": "Blueprint by 이모션 — 기획자용 기능명세·화면명세·와이어프레임 생성 플러그인",
   "author": {
     "name": "blueprint-emotion"

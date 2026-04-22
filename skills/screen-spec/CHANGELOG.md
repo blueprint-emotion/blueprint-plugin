@@ -6,6 +6,12 @@
 - **MINOR**: 새 type·새 선택 필드·새 패턴 추가 (호환성 유지)
 - **PATCH**: 문서 명료화·예제 보강·오타 수정
 
+## [1.6.2] - 2026-04-21
+
+### Changed
+
+- **Overlay viewport 독립 규약 명시화**: sheet·dialog frontmatter 의 `viewport` 는 page 와 **독립**. 와이어프레임 생성기가 overlay viewport 를 독립적으로 따라 pc/mobile suffix 파일(`wireframe_sheet_{name}_mobile.html`) 을 각각 만든다는 규약을 "파일 구조: 타입별 파일명" 섹션에 추가. 기존 동작의 문서화이므로 호환성 영향 없음 (PATCH)
+
 ## [1.6.1] - 2026-04-20
 
 ### Added
