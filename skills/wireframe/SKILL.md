@@ -1,6 +1,6 @@
 ---
 name: wireframe
-version: 4.3.1
+version: 4.3.2
 user-invocable: false
 description: >
   와이어프레임 HTML을 생성한다. bp-* Web Components(shadcn/ui 포팅 51종 + bp-icon)를 사용.
@@ -634,3 +634,5 @@ bp-area                        → wrapper only
 | 한 파일에 `<bp-frame viewport="pc">`와 `<bp-frame viewport="mobile">` 둘 다 배치 | 한 파일 = 한 viewport. 화면명세 viewport가 둘 다면 파일 두 개를 만든다 |
 | `<bp-dialog open>` / `<bp-sheet open>` / `<bp-alert-dialog open>` 을 `<div class="absolute inset-0 ... bg-black/20">` 같은 wrapper 로 감쌈 | 오버레이 컴포넌트는 부모 흐름 안에 정적 카드로 렌더된다 (viewport-fixed 아님). backdrop 흉내용 wrapper 는 이중 박스만 만들고, `bp-fragment` body 의 기본 보더·패딩과 시각 충돌을 일으킨다. fragment body 에 **직접** 배치할 것 |
 | 한 `<bp-fragment>` 안에 `<bp-dialog open>` 을 여러 개 중첩 | 1 fragment = 1 오버레이 상태 원칙. 상태별(초기·전송중·에러) 이나 분기별 다이얼로그는 각자 별도 fragment (`edit-request-dialog`, `edit-request-dialog-submitting` 식) 로 분리 |
+| 와이어프레임에 `sticky top-0` / `sticky bottom-0` 같은 스크롤 동작 CSS 직접 적용 | 와이어는 정적 표현물 (보드 캡처 메타포). 스크롤 컨테이너가 보장 안 돼 시각적으로도 어색하고, 검토자가 의도를 추정하기 어렵다. **동적 동작은 element 의 description 에 산문으로 적는다** ("스크롤 시 화면 상단에 sticky 로 고정"). 단, `bp-page-footer` / `bp-page-header` 처럼 셸 컴포넌트가 자체 sticky 를 갖는 경우는 예외 (그 컴포넌트의 표준 동작) |
+| 메인 UI 의 시각 영역(섹션 내비, 필터 바 등)을 `<bp-section>` 없이 raw `<div>` 로 배치 | 핀 앵커가 잡히지 않아 코멘트·하이라이트 연동 불가. 시각 보조용 요소라도 사용자가 인식할 수 있는 단위면 별도 feature 로 잡아 `<bp-section data-feature data-feature-key data-label>` 으로 감싼다 (예: `PRODUCT__SECTION_NAV` "섹션 탭") |

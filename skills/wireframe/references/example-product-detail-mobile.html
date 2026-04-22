@@ -74,6 +74,14 @@ title: 상품 상세 (샘플 · 모바일)
           ]
         },
         {
+          "feature": "PRODUCT__SECTION_NAV",
+          "label": "섹션 탭",
+          "elements": [
+            { "name": "탭 라벨 바", "description": "상세 정보 / 리뷰 / 문의 — 한 페이지에 쭉 펼쳐진 섹션의 시각 앵커. 현재 위치 탭은 하단 보더 강조. 모바일에서는 본문 스크롤 시 화면 상단에 sticky 로 고정되어 항상 보임 (실제 동작 와이어프레임에는 정적으로만 표현)" },
+            { "name": "탭 클릭", "description": "해당 섹션으로 자동 스크롤. 와이어에는 동작 표현 없음" }
+          ]
+        },
+        {
           "feature": "PRODUCT__DETAIL",
           "label": "상품 상세",
           "elements": [
@@ -172,14 +180,15 @@ title: 상품 상세 (샘플 · 모바일)
               </div>
             </bp-section>
 
-            <!-- 4) 상세·리뷰·문의 — 한 화면에 쭉 (탭 라벨은 시각 앵커 단서) -->
+            <!-- 4) 상세·리뷰·문의 — 한 화면에 쭉. 섹션 탭은 별도 feature -->
             <div class="mt-8 flex flex-col gap-10">
-              <!-- 앵커 라벨 바 (시각용) -->
-              <div class="flex border-b border-border text-xs sticky top-0 bg-background z-10">
-                <div class="flex-1 px-2 py-2 border-b-2 border-foreground -mb-px font-medium text-center">상세 정보</div>
-                <div class="flex-1 px-2 py-2 text-muted-foreground text-center">리뷰 (1,234)</div>
-                <div class="flex-1 px-2 py-2 text-muted-foreground text-center">문의 (47)</div>
-              </div>
+              <bp-section data-feature="PRODUCT__SECTION_NAV" data-feature-key="section-nav" data-label="섹션 탭">
+                <div data-element="탭 라벨 바" class="flex border-b border-border text-xs">
+                  <div class="flex-1 px-2 py-2 border-b-2 border-foreground -mb-px font-medium text-center">상세 정보</div>
+                  <div class="flex-1 px-2 py-2 text-muted-foreground text-center">리뷰 (1,234)</div>
+                  <div class="flex-1 px-2 py-2 text-muted-foreground text-center">문의 (47)</div>
+                </div>
+              </bp-section>
 
               <!-- 상세 -->
               <div>

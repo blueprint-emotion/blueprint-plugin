@@ -6,6 +6,20 @@
 - **MINOR**: 새 컴포넌트·새 패턴·새 옵션 추가 (호환성 유지)
 - **PATCH**: 문서 명료화·예제 보강·오타 수정
 
+## [4.3.2] - 2026-04-22
+
+### Added (자주 하는 실수)
+
+- **와이어프레임에 `sticky` CSS 직접 적용 금지**: 와이어는 정적 표현. 스크롤 동작은 element description 에 산문으로 적는다 ("스크롤 시 화면 상단에 sticky 로 고정"). `bp-page-footer` / `bp-page-header` 의 자체 sticky 는 예외
+- **시각 보조 영역도 `<bp-section>` 으로 감싼다**: 섹션 내비·필터 바 같은 UI 도 raw `<div>` 가 아니라 `<bp-section data-feature data-feature-key data-label>` 으로. 핀 앵커·하이라이트 연동을 위해. `PRODUCT__SECTION_NAV` "섹션 탭" 예시 등록
+
+### Changed (예제 정리)
+
+- `references/example-product-detail.html` (PC) + `references/example-product-detail-mobile.html`:
+  - 상세/리뷰/문의 탭 라벨 바를 `<bp-section data-feature="PRODUCT__SECTION_NAV">` 로 감쌈 (이전: raw `<div>`)
+  - 모바일의 sticky CSS 제거. JSON description 에 "스크롤 시 화면 상단에 sticky" 동작 명시
+  - JSON description 에 `PRODUCT__SECTION_NAV` 섹션 추가 (탭 라벨 바, 탭 클릭 elements)
+
 ## [4.3.1] - 2026-04-22
 
 ### Changed
