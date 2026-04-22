@@ -70,12 +70,15 @@ wireframer 가 해야 할 일은 **"HTML 생성 + 자기점검"** + **"SendMessa
 - `[mobile]`이면 → `wireframe_mobile.html` 1개
 - `[pc, mobile]`이면 → `wireframe.html` + `wireframe_mobile.html` 2개
 
-**오버레이(`sheet_{name}.md`, `dialog_{name}.md`)** — 각 오버레이의 frontmatter `viewport` 를 **독립적으로** 따른다:
-- `[pc]` → `wireframe_sheet_{name}.html` (또는 `wireframe_dialog_{name}.html`)
-- `[mobile]` → `wireframe_sheet_{name}_mobile.html`
-- `[pc, mobile]` → 두 파일 모두
+**오버레이(`sheet_{name}.md`, `dialog_{name}.md`)** — 두 가지 표현, 기본은 메인 fragment:
 
-page `viewport` 와 overlay `viewport` 는 독립이다. page 가 `[pc]` 만 지원해도 overlay 가 `[pc, mobile]` 이면 overlay 는 두 파일 나온다. 파일명 규약은 wireframe 스킬에 정의된 대로 따른다.
+1. **메인 와이어 안 `<bp-fragment>` + `<bp-sheet open>` / `<bp-dialog open>` 정적 카드 (기본, 항상 포함)** — 트리거 컨텍스트 + "어디서 어떤 오버레이가 뜨는지" 표현. 모든 `sheet_*.md` / `dialog_*.md` 를 메인 와이어 안에 포함한다.
+2. **별도 파일 (opt-in)** — 오케스트레이터가 Task prompt 에 `extract_overlays: ["sheet_review"]` 같은 이름 목록을 명시한 경우만 추가 생성. 각 오버레이의 frontmatter `viewport` 를 **독립적으로** 따른다:
+   - `[pc]` → `wireframe_sheet_{name}.html` (또는 `wireframe_dialog_{name}.html`)
+   - `[mobile]` → `wireframe_sheet_{name}_mobile.html`
+   - `[pc, mobile]` → 두 파일 모두
+
+별도 파일을 만들어도 메인 와이어 안 fragment 는 그대로 유지 (트리거 컨텍스트 SSOT). page `viewport` 와 overlay `viewport` 는 독립이다. 파일명 규약은 wireframe 스킬에 정의된 대로 따른다.
 
 ---
 
@@ -92,7 +95,7 @@ page `viewport` 와 overlay `viewport` 는 독립이다. page 가 `[pc]` 만 지
 screen.md가 있는 폴더의 다른 파일을 자동으로 읽는다:
 
 - `area_*.md` — 영역 화면명세. features[].id와 elements를 가져온다
-- `sheet_*.md`, `dialog_*.md` — 오버레이. 각각 별도 와이어 파일이 됨
+- `sheet_*.md`, `dialog_*.md` — 오버레이. 기본은 메인 와이어 안 fragment 로 포함. 오케스트레이터가 `extract_overlays` 로 명시한 이름만 별도 파일로 추가 생성
 
 읽기 전에 프론트매터 `toc`나 헤딩 구조를 먼저 보고, 필요한 부분만 grep + offset/limit으로 읽는다 (토큰 효율).
 
@@ -134,7 +137,12 @@ viewport: [pc, mobile]
 
 ### 6단계 — 시트·다이얼로그 처리
 
-폴더에 `sheet_*.md` 또는 `dialog_*.md`가 있으면 각각 별도 와이어 파일 생성. 파일명 패턴은 wireframe 스킬 규약대로.
+폴더에 `sheet_*.md` 또는 `dialog_*.md` 가 있으면:
+
+1. **모두 메인 와이어 안에 `<bp-fragment>` + 오버레이 정적 카드로 포함 (기본)**. fragment id 는 `{name}` (예: `sheet_review.md` → `<bp-fragment id="review">`). 각 fragment 의 description 은 트리거 컨텍스트 + 사전조건 등 6 체크리스트 (wireframe 스킬 §"bp-fragment description 자세히 쓰기" 참조).
+2. **오케스트레이터 Task prompt 에 `extract_overlays: [...]` 가 명시된 경우만** 그 이름들을 별도 와이어 파일로 추가 생성. 메인 fragment 는 유지. 파일명 패턴은 wireframe 스킬 규약대로 (`wireframe_sheet_{name}.html` + viewport suffix).
+
+`extract_overlays` 가 없으면 별도 파일은 만들지 않는다.
 
 ### 7단계 — 자기점검 + 반송 (reviewer 호출 없음)
 

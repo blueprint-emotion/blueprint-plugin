@@ -72,11 +72,15 @@ HTML 생성 단계에서 오케스트레이터가 Task tool 로 정식 위임한
 - viewport: {[pc] | [mobile] | [pc, mobile]}
 - 생성 파일 예상 목록: {...}
 - 덮어쓰기: {yes | no} (기존 wireframe*.html 유무 기반)
+- extract_overlays: {[] | ["sheet_review", "dialog_zoom", ...]}
+  ← 게이트 2 응답. 빈 배열이면 메인 fragment 만 (기본). 이름이 있으면 그 overlay 들을 별도 파일로도 추가 생성.
 
 작업:
 1. 같은 폴더의 area_*.md, sheet_*.md, dialog_*.md 자동 수집
 2. features[].ref 따라 기능명세 rules 참조
 3. wireframe 스킬 가이드 따라 viewport 별 HTML 생성
+   - 메인 wireframe 안에 모든 sheet/dialog 를 `<bp-fragment>` + `<bp-sheet open>` / `<bp-dialog open>` 정적 카드로 포함
+   - extract_overlays 에 명시된 이름은 별도 파일도 추가 (메인 fragment 는 유지)
 4. 자기점검 (visual-review.md 체크리스트) — 명세 결함이면 이 단계에서 회송 판단
 5. 생성·수정한 파일 목록을 반송하고 turn 종료 — reviewer 호출은 오케스트레이터가 담당
 

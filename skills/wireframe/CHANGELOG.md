@@ -6,6 +6,16 @@
 - **MINOR**: 새 컴포넌트·새 패턴·새 옵션 추가 (호환성 유지)
 - **PATCH**: 문서 명료화·예제 보강·오타 수정
 
+## [4.3.1] - 2026-04-22
+
+### Changed
+
+- 오버레이 섹션 (`bp-dialog`, `bp-sheet`, `bp-alert-dialog`) 에 **메인 wireframe vs 별도 파일** 결정 기준 추가:
+  - 기본은 메인 와이어 안 `<bp-fragment>` 에 `<bp-dialog open>` 으로 포함
+  - 별도 파일 (`wireframe_sheet_{name}.html` 등) 은 풍부한 상태 변형이 있을 때만 opt-in
+  - 두 표현이 공존 가능 (트리거 컨텍스트는 메인이 SSOT)
+- `wireframe-harness/confirm-gates.md` 게이트 2 와의 SSOT 일치화 (와이어 분리 결정은 게이트 2 가 owner)
+
 ## [4.3.0] - 2026-04-22
 
 ### Added

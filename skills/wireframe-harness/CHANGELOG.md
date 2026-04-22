@@ -1,5 +1,35 @@
 # Changelog — wireframe-harness skill
 
+## 2.1.0 — 2026-04-22
+
+### Changed — 시트·다이얼로그 와이어 분리 정책 뒤집음
+
+이전: 같은 폴더에 `sheet_*.md` / `dialog_*.md` 가 있으면 와이어 생성기가 **자동으로 별도 파일**(`wireframe_sheet_{name}.html` 등) 을 생성. 메인 와이어 안 fragment 표현은 자율 (가이드 모호).
+
+이후: **기본은 메인 와이어 안에 fragment 로 모두 포함**. 별도 파일은 기획자가 명시적으로 이름을 말한 경우에만 opt-in 생성. 명세 분리(`sheet_*.md` / `dialog_*.md`)는 그대로 SSOT 단위 (자체 screenId · 상태 · AC) 이지만, 와이어 표현 단위는 메인에 합치는 것이 기본.
+
+### Added — 게이트 2
+
+- `confirm-gates.md` — viewport 예고 게이트(게이트 1) 다음에 **게이트 2** 신설. `sheet_*.md` / `dialog_*.md` 가 1개 이상 있을 때만 발동. 목록을 보여주고 "별도 파일로도 뽑을 게 있을까요?" 한 번 질의. 기본 응답("없음" / 무응답) 은 메인 fragment 만, 이름을 말하면 그 이름들만 별도 파일 추가 (메인 fragment 는 유지)
+- 응답 처리 표 (없음 / 일부 이름 / 전부 / 알 수 없는 이름)
+- 별도 파일 생성 시 viewport 분기 규약 유지 (각 overlay 의 viewport 배열을 독립적으로 따름)
+
+### Changed — SKILL.md
+
+- §책임 분배 다이어그램의 게이트를 1단계 → 2단계로 분리 (viewport 예고 / 시트·다이얼로그 분리)
+- §기획자 경험 원칙 #2 의 예시 메시지를 게이트 2 포함 형태로 갱신
+
+### Why
+
+- 검토자 입장에서 메인 와이어 한 파일만 열어도 "어디서 어떤 오버레이가 뜨는지" 한눈에 보이는 것이 기본값으로 더 가치 있음
+- 별도 파일은 추가 생성·렌더·관리 비용. 정말 풍부한 상태 변형이 있을 때만 정당화됨
+- 명세 SSOT 분리(`sheet_*.md`) 와 와이어 표현 단위는 직교 — 명세는 도메인·AC 단위, 와이어는 시각 단위
+
+### Requires
+
+- `wireframe` 스킬 4.3.1 (오버레이 섹션에 "기본 메인 fragment, 별도 파일은 opt-in" 명시)
+- `blueprint-plugin` MINOR bump 검토
+
 ## 2.0.0 — 2026-04-21
 
 ### BREAKING — Producer-Reviewer 수렴 루프를 오케스트레이터 주도로 이관

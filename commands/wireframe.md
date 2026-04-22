@@ -29,11 +29,12 @@ argument-hint: <screen.md 경로>
 
 인자 검증이 끝나면 이 커맨드는 **`wireframe-harness` 스킬의 SKILL.md 를 SSOT 로 삼아** 다음 흐름을 수행한다:
 
-1. viewport 예고 게이트 (만들 파일 목록 안내)
-2. 덮어쓰기 분기 (기존 html 있을 때)
-3. `bp:wireframer` 에 HTML 생성 위임 (Task)
-4. Producer-Reviewer 수렴 루프 (오케스트레이터 주도)
-5. 최종 보고 (수렴 / 명세 결함 회송 / 루프 한계)
+1. viewport 예고 게이트 (만들 메인 파일 목록 안내)
+2. 시트·다이얼로그 분리 게이트 (`sheet_*.md` / `dialog_*.md` 1개 이상이면 발동, 기본 메인 fragment 포함)
+3. 덮어쓰기 분기 (기존 html 있을 때)
+4. `bp:wireframer` 에 HTML 생성 위임 (Task) — 메인 파일 + opt-in 별도 파일
+5. Producer-Reviewer 수렴 루프 (오케스트레이터 주도)
+6. 최종 보고 (수렴 / 명세 결함 회송 / 루프 한계)
 
 **세부 알고리즘·프롬프트 템플릿·UX 원칙은 `wireframe-harness` 스킬** — 여기선 요약만.
 
@@ -55,12 +56,18 @@ argument-hint: <screen.md 경로>
 
 ## 산출물
 
+### 메인 파일 (항상 생성)
+
 페이지(`screen.md`) viewport 배열에 따라:
 - `[pc]` → `wireframe.html` 1개
 - `[mobile]` → `wireframe_mobile.html` 1개
 - `[pc, mobile]` → `wireframe.html` + `wireframe_mobile.html` 2개
 
-시트·다이얼로그(`sheet_{name}.md`, `dialog_{name}.md`)도 **자기 frontmatter의 `viewport` 배열을 따라** 같은 규약으로 각각 파일 생성:
+같은 폴더의 모든 `sheet_*.md` / `dialog_*.md` 는 **기본적으로 메인 와이어 안에 `<bp-fragment>` + `<bp-sheet open>` / `<bp-dialog open>` 정적 카드로 포함**한다.
+
+### 별도 파일 (opt-in, 게이트 2 응답에 따라)
+
+기획자가 게이트 2 에서 명시적으로 이름을 말한 경우만 추가 생성. 메인 와이어 안 fragment 는 그대로 유지 (트리거 컨텍스트 SSOT).
 
 | overlay 파일 | viewport | 생성 파일 |
 |---|---|---|
@@ -71,14 +78,18 @@ argument-hint: <screen.md 경로>
 
 **suffix 규약**: `wireframe_{type}_{name}.html` 이 pc 기본, `_mobile` 이 모바일 suffix. `{type}` 는 `sheet` / `dialog`. overlay 의 `viewport` 는 page 와 독립이라 page 는 `[pc]` 만 해도 overlay 가 `[pc, mobile]` 이면 overlay 는 두 개 나온다.
 
-### 예고 게이트 파일 목록 예시
+### 예고 게이트 메시지 예시
 
-page `[pc, mobile]` + `sheet_review` `[pc, mobile]` + `dialog_zoom` `[pc]` 인 경우:
+page `[pc, mobile]` + `sheet_review` + `dialog_zoom` 인 경우:
 
 ```
-wireframe.html
-wireframe_mobile.html
-wireframe_sheet_review.html
-wireframe_sheet_review_mobile.html
-wireframe_dialog_zoom.html
+좋아요, 그릴게요.
+- wireframe.html
+- wireframe_mobile.html
+
+이 화면에 시트·다이얼로그 2개 있어요. 기본은 메인 와이어 안에 fragment 로 모두 포함합니다:
+- sheet_review
+- dialog_zoom
+
+별도 파일로도 뽑을 게 있을까요? (없으면 "없음" / 있으면 이름 알려주세요)
 ```

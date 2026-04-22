@@ -1,6 +1,6 @@
 ---
 name: wireframe
-version: 4.3.0
+version: 4.3.1
 user-invocable: false
 description: >
   와이어프레임 HTML을 생성한다. bp-* Web Components(shadcn/ui 포팅 51종 + bp-icon)를 사용.
@@ -555,6 +555,17 @@ bp-area                        → wrapper only
 - `<bp-fragment>` body 에 `<bp-dialog open>` 을 **직접** 배치한다. backdrop 흉내 용 `<div class="absolute inset-0 bg-black/20">` 같은 wrapper 로 감싸지 말 것 — 구 패턴 (컴포넌트가 `position: fixed` 였을 때 필요하던 우회) 이고 이제는 이중 박스만 만든다
 - 한 페이지에 여러 오버레이를 동시에 `open` 해도 서로 겹치지 않고 각자 자기 fragment 안에 독립적으로 렌더된다
 - 원칙: **1 fragment = 1 오버레이 상태**. 초기·전송중·에러 등 상태를 보이려면 fragment 를 분리한다 (같은 fragment 안에 같은 오버레이 2개 넣으면 grid-col 로 나란히는 보이지만 의미상 혼란)
+
+#### 메인 wireframe vs 별도 파일 — 기본은 "메인 fragment 포함"
+
+명세에서 `sheet_*.md` / `dialog_*.md` 로 분리되어 있어도 **와이어는 기본 메인 wireframe 안에 fragment 로 모두 포함**한다. 별도 파일 (`wireframe_sheet_{name}.html` / `wireframe_dialog_{name}.html`) 은 **opt-in** — 기획자가 게이트 2 에서 명시적으로 이름을 말한 경우에만 추가 생성한다 ([wireframe-harness/confirm-gates.md](../wireframe-harness/references/confirm-gates.md#게이트-2--시트다이얼로그-분리-여부-오케스트레이터가-소유) 참조).
+
+| 표현 | 언제 |
+|------|------|
+| 메인 와이어 안 `<bp-fragment>` + `<bp-dialog open>` (기본) | 트리거 컨텍스트 + "어디서 어떤 오버레이가 뜨는지" 를 검토자가 한눈에 봐야 할 때 (= 거의 항상) |
+| 별도 `wireframe_sheet_{name}.html` 파일 (opt-in) | 그 시트 자체의 풍부한 상태 변형(초기·입력중·전송중·에러·결과) 을 보여줘야 할 때 |
+
+두 표현은 공존할 수 있다 — 별도 파일을 만들어도 메인 와이어 안 fragment 는 그대로 유지한다 (트리거 컨텍스트는 메인이 SSOT).
 
 | bp 태그 | 주요 prop |
 |---------|-----------|
