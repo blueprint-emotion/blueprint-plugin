@@ -1,6 +1,6 @@
 ---
 name: wireframe
-version: 4.3.2
+version: 4.4.0
 user-invocable: false
 description: >
   와이어프레임 HTML을 생성한다. bp-* Web Components(shadcn/ui 포팅 51종 + bp-icon)를 사용.
@@ -218,6 +218,44 @@ bp-area                        → wrapper only
 
 ---
 
+## 생성 전략 — 기능별 단계 진행 (필수)
+
+와이어프레임은 한 번의 Write 로 통째 만들지 않는다. 화면 크기와 무관하게 **항상 기능 그룹 단위로 점진 생성** 한다 (Read → Edit → Read → Edit ...).
+
+```
+스테이지 1 — 레이아웃 + 디폴트 화면
+  ├─ HTML 템플릿 (head + Tailwind CDN + bp-components + base.css)
+  ├─ JSON description 골격 (sections 배열에 모든 feature 의 {feature, label, elements: []})
+  └─ <bp-board> > <bp-frame> > <bp-page> > 모든 feature 의 정상 시각 <bp-section>
+
+스테이지 2 — 기능 그룹 1 (예: 이미지)
+  ├─ JSON description 의 PRODUCT__GALLERY elements 6 체크리스트로 채움
+  └─ <bp-area data-feature="PRODUCT__GALLERY"> > 그 feature 의 fragment 들 (gallery-empty, ...)
+
+스테이지 3 — 기능 그룹 2 (예: 옵션·구매)
+  ├─ JSON elements 채움 + 시트/다이얼로그 fragment 도 같은 area 에
+  └─ <bp-area data-feature="PRODUCT__OPTION"> > option-sheet, purchase-sold-out, ...
+
+... 스테이지 N 까지 같은 패턴
+```
+
+**상품 상세 (표준 5 단계)**: ① 레이아웃+디폴트 → ② 이미지(GALLERY) → ③ 옵션·구매(OPTION) → ④ 리뷰(REVIEW) → ⑤ 문의(QNA)
+
+**왜**:
+- 한 응답 안에 메인 + 모든 fragment + 모든 elements 디테일을 다 담으면 출력 한계·디테일 누락이 잦다
+- 기능 단위로 묶으면 한 스테이지가 자기완결적 (정상 + 변형 + rail 6 체크리스트가 같이 옴) → SSOT·매칭 검증 쉬움
+- 시트/다이얼로그 fragment 는 그 feature 의 변형이므로 (`bp-area` 가 기능 단위), 같은 스테이지에서 추가하면 자연스럽게 묶임
+
+**규약**:
+- 스테이지 1 끝 시점: 메인 시각 + JSON sections 골격 (elements 빈 배열) 모두 존재
+- 스테이지 2~N 각각: 그 그룹의 (a) JSON elements 가 6 체크리스트로 채워지고, (b) 해당 feature 의 fragment 들이 `<bp-area>` 안에 모두 있고, (c) 메인 시각 보강 필요하면 같이
+- 스테이지 사이에 직전 파일을 Read 하고 Edit 으로 추가 (Write 로 통째 재작성 X — 직전 결과 유실)
+- 단일 feature 만 있는 화면도 동일하게 ① 레이아웃+디폴트 → ② 그 feature 그룹 의 두 스테이지로 진행 (스킵 X)
+
+리뷰어 호출은 모든 스테이지 종료 후 한 번 (오케스트레이터 주도). 스테이지별 자체 검증은 wireframer 내부 자기점검만.
+
+---
+
 ## 보드 구조
 
 ```
@@ -283,34 +321,63 @@ bp-area                        → wrapper only
 | 다른 영역의 상태 | **feature 별로 별도 `<bp-area>`** (시트/다이얼로그 종류로 묶지 말 것) |
 | 버튼 hover·disabled 같은 컴포넌트 변형 | 정상 프레임에 흡수 (조각으로 분리하지 않는다) |
 
-### bp-fragment description 자세히 쓰기 ⚠️
+### description 의 두 자리 — 자세히는 rail, 짧게는 fragment ⚠️
 
-`description` 은 한 줄짜리 키워드("우클릭 시", "재고 0") 가 아니라 **검토자가 와이어를 보지 않고도 그 상태를 이해할 수 있을 정도의 설명**이어야 한다. 다음을 모두 포함:
+description 은 두 곳에 들어가는데 **자세함의 책임이 정반대**다.
 
-1. **트리거 / 진입 조건** — 어떤 사용자 행동·상태에서 이 조각이 보이는가
+| 위치 | 어디에 보이는가 | 길이 | 무엇을 담나 |
+|------|----------------|:---:|------|
+| **JSON `sections[].elements[].description`** (디스크립션 페널) | 우측 sticky rail | **자세히** | 트리거·사전조건·시각차이·액션·닫힘·사이드이펙트 |
+| **`<bp-fragment description="...">`** (조각 헤더) | 와이어 본문 위 h3+p | **짧게 (한 줄)** | 이 조각이 "무엇" 인지 — 상태 식별만 |
+
+**왜 이렇게 나뉘는가**:
+- rail 은 검토자가 와이어를 보지 않고도 동작을 이해해야 하는 SSOT 다 — element 단위로 모든 상세 동작이 들어간다
+- fragment description 은 와이어 옆에 같이 보이므로 "이 그림이 어떤 상태인지" 만 한 줄로 식별 → 본문 시각이 나머지를 설명한다
+- 같은 상세를 두 곳에 쓰면 SSOT 가 깨지고 fragment 헤더가 시각을 가려 와이어 가독성이 떨어진다
+
+#### JSON elements description 6 체크리스트
+
+각 element description 은 다음을 모두 포함:
+
+1. **트리거 / 진입 조건** — 어떤 사용자 행동·상태에서 이 element 가 활성화 / 노출되는가
 2. **사전 조건** — 비로그인·권한 없음·재고 0 같은 컨텍스트
-3. **시각 차이** — 정상 상태와 무엇이 다른가 (대체된 영역, 추가/제거된 요소)
+3. **시각 차이** — 정상과 무엇이 다른가 (대체된 영역, 추가/제거된 요소)
 4. **사용자가 할 수 있는 액션** — CTA, 닫기 방법, 다음 화면
-5. **닫힘·복귀 조건** — Esc / 외부 클릭 / 명시적 버튼 / 자동 사라짐 여부
+5. **닫힘·복귀 조건** — Esc / 외부 클릭 / 명시적 버튼 / 자동 사라짐
 6. **데이터 사이드이펙트** — 제출 시 무엇이 변하는가, 취소 시 입력은 폐기되는가
 
+```jsonc
+// ❌ 너무 짧음 — 동작 전반이 빠짐
+{ "name": "장바구니 중복 확인 알랏", "description": "장바구니에 같은 옵션 있을 때" }
+
+// ✅ 충분 — rail 한 줄로 동작 전체를 이해
+{
+  "name": "장바구니 중복 확인 알랏",
+  "description": "이미 장바구니에 같은 옵션의 상품이 담겨 있는 상태에서 '장바구니' 버튼 클릭 시 노출. '추가 담기' 시 기존 라인의 수량이 +1, '취소' 시 변동 없이 닫힘. 명시적 선택을 강제하기 위해 X 버튼이 없고 외부 클릭/Esc 로도 닫히지 않는다."
+}
+```
+
+#### bp-fragment description 은 짧게
+
+조각 헤더는 **한 줄·30자 내외** 로 상태만 식별한다.
+
 ```html
-<!-- ❌ 너무 짧음 -->
+<!-- ❌ 와이어 위에 본문보다 긴 설명 박힘 -->
+<bp-fragment id="purchase-already-in-cart-alert"
+  title="장바구니 중복 확인 알랏"
+  description="이미 장바구니에 같은 옵션의 상품이 담겨 있는 상태에서 '장바구니' 버튼 클릭 시 노출.
+              '추가 담기' 시 기존 라인의 수량이 +1, '취소' 시 변동 없이 닫힘.
+              명시적 선택을 강제하기 위해 X 버튼이 없고 외부 클릭/Esc 로도 닫히지 않는다."
+>
+
+<!-- ✅ 한 줄 식별. 상세는 JSON elements 의 같은 이름 element 에 들어가 있다 -->
 <bp-fragment id="purchase-already-in-cart-alert"
   title="장바구니 중복 확인 알랏"
   description="이미 같은 옵션이 장바구니에 있을 때 '장바구니' 클릭"
 >
-
-<!-- ✅ 충분 -->
-<bp-fragment id="purchase-already-in-cart-alert"
-  title="장바구니 중복 확인 알랏"
-  description="이미 장바구니에 같은 옵션의 상품이 담겨 있는 상태에서 '장바구니' 버튼 클릭 시 노출.
-              '추가 담기' 시 기존 라인의 수량이 +1 증가, '취소' 시 변동 없이 닫힘.
-              명시적 선택을 강제하기 위해 X 닫기 버튼이 없고 외부 클릭/Esc 로도 닫히지 않는다."
->
 ```
 
-짧게 끝나면 보통 **사후 동작** 이나 **사전 조건** 이 빠져 있다. 한 번 작성 후 위 6 체크리스트로 누락 점검.
+조각 description 이 두세 줄을 넘어가면 그 내용은 JSON elements 로 옮긴다. fragment 안의 시각(`data-element` 가 붙은 노드) 이 어떤 동작을 하는지는 rail 을 통해 알 수 있어야 한다.
 
 ---
 

@@ -118,22 +118,44 @@ viewport: [pc, mobile]
 
 각 파일은 `<bp-frame viewport="pc|mobile">`을 사용. 한 파일에 두 viewport 섞지 않는다.
 
-### 5단계 — 와이어프레임 작성
+### 5단계 — 와이어프레임 작성 (기능별 단계 진행, 필수)
 
-`wireframe` 스킬의 가이드를 그대로 따른다:
+화면 크기와 무관하게 **항상 기능 단위 스테이지** 로 점진 작성한다. 단일 feature 화면도 ① 레이아웃+디폴트 → ② 그 feature 그룹 두 스테이지 진행 (스킵 X).
 
-- HTML 템플릿 (Tailwind CDN, bp-components, base.css)
-- `<script type="application/bp-description+json">` 우측 rail 설명
-- `<bp-board>` → `<bp-frame>` (정상) + `<bp-area>` (상태 조각)
-- `<bp-section data-feature data-feature-key data-label>` 메인 UI
-- `<bp-fragment>` 안 `<bp-section data-feature>` 상태 조각
+**기본 N 단계 (상품 상세 같은 표준 화면 기준)**:
+
+1. **레이아웃 + 디폴트 화면** — HTML 템플릿 골격(head 의 JSON description 빈 sections 배열 + body 의 `<bp-board>` `<bp-frame>` `<bp-page>` `<bp-page-content>` `<bp-page-footer>`) + 전 feature 의 정상 시각을 한 번에 배치 (`<bp-section data-feature data-feature-key data-label>`). 이 단계에서는 fragment 0개. JSON sections 도 `feature` + `label` 만 있고 `elements` 는 비워둠 (다음 단계에서 채움)
+2. **기능 그룹 1** — JSON elements 6 체크리스트 채우기 + 그 기능의 변형(fragment) 들을 `<bp-area data-feature="...">` 안에 추가
+3. **기능 그룹 2**
+4. **기능 그룹 3**
+5. **... 나머지 그룹**
+
+상품 상세 예: ① 레이아웃+디폴트 → ② 이미지(GALLERY) → ③ 옵션·구매(OPTION) → ④ 리뷰(REVIEW) → ⑤ 문의(QNA).
+
+**왜 이렇게**:
+- 한 응답에 모든 시각·fragment·rail 디테일을 다 그리면 출력 토큰 한계 + 디테일 누락이 잦음
+- 기능 단위로 묶으면 한 스테이지가 자기완결적 (해당 feature 의 정상 + 변형 + rail elements 가 같이 옴) → SSOT 검증 쉬움
+- 각 스테이지는 직전 파일을 Read 한 뒤 Edit 으로 추가 (Write 로 통째 재작성하지 말 것 — 직전 단계 결과 손실)
+
+**스테이지 산출물 규약**:
+
+- 스테이지 1 종료 시: 메인 페널 시각이 모든 feature 에 대해 채워져 있고, JSON description 의 `sections` 배열에 모든 feature 의 `{feature, label, elements: []}` 골격이 있다 (elements 는 빈 배열)
+- 스테이지 2~N 종료 시 (각각): 그 그룹의 (a) JSON elements 가 6 체크리스트 기준으로 채워짐, (b) 해당 feature 의 fragment 가 `<bp-area>` 안에 모두 추가됨, (c) 메인 시각에 변경 필요하면 보강
+- 마지막 스테이지 종료 시 자기점검 (visual-review.md) → reviewer 호출 대기 신호 반송
+
+**스킬 가이드 적용**:
+- HTML 템플릿 (Tailwind CDN, bp-components, base.css) — 스테이지 1 에서 한 번
+- `<bp-board>` → `<bp-frame>` (정상) + `<bp-area>` (상태 조각) — `<bp-area>` 는 스테이지 2~N 에서 점진 추가
+- `<bp-section data-feature data-feature-key data-label>` 메인 UI — 스테이지 1
+- `<bp-fragment>` 안 `<bp-section data-feature>` 상태 조각 — 스테이지 2~N
 - bp-* Web Components (shadcn/ui 1:1 포팅) + Tailwind 레이아웃
 
 **중요**:
-- `bp-components.js`를 fetch/read하지 않는다 (6,600줄 빌드 산출물)
-- 빠른 참조 표만으로 대부분 작성. shadcn과 차이가 있는 컴포넌트만 `references/components/bp-X.md` 한 파일을 읽는다
-- 메인 UI의 `<bp-section>`에는 항상 `data-feature-key` 부여. 페이지 내 unique
-- JSON description의 `sections[].feature`는 도메인 축. 같은 feature가 여러 위치에 등장해도 section은 1개로 유지
+- `bp-components.js` 를 fetch/read 하지 않는다 (6,600 줄 빌드 산출물)
+- 빠른 참조 표만으로 대부분 작성. shadcn 과 차이가 있는 컴포넌트만 `references/components/bp-X.md` 한 파일을 읽는다
+- 메인 UI 의 `<bp-section>` 에는 항상 `data-feature-key` 부여. 페이지 내 unique
+- JSON description 의 `sections[].feature` 는 도메인 축. 같은 feature 가 여러 위치에 등장해도 section 은 1개로 유지
+- description 의 자세함 책임: **JSON elements = 자세히 (6 체크리스트), fragment = 한 줄 식별만** ([wireframe SKILL.md](../skills/wireframe/SKILL.md#description-의-두-자리--자세히는-rail-짧게는-fragment) 참조)
 
 ### 6단계 — 시트·다이얼로그 처리
 
@@ -142,7 +164,7 @@ viewport: [pc, mobile]
 1. **모두 메인 와이어 안에 `<bp-fragment>` + 오버레이 정적 카드로 포함 (기본)**. fragment id 는 `{name}` (예: `sheet_review.md` → `<bp-fragment id="review">`). 각 fragment 의 description 은 트리거 컨텍스트 + 사전조건 등 6 체크리스트 (wireframe 스킬 §"bp-fragment description 자세히 쓰기" 참조).
 2. **오케스트레이터 Task prompt 에 `extract_overlays: [...]` 가 명시된 경우만** 그 이름들을 별도 와이어 파일로 추가 생성. 메인 fragment 는 유지. 파일명 패턴은 wireframe 스킬 규약대로 (`wireframe_sheet_{name}.html` + viewport suffix).
 
-`extract_overlays` 가 없으면 별도 파일은 만들지 않는다.
+`extract_overlays` 가 없으면 별도 파일은 만들지 않는다. 메인 와이어 안 sheet/dialog fragment 는 5 단계 진행 중 해당 feature 그룹 스테이지에서 같이 추가된다 (예: 옵션 시트는 ③ 옵션 그룹).
 
 ### 7단계 — 자기점검 + 반송 (reviewer 호출 없음)
 

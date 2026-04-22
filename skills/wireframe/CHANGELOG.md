@@ -6,6 +6,45 @@
 - **MINOR**: 새 컴포넌트·새 패턴·새 옵션 추가 (호환성 유지)
 - **PATCH**: 문서 명료화·예제 보강·오타 수정
 
+## [4.4.0] - 2026-04-22
+
+### Added — 생성 전략: 기능별 단계 진행 (필수)
+
+와이어프레임은 한 번의 Write 로 통째 만들지 않고, **항상 기능 그룹 단위 스테이지** 로 점진 생성한다 (Read → Edit → Read → Edit ...). 화면 크기와 무관하게 적용.
+
+**기본 N 단계 (상품 상세 표준)**: ① 레이아웃+디폴트 → ② 이미지(GALLERY) → ③ 옵션·구매(OPTION) → ④ 리뷰(REVIEW) → ⑤ 문의(QNA)
+
+- 스테이지 1: HTML 템플릿 + JSON sections 골격 (elements 빈 배열) + 모든 feature 의 정상 시각 메인 패널
+- 스테이지 2~N: 각 feature 그룹의 (a) JSON elements 6 체크리스트 채우기, (b) `<bp-area data-feature="...">` 안에 fragment 추가, (c) 메인 시각 보강
+- 시트/다이얼로그 fragment 는 그 feature 그룹 스테이지에서 같이 추가 (bp-area 가 기능 단위)
+- 리뷰어는 모든 스테이지 종료 후 한 번 호출 (오케스트레이터)
+
+`wireframe/SKILL.md` 에 "생성 전략 — 기능별 단계 진행 (필수)" 섹션 신설. `agents/wireframer.md` §5 에 단계별 산출물 규약 명시.
+
+### Changed — description 자세함 책임 뒤집음 (4.3.0 → 반대 방향)
+
+이전(4.3.0): "bp-fragment description 자세히 쓰기" 6 체크리스트 — 조각 헤더에 트리거·사전조건·시각·액션·닫힘·사이드이펙트 다 담음.
+
+이후(4.4.0): description 이 들어가는 두 자리의 책임을 분리:
+- **JSON `sections[].elements[].description`** (우측 디스크립션 페널 = rail) → **자세히**. 6 체크리스트 SSOT
+- **`<bp-fragment description="...">`** (와이어 위 h3+p 헤더) → **짧게 한 줄, 상태 식별만**
+
+같은 상세를 두 곳에 쓰면 SSOT 가 깨지고, fragment 헤더가 본문 시각을 가려 와이어 가독성이 떨어진다.
+
+### Changed — SKILL.md
+
+- §"bp-fragment description 자세히 쓰기" → §"description 의 두 자리 — 자세히는 rail, 짧게는 fragment" 로 재작성
+- 두 자리 비교 표 + 왜 이렇게 나뉘는지 + JSON elements 6 체크리스트 + 좋은/나쁜 예시 (rail 자세함 / fragment 짧음)
+
+### Changed — example 파일
+
+- `references/example-product-detail.html` (PC):
+  - 9 개 fragment description 을 모두 한 줄로 줄임 (이전 multi-line 상세 표현 제거)
+  - 그 상세 내용을 JSON `PRODUCT__GALLERY` / `PRODUCT__OPTION` / `PRODUCT__REVIEW` / `PRODUCT__QNA` elements 로 이동 (매칭 element 의 description 보강)
+- `references/example-product-detail-mobile.html`:
+  - fragment description 은 이미 짧으므로 변경 없음
+  - JSON elements 를 PC 와 동일한 6 체크리스트 수준으로 보강 (sheet/dialog 동작·취소·사이드이펙트 등)
+
 ## [4.3.2] - 2026-04-22
 
 ### Added (자주 하는 실수)
