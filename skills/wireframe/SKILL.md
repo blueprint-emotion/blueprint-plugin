@@ -1,6 +1,6 @@
 ---
 name: wireframe
-version: 4.2.1
+version: 4.3.0
 user-invocable: false
 description: >
   와이어프레임 HTML을 생성한다. bp-* Web Components(shadcn/ui 포팅 51종 + bp-icon)를 사용.
@@ -242,14 +242,75 @@ bp-area                        → wrapper only
 - `bp-area`가 자식 `bp-fragment`들을 자동으로 외곽 `bp-card`로 감싸고, 조각 사이에 `bp-separator`를 삽입한다
 - `bp-fragment`는 `title`/`description`이 h3+p 헤더로 자동 prepend되고, **본문은 항상 `.bp-fragment-body` 박스(border+radius+padding)로 래핑**된다 — 조각 안에 다시 카드/보더 wrapper를 두지 말 것 (이중 박스)
 
+### bp-area 묶음 = 기능(featureId) 단위 ⚠️
+
+**조각은 컴포넌트 종류(시트/다이얼로그/알랏)로 묶지 않는다. 항상 `data-feature` 단위로 묶는다.**
+
+```
+✅ <bp-area>                                    ← PRODUCT__OPTION 의 모든 변형
+     <bp-fragment id="option-sheet">…</bp-fragment>           (sheet)
+     <bp-fragment id="purchase-sold-out">…</bp-fragment>      (alert UI)
+     <bp-fragment id="purchase-option-error">…</bp-fragment>  (form error)
+     <bp-fragment id="size-guide-dialog">…</bp-fragment>      (dialog)
+     <bp-fragment id="already-in-cart">…</bp-fragment>        (alert-dialog)
+   </bp-area>
+
+❌ <bp-area>                                    ← "시트 모음" — 절대 금지
+     <bp-fragment id="option-sheet">…</bp-fragment>     (PRODUCT__OPTION)
+     <bp-fragment id="qna-write-sheet">…</bp-fragment>  (PRODUCT__QNA)  ← 다른 feature 가 섞임
+   </bp-area>
+```
+
+**왜**: 우측 rail · 코멘트 핀 앵커 · 검토자 시선이 모두 feature 축으로 정렬되기 때문이다. 컴포넌트 종류로 묶으면 "옵션 시트" 와 "문의 시트" 가 한 카드 안에 섞여 무관한 변형을 함께 보게 된다.
+
+### bp-area viewport 속성
+
+`<bp-area viewport="mobile">` 로 모바일 와이어프레임에서는 영역 폭이 370px 로 좁아진다 (default 560px = pc). 모바일 와이어 파일 안의 모든 `<bp-area>` 에 명시할 것.
+
+| viewport | 폭 |
+|---|---|
+| `pc` (기본) | 560px |
+| `mobile` | 370px |
+
+명시적 `width="..."` 속성이 있으면 그 값이 우선한다.
+
 ### 상태 조각 배치 판단
 
 | 상황 | 배치 |
 |------|------|
 | 주 상태(성공·정상 데이터) | `<bp-frame>` 안 `<bp-page>` |
-| 같은 영역의 변형 (빈 목록·로딩·에러·권한 없음 등) | 해당 영역을 가리키는 `<bp-area>` 안에 `<bp-fragment>` 여러 개 |
-| 서로 다른 영역의 상태를 모으고 싶을 때 | `<bp-area>`를 여러 개 둔다. 영역 구분은 각 fragment의 title/description으로 드러난다 |
+| 같은 영역의 변형 (빈 목록·로딩·에러·권한 없음 등) | **같은 featureId 의 `<bp-area>`** 안에 `<bp-fragment>` 여러 개 |
+| 다른 영역의 상태 | **feature 별로 별도 `<bp-area>`** (시트/다이얼로그 종류로 묶지 말 것) |
 | 버튼 hover·disabled 같은 컴포넌트 변형 | 정상 프레임에 흡수 (조각으로 분리하지 않는다) |
+
+### bp-fragment description 자세히 쓰기 ⚠️
+
+`description` 은 한 줄짜리 키워드("우클릭 시", "재고 0") 가 아니라 **검토자가 와이어를 보지 않고도 그 상태를 이해할 수 있을 정도의 설명**이어야 한다. 다음을 모두 포함:
+
+1. **트리거 / 진입 조건** — 어떤 사용자 행동·상태에서 이 조각이 보이는가
+2. **사전 조건** — 비로그인·권한 없음·재고 0 같은 컨텍스트
+3. **시각 차이** — 정상 상태와 무엇이 다른가 (대체된 영역, 추가/제거된 요소)
+4. **사용자가 할 수 있는 액션** — CTA, 닫기 방법, 다음 화면
+5. **닫힘·복귀 조건** — Esc / 외부 클릭 / 명시적 버튼 / 자동 사라짐 여부
+6. **데이터 사이드이펙트** — 제출 시 무엇이 변하는가, 취소 시 입력은 폐기되는가
+
+```html
+<!-- ❌ 너무 짧음 -->
+<bp-fragment id="purchase-already-in-cart-alert"
+  title="장바구니 중복 확인 알랏"
+  description="이미 같은 옵션이 장바구니에 있을 때 '장바구니' 클릭"
+>
+
+<!-- ✅ 충분 -->
+<bp-fragment id="purchase-already-in-cart-alert"
+  title="장바구니 중복 확인 알랏"
+  description="이미 장바구니에 같은 옵션의 상품이 담겨 있는 상태에서 '장바구니' 버튼 클릭 시 노출.
+              '추가 담기' 시 기존 라인의 수량이 +1 증가, '취소' 시 변동 없이 닫힘.
+              명시적 선택을 강제하기 위해 X 닫기 버튼이 없고 외부 클릭/Esc 로도 닫히지 않는다."
+>
+```
+
+짧게 끝나면 보통 **사후 동작** 이나 **사전 조건** 이 빠져 있다. 한 번 작성 후 위 6 체크리스트로 누락 점검.
 
 ---
 

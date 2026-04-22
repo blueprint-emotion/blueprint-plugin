@@ -6,6 +6,29 @@
 - **MINOR**: 새 컴포넌트·새 패턴·새 옵션 추가 (호환성 유지)
 - **PATCH**: 문서 명료화·예제 보강·오타 수정
 
+## [4.3.0] - 2026-04-22
+
+### Added
+
+- `bp-area viewport="mobile"` 속성: 모바일 와이어프레임에서 영역 폭이 자동으로 370px (PC 기본 560px) 으로 좁아진다. 명시적 `width="..."` 가 있으면 그 값이 우선
+- `bp-section` 헤더 주석 업데이트 — `display: contents` → `display: block` 전환에 맞춘 트레이드오프(자식 sticky containing block 변경, grid/flex 자식 직접 item 패턴 깨짐) 명시
+- `bp-page-content` 모바일 패딩 16px (PC 24px) — `bp-frame[viewport="mobile"]` 스코프에서 `--page-padding-x` 자동 좁힘
+- SKILL.md 신규 섹션:
+  - **bp-area 묶음 = 기능(featureId) 단위** — 시트/다이얼로그 종류로 묶지 말 것 (예시 + 금지 패턴)
+  - **bp-area viewport 속성** — pc(560)/mobile(370) 폭 표
+  - **bp-fragment description 자세히 쓰기** — 6 체크리스트(트리거·사전조건·시각차이·액션·닫힘·사이드이펙트) + 좋은/나쁜 예
+- `references/example-product-detail-mobile.html` 신규 — PC 예제의 모바일 1열 레이아웃 + 하단 sticky CTA + bottom 시트 + viewport="mobile" 영역들
+
+### Changed
+
+- `bp-section` `display: contents` → `display: block` (BREAKING 주의: 부모 grid/flex 의 자식들을 bp-section 자식이 직접 item 으로 받던 패턴은 wrapper div 한 개로 묶는 패턴으로 바꿔야 함)
+- `bp-sheet` overlay 가 항상 보이도록 방향별 고정 strip(w-24 / h-24)으로 전환 (`flex-1` 만 쓰면 content 가 부모보다 클 때 collapse)
+- `bp-sheet` `sm:max-w-sm` → `max-w-sm` — 뷰어 viewport(모바일/PC) 와 무관하게 일관된 폭
+- `references/example-product-detail.html` PC 예제 정리:
+  - bp-area 묶음을 기능별로 재정렬 (qna-write-sheet 를 PRODUCT__QNA 영역으로 이동, "구매" → "옵션·구매" 통합)
+  - 모든 fragment description 을 6 체크리스트 기준으로 확장
+  - PRODUCT__QNA `data-label` 을 "Q&A" → "문의" 로 통일 (JSON `label` 과 일치)
+
 ## [4.2.1] - 2026-04-22
 
 ### Added

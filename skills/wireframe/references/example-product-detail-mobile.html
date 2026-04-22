@@ -2,7 +2,7 @@
 ---
 type: wireframe
 screenId: SHOP-PRODUCT-DETAIL
-title: 상품 상세 (샘플)
+title: 상품 상세 (샘플 · 모바일)
 ---
 -->
 <!doctype html>
@@ -10,19 +10,18 @@ title: 상품 상세 (샘플)
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SHOP — 상품 상세 (보드 패턴 샘플)</title>
+    <title>SHOP — 상품 상세 (모바일 샘플)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://blueprint-platform-pink.vercel.app/blueprint/v1/tailwind-config.js"></script>
     <script src="https://blueprint-platform-pink.vercel.app/blueprint/v1/bp-components.js" defer></script>
     <link rel="stylesheet" href="https://blueprint-platform-pink.vercel.app/blueprint/v1/base.css" />
 
     <!--
-      SHOP / 상품 상세 (와이어프레임 보드 패턴 샘플)
-      - 보드: <bp-board> 안에 정상 프레임 1개 + 영역 컬럼 2개 (갤러리, 구매)
-      - 기능 설명은 <script type="application/bp-description+json">에 임베드 → 우측 rail 자동 렌더
-      - 메인 페이지 트리의 bp-section은 data-feature-key로 슬롯을 구분한다
-      - 상태 변형(이미지 없음, 품절, 옵션 미선택 에러 등)은 section.elements로 흡수하고
-        시각 조각은 <bp-area> 안의 <bp-fragment>로 분리
+      SHOP / 상품 상세 — 모바일 (와이어프레임 보드 패턴 샘플)
+      - PC 버전과 같은 도메인·기능. 레이아웃만 모바일(375px) 단일 컬럼으로 재구성
+      - 갤러리 → 상품 정보 → 옵션·CTA 순으로 세로 스택
+      - 시트는 side="bottom" (모바일 표준). 다이얼로그·알랏은 그대로 중앙
+      - PC 전용 패턴(이미지 우클릭 컨텍스트 메뉴) 은 모바일 fragment 에서 제외
     -->
 
     <script type="application/bp-description+json">
@@ -47,12 +46,10 @@ title: 상품 상세 (샘플)
           "feature": "PRODUCT__GALLERY",
           "label": "상품 이미지 뷰어",
           "elements": [
-            { "name": "메인 이미지", "description": "대표 이미지 1장. 썸네일 클릭 시 전환. 최대 10장" },
-            { "name": "썸네일 목록", "description": "하단 최대 5개 노출. 초과 시 우측 슬라이드" },
-            { "name": "이미지 없음", "description": "상품에 등록된 이미지가 없을 때 플레이스홀더" },
-            { "name": "이미지 컨텍스트 메뉴", "description": "메인 이미지 우클릭 시 노출. 이미지 저장 / 링크 복사 / 신고" }
-          ],
-          "notes": ["이미지 확대/축소 미지원 — 정책 확정 필요"]
+            { "name": "메인 이미지", "description": "대표 이미지 1장. 좌우 스와이프로 전환. 최대 10장" },
+            { "name": "이미지 인디케이터", "description": "현재 이미지 순서 (3 / 10) 우하단 오버레이" },
+            { "name": "이미지 없음", "description": "상품에 등록된 이미지가 없을 때 플레이스홀더" }
+          ]
         },
         {
           "feature": "PRODUCT__INFO",
@@ -65,16 +62,15 @@ title: 상품 상세 (샘플)
         },
         {
           "feature": "PRODUCT__OPTION",
-          "label": "옵션 선택",
+          "label": "옵션 선택 (하단 시트)",
           "elements": [
-            { "name": "옵션 셀렉터", "description": "옵션 그룹별 select. 전체 선택 전 구매 불가" },
-            { "name": "수량 입력", "description": "최소 1, 재고 수량까지" },
-            { "name": "구매 버튼", "description": "primary. 옵션 미선택·품절 시 비활성" },
-            { "name": "장바구니 버튼", "description": "outline. 동일 제약" },
-            { "name": "품절", "description": "재고 0일 때 버튼 영역을 '일시 품절' 안내로 대체" },
-            { "name": "옵션 미선택 에러", "description": "구매 버튼 클릭 시 미선택 옵션을 빨간 border + 메시지로 표시" },
-            { "name": "사이즈 가이드 다이얼로그", "description": "'사이즈 가이드' 링크 클릭 시 중앙 모달로 사이즈 표 노출. X로 닫음" },
-            { "name": "장바구니 중복 확인 알랏", "description": "이미 장바구니에 같은 옵션이 담긴 상태에서 '장바구니' 클릭 시 '추가 담기 / 취소' 확인" }
+            { "name": "구매하기 CTA", "description": "하단 sticky 영역의 primary 버튼. 클릭 시 옵션 시트 오픈" },
+            { "name": "장바구니 CTA", "description": "하단 sticky 영역의 outline 버튼. 동일 시트 오픈" },
+            { "name": "옵션 시트", "description": "bottom 시트로 옵션·수량 선택. '구매' / '장바구니' 로 결제 진행" },
+            { "name": "품절", "description": "재고 0일 때 하단 CTA 영역을 '일시 품절' 안내로 대체" },
+            { "name": "옵션 미선택 에러", "description": "옵션 시트 내 미선택 옵션을 빨간 border + 메시지로 표시" },
+            { "name": "사이즈 가이드 다이얼로그", "description": "옵션 시트 내 '사이즈 가이드' 링크 클릭 시 중앙 모달" },
+            { "name": "장바구니 중복 확인 알랏", "description": "이미 장바구니에 같은 옵션이 담긴 상태에서 '장바구니' 클릭 시 확인" }
           ]
         },
         {
@@ -93,8 +89,8 @@ title: 상품 상세 (샘플)
             { "name": "평균 평점", "description": "별점 평균 + 총 리뷰 수" },
             { "name": "정렬 셀렉터", "description": "최신순 / 평점 높은 순 / 평점 낮은 순" },
             { "name": "사진 리뷰만 보기", "description": "사진 첨부된 리뷰만 필터링하는 토글" },
-            { "name": "리뷰 카드", "description": "작성자·평점·본문·사진. 신고 메뉴" },
-            { "name": "더보기 버튼", "description": "10개 단위 페이징. 마지막 페이지면 비활성" },
+            { "name": "리뷰 카드", "description": "작성자·평점·본문·사진" },
+            { "name": "더보기 버튼", "description": "10개 단위 페이징" },
             { "name": "빈 리뷰 목록", "description": "리뷰 0건일 때 첫 리뷰 작성 유도" }
           ]
         },
@@ -103,7 +99,7 @@ title: 상품 상세 (샘플)
           "label": "문의",
           "elements": [
             { "name": "문의 작성 버튼", "description": "비로그인 시 로그인 페이지로 이동, 로그인 시 문의 작성 시트 오픈" },
-            { "name": "문의 작성 시트", "description": "우측에서 슬라이드되는 시트. 제목·본문·비밀글 체크. '등록' 으로 제출, '취소' 로 닫음" },
+            { "name": "문의 작성 시트", "description": "하단 시트. 제목·본문·비밀글 체크. '등록' 으로 제출" },
             { "name": "문의 카드", "description": "질문 본문·작성자·상태 배지(답변 대기/완료)" },
             { "name": "답변", "description": "판매자 답변. 카드 안에 들여쓰기로 노출" },
             { "name": "비밀글 잠금", "description": "비밀글이고 작성자/판매자 아닐 때 본문 마스킹" },
@@ -117,126 +113,82 @@ title: 상품 상세 (샘플)
   <body>
     <bp-board>
       <!-- ============================================================
-           정상 상태 프레임 (PC)
+           정상 상태 프레임 (Mobile · 375px)
            ============================================================ -->
-      <bp-frame viewport="pc">
+      <bp-frame viewport="mobile">
         <bp-page>
           <bp-page-header>header</bp-page-header>
 
-          <bp-page-content>
+          <bp-page-content class="pb-24">
             <!-- 1) 브랜드 소개 -->
             <bp-section data-feature="BRAND__BOX" data-feature-key="brand" data-label="브랜드 소개">
-              <bp-card size="sm" class="!flex-row items-center gap-4 px-4">
+              <bp-card size="sm" class="!flex-row items-center gap-3 px-3">
                 <bp-image
                   data-element="브랜드 로고"
                   aspect-ratio="1/1"
                   fit="cover"
                   rounded
-                  class="w-14 h-14 shrink-0"
+                  class="w-10 h-10 shrink-0"
                 ></bp-image>
                 <bp-card-header class="flex-1 min-w-0 !p-0">
-                  <bp-card-title data-element="브랜드 샵명">샘플 브랜드</bp-card-title>
-                  <bp-card-description>브랜드 한 줄 소개 텍스트</bp-card-description>
+                  <bp-card-title data-element="브랜드 샵명" class="text-sm">샘플 브랜드</bp-card-title>
+                  <bp-card-description class="text-xs">브랜드 한 줄 소개</bp-card-description>
                 </bp-card-header>
                 <bp-card-action class="!static">
-                  <bp-button data-element="브랜드 홈 이동 버튼" variant="outline" size="sm">
-                    브랜드 홈
-                    <bp-icon name="chevron-right" size="xs"></bp-icon>
+                  <bp-button data-element="브랜드 홈 이동 버튼" variant="ghost" size="sm">
+                    <bp-icon name="chevron-right" size="sm"></bp-icon>
                   </bp-button>
                 </bp-card-action>
               </bp-card>
             </bp-section>
 
-            <!-- 2) 본문: 갤러리 + 정보/옵션 2열 -->
-            <div class="grid grid-cols-2 gap-8 mt-6">
-              <!-- 좌: 갤러리 -->
-              <bp-section data-feature="PRODUCT__GALLERY" data-feature-key="gallery" data-label="상품 이미지 뷰어">
-                <div class="flex flex-col gap-3">
-                  <bp-image data-element="메인 이미지" aspect-ratio="1/1" rounded></bp-image>
-                  <div data-element="썸네일 목록" class="grid grid-cols-5 gap-2">
-                    <bp-image aspect-ratio="1/1" rounded></bp-image>
-                    <bp-image aspect-ratio="1/1" rounded></bp-image>
-                    <bp-image aspect-ratio="1/1" rounded></bp-image>
-                    <bp-image aspect-ratio="1/1" rounded></bp-image>
-                    <bp-image aspect-ratio="1/1" rounded></bp-image>
-                  </div>
+            <!-- 2) 갤러리 — 단일 큰 이미지 + 인디케이터 -->
+            <bp-section data-feature="PRODUCT__GALLERY" data-feature-key="gallery" data-label="상품 이미지 뷰어" class="mt-4">
+              <div class="relative">
+                <bp-image data-element="메인 이미지" aspect-ratio="1/1"></bp-image>
+                <div
+                  data-element="이미지 인디케이터"
+                  class="absolute bottom-3 right-3 px-2 py-0.5 rounded-full bg-black/60 text-white text-xs"
+                >
+                  3 / 10
                 </div>
-              </bp-section>
-
-              <!-- 우: 상품 정보 + 옵션 -->
-              <div class="flex flex-col gap-6">
-                <bp-section data-feature="PRODUCT__INFO" data-feature-key="summary" data-label="상품 기본 정보">
-                  <div class="flex flex-col gap-2">
-                    <h1 data-element="상품명" class="text-2xl font-semibold">
-                      샘플 상품명이 두 줄까지 노출됩니다
-                    </h1>
-                    <div data-element="판매가" class="flex items-baseline gap-2">
-                      <span class="text-muted-foreground line-through text-sm">45,000원</span>
-                      <bp-badge variant="destructive">20%</bp-badge>
-                      <span class="text-2xl font-bold">36,000원</span>
-                    </div>
-                    <div data-element="재고 상태" class="text-xs text-muted-foreground">
-                      재고 12개 남음
-                    </div>
-                  </div>
-                </bp-section>
-
-                <bp-section data-feature="PRODUCT__OPTION" data-feature-key="option" data-label="옵션 선택">
-                  <bp-field-group>
-                    <bp-field>
-                      <bp-label for="opt-color">색상</bp-label>
-                      <bp-native-select id="opt-color" class="w-full" data-element="옵션 셀렉터">
-                        <option value="" disabled selected>색상 선택</option>
-                        <option value="black">블랙</option>
-                        <option value="white">화이트</option>
-                      </bp-native-select>
-                    </bp-field>
-
-                    <bp-field>
-                      <bp-label for="opt-size">사이즈</bp-label>
-                      <bp-native-select id="opt-size" class="w-full" data-element="옵션 셀렉터">
-                        <option value="" disabled selected>사이즈 선택</option>
-                        <option value="s">S</option>
-                        <option value="m">M</option>
-                        <option value="l">L</option>
-                      </bp-native-select>
-                    </bp-field>
-
-                    <bp-field>
-                      <bp-label for="opt-qty">수량</bp-label>
-                      <bp-input id="opt-qty" data-element="수량 입력" type="number" value="1"></bp-input>
-                    </bp-field>
-
-                    <div class="flex gap-2 mt-2">
-                      <bp-button data-element="장바구니 버튼" variant="outline" class="flex-1">
-                        장바구니
-                      </bp-button>
-                      <bp-button data-element="구매 버튼" variant="default" class="flex-1">
-                        바로 구매
-                      </bp-button>
-                    </div>
-                  </bp-field-group>
-                </bp-section>
               </div>
-            </div>
+            </bp-section>
 
-            <!-- 3) 상세·리뷰·문의 — 한 화면에 쭉 (탭 라벨은 시각 앵커 단서, 기능 없음) -->
-            <div class="mt-10 flex flex-col gap-12">
-              <!-- 앵커 라벨 바 (시각용. 클릭 동작 없음) -->
-              <div class="flex border-b border-border text-sm">
-                <div class="px-4 py-2 border-b-2 border-foreground -mb-px font-medium">상세 정보</div>
-                <div class="px-4 py-2 text-muted-foreground">리뷰 (1,234)</div>
-                <div class="px-4 py-2 text-muted-foreground">문의 (47)</div>
+            <!-- 3) 상품 정보 -->
+            <bp-section data-feature="PRODUCT__INFO" data-feature-key="summary" data-label="상품 기본 정보" class="mt-4">
+              <div class="flex flex-col gap-2">
+                <h1 data-element="상품명" class="text-lg font-semibold">
+                  샘플 상품명이 두 줄까지 노출됩니다
+                </h1>
+                <div data-element="판매가" class="flex items-baseline gap-2 flex-wrap">
+                  <bp-badge variant="destructive">20%</bp-badge>
+                  <span class="text-xl font-bold">36,000원</span>
+                  <span class="text-muted-foreground line-through text-xs">45,000원</span>
+                </div>
+                <div data-element="재고 상태" class="text-xs text-muted-foreground">
+                  재고 12개 남음
+                </div>
+              </div>
+            </bp-section>
+
+            <!-- 4) 상세·리뷰·문의 — 한 화면에 쭉 (탭 라벨은 시각 앵커 단서) -->
+            <div class="mt-8 flex flex-col gap-10">
+              <!-- 앵커 라벨 바 (시각용) -->
+              <div class="flex border-b border-border text-xs sticky top-0 bg-background z-10">
+                <div class="flex-1 px-2 py-2 border-b-2 border-foreground -mb-px font-medium text-center">상세 정보</div>
+                <div class="flex-1 px-2 py-2 text-muted-foreground text-center">리뷰 (1,234)</div>
+                <div class="flex-1 px-2 py-2 text-muted-foreground text-center">문의 (47)</div>
               </div>
 
               <!-- 상세 -->
               <div>
                 <bp-section data-feature="PRODUCT__DETAIL" data-feature-key="detail" data-label="상품 상세">
-                  <div class="flex flex-col gap-6">
+                  <div class="flex flex-col gap-5">
                     <bp-image data-element="상세 이미지" aspect-ratio="3/4" rounded></bp-image>
                     <div data-element="상세 설명" class="text-sm leading-relaxed text-foreground">
                       가벼운 코튼 소재로 제작된 데일리 티셔츠입니다. 사계절 내내 부담 없이 입을 수 있고
-                      세탁 후에도 형태가 잘 유지됩니다. 캐주얼한 데님부터 슬랙스까지 매치하기 좋습니다.
+                      세탁 후에도 형태가 잘 유지됩니다.
                     </div>
                     <bp-table data-element="스펙 표">
                       <bp-table-header>
@@ -255,8 +207,8 @@ title: 상품 상세 (샘플)
                           <bp-table-cell>대한민국</bp-table-cell>
                         </bp-table-row>
                         <bp-table-row>
-                          <bp-table-cell>세탁 방법</bp-table-cell>
-                          <bp-table-cell>30°C 이하 단독 세탁, 표백제 사용 금지</bp-table-cell>
+                          <bp-table-cell>세탁</bp-table-cell>
+                          <bp-table-cell>30°C 이하 단독</bp-table-cell>
                         </bp-table-row>
                       </bp-table-body>
                     </bp-table>
@@ -266,30 +218,29 @@ title: 상품 상세 (샘플)
 
               <!-- 리뷰 -->
               <div>
-                <h2 class="text-lg font-semibold mb-3">리뷰 (1,234)</h2>
+                <h2 class="text-base font-semibold mb-3">리뷰 (1,234)</h2>
                 <bp-section data-feature="PRODUCT__REVIEW" data-feature-key="review" data-label="리뷰">
                   <div class="flex flex-col gap-4">
-                    <!-- 평점 + 필터 헤더 -->
-                    <div class="flex items-center justify-between gap-4 flex-wrap">
+                    <div class="flex flex-col gap-3">
                       <div data-element="평균 평점" class="flex items-center gap-3">
-                        <span class="text-3xl font-bold">4.6</span>
+                        <span class="text-2xl font-bold">4.6</span>
                         <div class="flex flex-col">
                           <div class="flex gap-0.5 text-yellow-500">
-                            <bp-icon name="star" size="sm"></bp-icon>
-                            <bp-icon name="star" size="sm"></bp-icon>
-                            <bp-icon name="star" size="sm"></bp-icon>
-                            <bp-icon name="star" size="sm"></bp-icon>
-                            <bp-icon name="star" size="sm"></bp-icon>
+                            <bp-icon name="star" size="xs"></bp-icon>
+                            <bp-icon name="star" size="xs"></bp-icon>
+                            <bp-icon name="star" size="xs"></bp-icon>
+                            <bp-icon name="star" size="xs"></bp-icon>
+                            <bp-icon name="star" size="xs"></bp-icon>
                           </div>
-                          <span class="text-xs text-muted-foreground">총 1,234개 리뷰</span>
+                          <span class="text-xs text-muted-foreground">총 1,234개</span>
                         </div>
                       </div>
-                      <div class="flex items-center gap-3">
+                      <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2" data-element="사진 리뷰만 보기">
                           <bp-switch id="photo-only" size="sm"></bp-switch>
-                          <bp-label for="photo-only" class="text-sm cursor-pointer">사진 리뷰만</bp-label>
+                          <bp-label for="photo-only" class="text-xs cursor-pointer">사진 리뷰만</bp-label>
                         </div>
-                        <bp-native-select data-element="정렬 셀렉터" class="w-[10rem]">
+                        <bp-native-select data-element="정렬 셀렉터" class="w-[8rem] text-xs">
                           <option value="recent" selected>최신순</option>
                           <option value="rating-desc">평점 높은 순</option>
                           <option value="rating-asc">평점 낮은 순</option>
@@ -299,7 +250,6 @@ title: 상품 상세 (샘플)
 
                     <bp-separator></bp-separator>
 
-                    <!-- 리뷰 카드 목록 -->
                     <div class="flex flex-col gap-3">
                       <bp-card data-element="리뷰 카드">
                         <bp-card-header>
@@ -314,11 +264,11 @@ title: 상품 상세 (샘플)
                                 <bp-icon name="star" size="xs"></bp-icon>
                               </div>
                             </div>
-                            <span class="text-xs text-muted-foreground">2026.04.18</span>
+                            <span class="text-xs text-muted-foreground">04.18</span>
                           </div>
                         </bp-card-header>
                         <bp-card-content class="text-sm">
-                          핏도 좋고 색감이 화면 그대로입니다. 세탁 후에도 줄어들지 않아서 만족.
+                          핏도 좋고 색감이 화면 그대로입니다. 세탁 후에도 줄어들지 않아 만족.
                         </bp-card-content>
                       </bp-card>
 
@@ -334,16 +284,16 @@ title: 상품 상세 (샘플)
                                 <bp-icon name="star" size="xs"></bp-icon>
                               </div>
                             </div>
-                            <span class="text-xs text-muted-foreground">2026.04.12</span>
+                            <span class="text-xs text-muted-foreground">04.12</span>
                           </div>
                         </bp-card-header>
                         <bp-card-content class="text-sm">
-                          무난하게 잘 입을 수 있는 티셔츠. 다만 흰색은 비치는 편이라 이너 필수.
+                          무난하게 잘 입을 수 있는 티셔츠. 흰색은 비치는 편이라 이너 필수.
                         </bp-card-content>
                       </bp-card>
                     </div>
 
-                    <bp-button data-element="더보기 버튼" variant="outline" class="w-full">
+                    <bp-button data-element="더보기 버튼" variant="outline" class="w-full" size="sm">
                       리뷰 더 보기
                     </bp-button>
                   </div>
@@ -352,11 +302,11 @@ title: 상품 상세 (샘플)
 
               <!-- 문의 -->
               <div>
-                <h2 class="text-lg font-semibold mb-3">문의 (47)</h2>
+                <h2 class="text-base font-semibold mb-3">문의 (47)</h2>
                 <bp-section data-feature="PRODUCT__QNA" data-feature-key="qna" data-label="문의">
                   <div class="flex flex-col gap-4">
                     <div class="flex items-center justify-between">
-                      <span class="text-sm text-muted-foreground">총 47개의 문의</span>
+                      <span class="text-xs text-muted-foreground">총 47개</span>
                       <bp-button data-element="문의 작성 버튼" size="sm">
                         <bp-icon name="plus" size="xs"></bp-icon>
                         문의 작성
@@ -370,7 +320,7 @@ title: 상품 상세 (샘플)
                             <bp-card-title class="text-sm">사이즈가 정사이즈인가요?</bp-card-title>
                             <bp-badge variant="secondary">답변 완료</bp-badge>
                           </div>
-                          <bp-card-description>user_***3 · 2026.04.10</bp-card-description>
+                          <bp-card-description class="text-xs">user_***3 · 04.10</bp-card-description>
                         </bp-card-header>
                         <bp-card-content class="text-sm">
                           평소 입던 사이즈로 주문해도 될까요? 어깨가 넓은 편입니다.
@@ -379,7 +329,7 @@ title: 상품 상세 (샘플)
                           <div data-element="답변" class="flex flex-col gap-1 w-full">
                             <span class="text-xs font-medium text-primary">판매자 답변</span>
                             <p class="text-sm text-muted-foreground">
-                              어깨가 넓으시면 한 사이즈 업을 추천드립니다. 평소 M 입으시면 L 사이즈 추천드려요.
+                              어깨가 넓으시면 한 사이즈 업을 추천드립니다.
                             </p>
                           </div>
                         </bp-card-footer>
@@ -394,10 +344,10 @@ title: 상품 상세 (샘플)
                             </bp-card-title>
                             <bp-badge variant="outline">답변 대기</bp-badge>
                           </div>
-                          <bp-card-description>user_***4 · 2026.04.08</bp-card-description>
+                          <bp-card-description class="text-xs">user_***4 · 04.08</bp-card-description>
                         </bp-card-header>
                         <bp-card-content data-element="비밀글 잠금" class="text-sm text-muted-foreground italic">
-                          비밀글로 작성된 문의입니다. 작성자와 판매자만 볼 수 있습니다.
+                          비밀글로 작성된 문의입니다.
                         </bp-card-content>
                       </bp-card>
                     </div>
@@ -406,18 +356,32 @@ title: 상품 상세 (샘플)
               </div>
             </div>
           </bp-page-content>
-          <bp-page-footer>footer</bp-page-footer>
+
+          <!-- 5) 하단 sticky CTA — 모바일 상품 상세의 표준 패턴 -->
+          <bp-page-footer class="sticky bottom-0 bg-background border-t p-3">
+            <bp-section data-feature="PRODUCT__OPTION" data-feature-key="cta" data-label="옵션 선택 (하단 시트)">
+              <div class="flex gap-2">
+                <bp-button data-element="장바구니 CTA" variant="outline" class="flex-1" size="lg">
+                  <bp-icon name="shopping-cart" size="sm"></bp-icon>
+                  장바구니
+                </bp-button>
+                <bp-button data-element="구매하기 CTA" variant="default" class="flex-[2]" size="lg">
+                  바로 구매
+                </bp-button>
+              </div>
+            </bp-section>
+          </bp-page-footer>
         </bp-page>
       </bp-frame>
 
       <!-- ============================================================
            영역: 갤러리 (PRODUCT__GALLERY)
            ============================================================ -->
-      <bp-area>
+      <bp-area viewport="mobile">
         <bp-fragment
           id="gallery-empty"
           title="이미지 없음"
-          description="관리자가 아직 이미지를 업로드하지 않은 상태. 메인/썸네일 영역 전체가 plain placeholder 로 대체된다. 안내 문구만 노출하고 별도 액션 없음 — 사용자는 다른 상품으로 이동하거나 페이지를 떠나게 된다."
+          description="상품에 등록된 이미지가 0장일 때"
         >
           <bp-section data-feature="PRODUCT__GALLERY" data-label="상품 이미지 뷰어">
             <bp-empty data-element="이미지 없음">
@@ -431,55 +395,66 @@ title: 상품 상세 (샘플)
             </bp-empty>
           </bp-section>
         </bp-fragment>
-
-        <bp-fragment
-          id="gallery-context-menu"
-          title="이미지 컨텍스트 메뉴"
-          description="메인 이미지 우클릭 시 마우스 좌표에 노출되는 컨텍스트 메뉴. 항목: 이미지 저장(⌘S), 링크 복사, 신고. '신고' 만 destructive 색. 와이어프레임에서는 위치 시각화를 위해 mock 카드를 이미지 위 absolute 로 오버레이 (실제 런타임은 fixed 포지셔닝). 외부 클릭/Esc 로 닫힘."
-        >
-          <bp-section data-feature="PRODUCT__GALLERY" data-label="상품 이미지 뷰어">
-            <!--
-              실제 런타임에는 bp-context-menu-content 가 마우스 좌표에 fixed 포지셔닝되지만,
-              와이어프레임에서는 항목 구성을 보이기 위해 mock 카드를 absolute 로 이미지 위에 오버레이.
-            -->
-            <div class="relative" data-element="이미지 컨텍스트 메뉴">
-              <bp-image aspect-ratio="1/1" rounded></bp-image>
-              <bp-card size="sm" class="!p-1 absolute top-16 left-16 z-10 shadow-lg" style="width: 13rem;">
-                <bp-card-content class="!p-1 flex flex-col gap-0.5 text-sm">
-                  <div class="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent">
-                    <bp-icon name="image" size="xs"></bp-icon>
-                    <span class="flex-1">이미지 저장</span>
-                    <bp-kbd>⌘S</bp-kbd>
-                  </div>
-                  <div class="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent">
-                    <bp-icon name="link" size="xs"></bp-icon>
-                    <span class="flex-1">링크 복사</span>
-                  </div>
-                  <bp-separator></bp-separator>
-                  <div class="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-accent text-destructive">
-                    <bp-icon name="circle-x" size="xs"></bp-icon>
-                    <span class="flex-1">신고</span>
-                  </div>
-                </bp-card-content>
-              </bp-card>
-            </div>
-          </bp-section>
-        </bp-fragment>
       </bp-area>
 
       <!-- ============================================================
            영역: 옵션·구매 (PRODUCT__OPTION)
-           - 품절, 옵션 미선택 에러, 사이즈 가이드, 장바구니 중복
+           - 옵션 선택 시트, 품절, 옵션 미선택 에러, 사이즈 가이드, 장바구니 중복
            ============================================================ -->
-      <bp-area>
+      <bp-area viewport="mobile">
+        <bp-fragment
+          id="option-sheet"
+          title="옵션 선택 시트"
+          description="하단 CTA 클릭 시 bottom 시트로 슬라이드"
+        >
+          <bp-section data-feature="PRODUCT__OPTION" data-label="옵션 선택 (하단 시트)">
+            <bp-sheet open data-element="옵션 시트">
+              <bp-sheet-content side="bottom">
+                <bp-sheet-header>
+                  <bp-sheet-title>옵션 선택</bp-sheet-title>
+                </bp-sheet-header>
+                <bp-field-group class="px-4 py-2">
+                  <bp-field>
+                    <bp-label for="m-opt-color">색상</bp-label>
+                    <bp-native-select id="m-opt-color" class="w-full">
+                      <option value="" disabled selected>색상 선택</option>
+                      <option value="black">블랙</option>
+                      <option value="white">화이트</option>
+                    </bp-native-select>
+                  </bp-field>
+                  <bp-field>
+                    <bp-label for="m-opt-size">사이즈</bp-label>
+                    <bp-native-select id="m-opt-size" class="w-full">
+                      <option value="" disabled selected>사이즈 선택</option>
+                      <option value="s">S</option>
+                      <option value="m">M</option>
+                      <option value="l">L</option>
+                    </bp-native-select>
+                  </bp-field>
+                  <bp-field>
+                    <bp-label for="m-opt-qty">수량</bp-label>
+                    <bp-input id="m-opt-qty" type="number" value="1"></bp-input>
+                  </bp-field>
+                </bp-field-group>
+                <bp-sheet-footer>
+                  <div class="flex gap-2 w-full">
+                    <bp-button variant="outline" class="flex-1">장바구니</bp-button>
+                    <bp-button class="flex-[2]">바로 구매</bp-button>
+                  </div>
+                </bp-sheet-footer>
+              </bp-sheet-content>
+            </bp-sheet>
+          </bp-section>
+        </bp-fragment>
+
         <bp-fragment
           id="purchase-sold-out"
           title="품절"
-          description="재고 수량 0 진입 시 옵션 셀렉터·구매/장바구니 버튼이 일시 품절 안내로 대체된다. '재입고 알림 신청' 으로 알림 등록 가능 (별도 가입 필요 없음, 비로그인 시 로그인 페이지로 이동). 재고가 1 이상 회복되면 자동으로 정상 옵션 영역으로 돌아온다."
+          description="재고 수량 0 — 하단 CTA 영역 대체"
         >
-          <bp-section data-feature="PRODUCT__OPTION" data-label="옵션 선택">
+          <bp-section data-feature="PRODUCT__OPTION" data-label="옵션 선택 (하단 시트)">
             <div class="flex flex-col gap-3">
-              <bp-badge variant="destructive" data-element="품절">일시 품절</bp-badge>
+              <bp-badge variant="destructive" data-element="품절" class="self-start">일시 품절</bp-badge>
               <bp-alert>
                 <bp-alert-title>현재 판매가 일시 중단된 상품입니다</bp-alert-title>
                 <bp-alert-description>
@@ -497,13 +472,13 @@ title: 상품 상세 (샘플)
         <bp-fragment
           id="purchase-option-error"
           title="옵션 미선택 에러"
-          description="옵션 그룹 중 하나라도 선택하지 않고 구매/장바구니 버튼 클릭 시 미선택 옵션의 셀렉터에 빨간 border + 인라인 에러 메시지 표시. 사용자가 해당 옵션을 선택하면 에러 표시는 자동으로 사라진다. 동시 다발로 미선택 옵션이 여러 개면 모두 표시. focus 는 가장 위 미선택 옵션으로 이동."
+          description="옵션 시트 내 미선택 옵션 강조"
         >
-          <bp-section data-feature="PRODUCT__OPTION" data-label="옵션 선택">
+          <bp-section data-feature="PRODUCT__OPTION" data-label="옵션 선택 (하단 시트)">
             <bp-field-group>
               <bp-field data-invalid="true">
-                <bp-label for="err-color">색상</bp-label>
-                <bp-native-select id="err-color" class="w-full" aria-invalid="true" data-element="옵션 셀렉터">
+                <bp-label for="m-err-color">색상</bp-label>
+                <bp-native-select id="m-err-color" class="w-full" aria-invalid="true">
                   <option value="" disabled selected>색상 선택</option>
                   <option value="black">블랙</option>
                   <option value="white">화이트</option>
@@ -512,20 +487,14 @@ title: 상품 상세 (샘플)
                   색상을 선택해주세요.
                 </bp-field-error>
               </bp-field>
-
               <bp-field>
-                <bp-label for="err-size">사이즈</bp-label>
-                <bp-native-select id="err-size" class="w-full" data-element="옵션 셀렉터">
+                <bp-label for="m-err-size">사이즈</bp-label>
+                <bp-native-select id="m-err-size" class="w-full">
                   <option value="s">S</option>
                   <option value="m" selected>M</option>
                   <option value="l">L</option>
                 </bp-native-select>
               </bp-field>
-
-              <div class="flex gap-2 mt-2">
-                <bp-button variant="outline" class="flex-1">장바구니</bp-button>
-                <bp-button variant="default" class="flex-1">바로 구매</bp-button>
-              </div>
             </bp-field-group>
           </bp-section>
         </bp-fragment>
@@ -533,14 +502,9 @@ title: 상품 상세 (샘플)
         <bp-fragment
           id="option-size-guide-dialog"
           title="사이즈 가이드 다이얼로그"
-          description="사이즈 셀렉터 옆 '사이즈 가이드' 링크 클릭 시 중앙 모달 노출. 사이즈/가슴둘레/총장 컬럼의 표 형태로 어드민이 등록한 데이터 표시. 표 외 추가 안내 문구·이미지는 어드민 입력에 따라 가변. X 또는 '닫기' 버튼으로 닫고, 닫은 뒤 옵션 영역 상태는 그대로 유지된다."
+          description="옵션 시트 내 '사이즈 가이드' 링크 클릭"
         >
-          <bp-section data-feature="PRODUCT__OPTION" data-label="옵션 선택">
-            <!--
-              bp-dialog 도 정적 카드로 렌더된다 (viewport-fixed 아님).
-              show-close-button="false" 명시 안 하면 우상단 X 버튼이 자동 삽입된다.
-              fragment body 에 직접 배치 — backdrop wrapper 금지.
-            -->
+          <bp-section data-feature="PRODUCT__OPTION" data-label="옵션 선택 (하단 시트)">
             <bp-dialog open data-element="사이즈 가이드 다이얼로그">
               <bp-dialog-content>
                 <bp-dialog-header>
@@ -553,7 +517,7 @@ title: 상품 상세 (샘플)
                   <bp-table-header>
                     <bp-table-row>
                       <bp-table-head>사이즈</bp-table-head>
-                      <bp-table-head>가슴둘레</bp-table-head>
+                      <bp-table-head>가슴</bp-table-head>
                       <bp-table-head>총장</bp-table-head>
                     </bp-table-row>
                   </bp-table-header>
@@ -588,13 +552,9 @@ title: 상품 상세 (샘플)
         <bp-fragment
           id="purchase-already-in-cart-alert"
           title="장바구니 중복 확인 알랏"
-          description="이미 장바구니에 같은 옵션의 상품이 담겨 있는 상태에서 '장바구니' 버튼 클릭 시 노출. '추가 담기' 시 기존 라인의 수량이 +1 증가, '취소' 시 변동 없이 닫힘. 명시적 선택을 강제하기 위해 X 닫기 버튼이 없고 외부 클릭/Esc 로도 닫히지 않는다."
+          description="이미 같은 옵션이 장바구니에 있을 때 '장바구니' 클릭"
         >
-          <bp-section data-feature="PRODUCT__OPTION" data-label="옵션 선택">
-            <!--
-              bp-alert-dialog 는 X 닫기 버튼이 없다 — cancel/action 으로만 닫힘.
-              명시적 선택을 강제하므로 결제 흐름의 중요한 분기점에 사용.
-            -->
+          <bp-section data-feature="PRODUCT__OPTION" data-label="옵션 선택 (하단 시트)">
             <bp-alert-dialog open data-element="장바구니 중복 확인 알랏">
               <bp-alert-dialog-portal>
                 <bp-alert-dialog-overlay>
@@ -620,11 +580,11 @@ title: 상품 상세 (샘플)
       <!-- ============================================================
            영역: 리뷰 (PRODUCT__REVIEW)
            ============================================================ -->
-      <bp-area>
+      <bp-area viewport="mobile">
         <bp-fragment
           id="review-empty"
           title="빈 리뷰 목록"
-          description="리뷰 0건일 때 노출. 평균 평점·정렬·필터 영역도 비활성/숨김 처리되고 빈 상태 안내와 '리뷰 작성' CTA 만 표시. 클릭 시 비로그인이면 로그인 페이지로 이동, 로그인이면 리뷰 작성 화면으로 이동."
+          description="리뷰가 한 건도 없을 때"
         >
           <bp-section data-feature="PRODUCT__REVIEW" data-label="리뷰">
             <bp-empty data-element="빈 리뷰 목록">
@@ -650,20 +610,15 @@ title: 상품 상세 (샘플)
            영역: 문의 (PRODUCT__QNA)
            - 문의 작성 시트, 빈 문의 목록
            ============================================================ -->
-      <bp-area>
+      <bp-area viewport="mobile">
         <bp-fragment
           id="qna-write-sheet"
           title="문의 작성 시트"
-          description="비로그인 사용자는 로그인 페이지로 이동, 로그인 사용자는 우측에서 슬라이드되는 시트로 진입. 제목·본문 필수, 비밀글 옵션(체크 시 작성자/판매자만 열람 가능). '등록' 으로 제출하면 답변 대기 상태로 목록 상단에 추가되고 시트는 자동 닫힘. '취소' 또는 X 로 닫으면 입력 내용은 폐기. 답변까지 1~2 영업일 안내 문구 노출."
+          description="문의 영역의 '문의 작성' 버튼 클릭"
         >
           <bp-section data-feature="PRODUCT__QNA" data-label="문의">
-            <!--
-              bp-sheet 는 와이어프레임 정적 표현에서 viewport-fixed 가 아니라
-              부모 fragment body 흐름 안에 정적 카드로 렌더된다.
-              backdrop 흉내 wrapper(div.absolute.bg-black/20) 로 감싸지 말 것 — 이중 박스.
-            -->
             <bp-sheet open data-element="문의 작성 시트">
-              <bp-sheet-content side="right">
+              <bp-sheet-content side="bottom">
                 <bp-sheet-header>
                   <bp-sheet-title>문의 작성</bp-sheet-title>
                   <bp-sheet-description>
@@ -672,17 +627,17 @@ title: 상품 상세 (샘플)
                 </bp-sheet-header>
                 <bp-field-group class="px-4 py-2">
                   <bp-field>
-                    <bp-label for="qna-title">제목</bp-label>
-                    <bp-input id="qna-title" placeholder="문의 제목"></bp-input>
+                    <bp-label for="m-qna-title">제목</bp-label>
+                    <bp-input id="m-qna-title" placeholder="문의 제목"></bp-input>
                   </bp-field>
                   <bp-field>
-                    <bp-label for="qna-body">본문</bp-label>
-                    <bp-textarea id="qna-body" rows="6" placeholder="궁금한 점을 자세히 적어주세요"></bp-textarea>
+                    <bp-label for="m-qna-body">본문</bp-label>
+                    <bp-textarea id="m-qna-body" rows="5" placeholder="궁금한 점을 자세히 적어주세요"></bp-textarea>
                   </bp-field>
                   <bp-field>
                     <div class="flex items-center gap-2">
-                      <bp-checkbox id="qna-private"></bp-checkbox>
-                      <bp-label for="qna-private" class="cursor-pointer">비밀글로 작성 (작성자와 판매자만 열람)</bp-label>
+                      <bp-checkbox id="m-qna-private"></bp-checkbox>
+                      <bp-label for="m-qna-private" class="cursor-pointer text-sm">비밀글로 작성</bp-label>
                     </div>
                   </bp-field>
                 </bp-field-group>
@@ -700,7 +655,7 @@ title: 상품 상세 (샘플)
         <bp-fragment
           id="qna-empty"
           title="빈 문의 목록"
-          description="문의 0건일 때 노출. '문의 작성' CTA 만 노출되고 정렬·필터 영역은 숨김. CTA 클릭 시 비로그인이면 로그인 페이지로 이동, 로그인 시 문의 작성 시트 오픈."
+          description="문의가 한 건도 없을 때"
         >
           <bp-section data-feature="PRODUCT__QNA" data-label="문의">
             <bp-empty data-element="빈 문의 목록">
