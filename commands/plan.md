@@ -35,9 +35,9 @@ argument-hint: <요구사항.md 경로 또는 자연어>
 2. 요구사항 파싱 → intake.md 초안
 3. 대화형 인터뷰 (빈 부분 단계별로)
 4. 통합 확인 게이트 (intake + 산출물 목록)
-5. `bp:planner` 에 명세 작성 위임 (Task)
-6. Producer-Reviewer 수렴 루프 (오케스트레이터 주도, Task(bp:reviewer) + SendMessage(planner))
-7. α 재진입 (수동 결정 필요 시)
+5. `bp:planner` 에 명세 작성 위임 (`Agent(bp:planner, round=1)`)
+6. Producer-Reviewer 수렴 루프 (오케스트레이터 주도 체이닝, 매 라운드 `Agent(bp:reviewer)` + `Agent(bp:planner)` 새 spawn)
+7. α 프로토콜 (수동 결정 필요 시 — 기획자 질문 번역 + decision Edit + 다음 라운드 planner 재호출)
 8. 최종 보고 + `/bp:wireframe` 안내
 
 **세부 알고리즘·프롬프트 템플릿·기획자 UX 원칙은 `plan-harness` 스킬** — 여기선 요약만.
@@ -47,16 +47,15 @@ argument-hint: <요구사항.md 경로 또는 자연어>
 - 인터뷰 전략: `plan-harness/references/interview-flow.md`
 - 기획자 언어 번역: `plan-harness/references/planner-ux.md`
 - 확인 게이트: `plan-harness/references/confirm-gates.md`
-- 수렴 루프·α 프로토콜: `plan-harness/references/convergence-loop.md`, `plan-harness/references/α-pending-to-question.md`
-- Task/SendMessage 템플릿: `plan-harness/references/task-tool-invocation.md`
-- 재진입·중단 복기: `plan-harness/references/resume.md`
+- 수렴 루프·α 프로토콜·Agent 호출 템플릿: `plan-harness/references/convergence-loop.md`
+- α 질문 번역: `plan-harness/references/α-pending-to-question.md`
 
 ## 엣지 케이스
 
 | 상황 | 처리 |
 |---|---|
 | 요구사항 md 에 여러 화면이 섞임 | 화면 후보 리스트 확인 → 1순위 1개부터 권장 (single screen first) |
-| 인터뷰 도중 기획자가 중단 | intake.md 상태 그대로 두고 종료. 다음 호출 시 `resume.md` 따라 이어감 |
+| 인터뷰 도중 기획자가 중단 | intake.md 상태 그대로 두고 종료. 기획자가 `/bp:plan` 을 다시 부르면 planner 가 intake.md `status` 를 읽어 이어감 (`plan-harness/SKILL.md` §기획자 경험 원칙 8 "중단되면 그냥 다시") |
 | 기획자가 인터뷰 중 맥락을 크게 바꿈 | 기존 초안 건드리지 않고 "새 화면으로 만들까요?" 확인 |
 | 수렴 루프 한계 초과 | 남은 위반 자연어 요약 + 기획자에게 같이 보자고 안내 (`plan-harness/SKILL.md` 보고 C) |
 

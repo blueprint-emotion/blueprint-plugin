@@ -1,5 +1,40 @@
 # Changelog — plan-harness skill
 
+## 4.0.0 — 2026-04-22
+
+### BREAKING — SendMessage 세션 재진입 → Agent 체이닝 전환
+
+**근거**:
+- 공식 문서 권고 (https://code.claude.com/docs/en/sub-agents): "If your workflow requires nested delegation, use Skills or chain subagents from the main conversation"
+- Agent Teams (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`) 는 experimental — 사용자 환경 의존성이 생기고, `/resume`·`/rewind` 미지원 등 알려진 버그가 있음
+- 모든 라운드 상태가 이미 **intake.md + 생성된 명세 파일** 에 저장됨 (durable truth) — 세션 연속성 불필요
+
+### Changed — 구조 변경
+
+- **수렴 루프의 producer 재진입을 매 라운드 새 `Agent(bp:planner)` spawn 으로** — 이전의 "최초 Task spawn + 이후 SendMessage 로 동일 세션 재진입" 패턴 폐기
+- agentId 라운드 간 보관 불필요
+- 오케스트레이터는 매 Agent 호출 prompt 에 `round: N` 과 `mode` 명시. 새 planner 인스턴스가 intake.md 상태를 읽어 맥락 복원
+- **α 프로토콜 α-5 단계 삭제** — SendMessage 로 기존 planner 재호출 → α-4 에 흡수 (다음 라운드 새 Agent 호출 + "α 결정 반영" prompt 템플릿)
+- **α + 위반 공존 ORDERING 규칙 추가** — 같은 라운드에 α + 자동 수정 가능 위반이 동시 발생 시 α 결정 반영이 선행, reviewer 를 한 번 더 돌려 최신 상태에서 위반을 재평가. 이유: α 결정으로 파일 구조가 바뀌면 이전 리포트의 라인 번호가 stale 됨
+- **`Task` → `Agent` 표기 일원화** — v2.1.63 공식 리네임. 내부적으로 `Task(...)` 는 alias 로 동작하지만 문서·새 코드는 `Agent(...)` 사용
+- **불변 규칙 8 추가** — 모든 Agent prompt 에 `round: N` 필수 (새 spawn 이 세션 기억이 없음)
+
+### Removed
+
+- `references/task-tool-invocation.md` — prompt 템플릿은 `convergence-loop.md` 에 통합. SendMessage 관련 절차·message 템플릿·세션 관리 섹션은 체이닝 모델에서 불필요
+- `references/resume.md` — 체이닝 모델에선 resume 경로가 "`/bp:plan` 다시 호출" 하나. 기획자 UX 톤은 SKILL.md §"기획자 경험 원칙 8"에 한 문단으로 흡수
+- `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` 의존성 제거
+
+### Migration
+
+- 기존 intake.md 는 payload 스키마 무변화라 그대로 호환 (`## _pending_decisions` 섹션 구조 동일)
+- 커스텀 agent 가 있다면 "SendMessage 수신" 분기를 제거하고 단일 진입점(`mode` 필드 분기)으로 통합
+- 플러그인 사용자는 `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 설정 해제 가능
+
+### 트레이드오프
+
+- α 결정 적용 시 spawn 1회 추가 (기존은 SendMessage 로 기존 세션 재사용). 세션 재진입 비용 제거와 상쇄되며, preload 감소로 전체 토큰은 감소
+
 ## 3.0.0 — 2026-04-21
 
 ### BREAKING — Producer-Reviewer 수렴 루프를 오케스트레이터 주도로 이관

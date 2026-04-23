@@ -6,6 +6,18 @@
 - **MINOR**: 새 컴포넌트·새 패턴·새 옵션 추가 (호환성 유지)
 - **PATCH**: 문서 명료화·예제 보강·오타 수정
 
+## [4.5.0] - 2026-04-22
+
+### Added — 커스텀 엘리먼트 닫는 태그 규칙
+
+- `shadcn → bp-* 변환` 표에 self-closing 행 추가 (`<Component />` → `<bp-component></bp-component>`)
+- **⚠️ 커스텀 엘리먼트 닫는 태그 — HTML 규칙** 섹션 신설. void 요소(`img`/`input`/`br`/`hr`/`meta`/`link`/`area`/`base`/`col`/`embed`/`source`/`track`/`wbr`)만 self-closing 허용. `bp-*` 포함 모든 커스텀 엘리먼트는 명시적 `</tag>` 필수
+- `자주 하는 실수` 표에 "커스텀 엘리먼트 self-closing" 항목 추가
+
+**근거**: HTML 파서는 커스텀 엘리먼트의 `/>` 를 무시하고 여는 태그로만 해석 → 뒤 형제 요소들이 자식으로 삼켜져 레이아웃이 파괴됨. IDE 의 "일부 브라우저에서 빈 태그가 작동하지 않습니다" 경고가 정확히 이 현상.
+
+호환성: 기존 와이어프레임 중 void 요소만 self-closing 한 것은 영향 없음. 커스텀 엘리먼트 self-closing 이 있던 경우는 reviewer(wireframe-harness 3.0.0) 의 `[HTML-CLOSING]` 카테고리로 자동 감지 + 자동 수정 가능 분류라 다음 `/bp:wireframe` 실행 시 반영됨.
+
 ## [4.4.0] - 2026-04-22
 
 ### Added — 생성 전략: 기능별 단계 진행 (필수)

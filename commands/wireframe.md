@@ -32,8 +32,8 @@ argument-hint: <screen.md 경로>
 1. viewport 예고 게이트 (만들 메인 파일 목록 안내)
 2. 시트·다이얼로그 분리 게이트 (`sheet_*.md` / `dialog_*.md` 1개 이상이면 발동, 기본 메인 fragment 포함)
 3. 덮어쓰기 분기 (기존 html 있을 때)
-4. `bp:wireframer` 에 HTML 생성 위임 (Task) — 메인 파일 + opt-in 별도 파일
-5. Producer-Reviewer 수렴 루프 (오케스트레이터 주도)
+4. `bp:wireframer` 에 HTML 생성 위임 (`Agent(bp:wireframer, round=1)`) — 메인 파일 + opt-in 별도 파일
+5. Producer-Reviewer 수렴 루프 (오케스트레이터 주도 체이닝, 매 라운드 `Agent(bp:reviewer)` + `Agent(bp:wireframer)` 새 spawn)
 6. 최종 보고 (수렴 / 명세 결함 회송 / 루프 한계)
 
 **세부 알고리즘·프롬프트 템플릿·UX 원칙은 `wireframe-harness` 스킬** — 여기선 요약만.
@@ -41,8 +41,7 @@ argument-hint: <screen.md 경로>
 참조:
 - 전체 흐름: `wireframe-harness/SKILL.md`
 - 확인 게이트: `wireframe-harness/references/confirm-gates.md`
-- 수렴 루프: `wireframe-harness/references/convergence-loop.md`
-- Task/SendMessage 템플릿: `wireframe-harness/references/task-tool-invocation.md`
+- 수렴 루프·Agent 호출 템플릿: `wireframe-harness/references/convergence-loop.md`
 - 자기점검: `wireframe-harness/references/visual-review.md`
 
 ## 엣지 케이스

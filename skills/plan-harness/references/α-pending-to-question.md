@@ -5,7 +5,7 @@
 ## 책임 경계 (재확인)
 
 - **planner subagent**: payload 6필드를 기록하고 turn 종료. 기획자-facing 자연어 질문은 **절대 최종 출력에 담지 않는다** (짧은 handoff note만 허용 — 예: "명세 대부분 작성했어요. 결정이 필요한 항목 있어서 오케스트레이터에게 넘깁니다")
-- **오케스트레이터**: `## _pending_decisions` 을 Read → 이 문서 규약으로 질문 번역 → 기획자에게 자연스러운 연결 문장으로 질문 → 응답 수집 → `decision:` 필드 Edit → **SendMessage 로 기존 planner 세션 재진입** (같은 `/bp:plan` 호출 안에서. 세션이 이미 끝난 resume 시나리오면 새 Task — `resume.md` 참조)
+- **오케스트레이터**: `## _pending_decisions` 을 Read → 이 문서 규약으로 질문 번역 → 기획자에게 자연스러운 연결 문장으로 질문 → 응답 수집 → `decision:` 필드 Edit → **다음 라운드의 새 `Agent(bp:planner)` spawn** ( `convergence-loop.md` "α 결정 반영" 템플릿 사용. 체이닝 모델이라 세션 재진입 대신 매번 새 Agent 호출. `/bp:plan` 세션이 이미 종료된 경우도 동일)
 
 번역 권한이 오케스트레이터에만 있으므로 **대화 톤이 `planner-ux.md` 규칙에 따라 일관**된다.
 
@@ -119,7 +119,7 @@
    - 예: `decision: "공통 규칙 (PRODUCT.md 로 승격)"`
    - 기획자가 말한 표현 거의 그대로 — 해석 여지 남기지 않기
 3. `status: awaiting_decision` 유지 (planner 가 재진입하면서 `ready` 로 바꿈)
-4. **SendMessage 로 기존 `planner_id` 세션 재진입** (`task-tool-invocation.md` "α 결정 수신 후" 템플릿 사용). 세션 종료 후 resume 시나리오면 새 Task — `resume.md` 참조
+4. **다음 라운드의 새 `Agent(bp:planner)` spawn** — [`convergence-loop.md`](convergence-loop.md) 의 "α 결정 반영" prompt 템플릿 사용. 체이닝 모델이라 세션 재진입 대신 매번 새 Agent 호출 (세션 종료 후 `/bp:plan` 재호출 시나리오도 동일 경로)
 5. planner 결과 반환되면 이어서 다음 α 라운드 처리 또는 최종 보고 (A/B/C)
 
 ## 체크리스트 (오케스트레이터 자가점검)

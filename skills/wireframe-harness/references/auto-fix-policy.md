@@ -22,6 +22,7 @@ plan 과 동일:
 - **`<bp-fragment>` 안 `<bp-section>` 의 `data-feature-key` 존재** → 제거 (규약: 메인 UI 에만 부여)
 - **`data-feature-key` 페이지 내 중복** → 숫자 suffix 부여
 - **메인 UI `<bp-section>` 누락 `data-feature` 추가** — area features[] 참조로 명확할 때
+- **[HTML-CLOSING] 커스텀 엘리먼트 self-closing 교체** — `<bp-input ... />` → `<bp-input ...></bp-input>` (기계적 치환, void 요소 아닌 모든 태그에 적용)
 
 ### 자동 수정 불가 → /bp:plan 회송
 

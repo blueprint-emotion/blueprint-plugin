@@ -41,21 +41,23 @@ blueprint-plugin/
 ## 호출 흐름
 
 ```
-/bp:plan → 인자 검증 → [오케스트레이터] 인터뷰·확정 → Task(bp:planner) 명세 작성
-                    → [오케스트레이터] 수렴 루프: Task(bp:reviewer) + SendMessage(planner) 반복
+/bp:plan → 인자 검증 → [오케스트레이터] 인터뷰·확정 → Agent(bp:planner, round=1) 명세 작성
+                    → [오케스트레이터] 수렴 루프 (체이닝): 매 라운드 Agent(bp:reviewer) + Agent(bp:planner) 새 spawn
                     → α 재진입 필요 시 오케스트레이터가 기획자 언어로 질문·수집 → 최종 보고
 
-/bp:wireframe → 인자 검증 → [오케스트레이터] viewport 예고·덮어쓰기 분기 → Task(bp:wireframer) HTML 생성
-              → [오케스트레이터] 수렴 루프: Task(bp:reviewer) + SendMessage(wireframer) 반복
+/bp:wireframe → 인자 검증 → [오케스트레이터] viewport 예고·덮어쓰기 분기 → Agent(bp:wireframer, round=1) HTML 생성
+              → [오케스트레이터] 수렴 루프 (체이닝): 매 라운드 Agent(bp:reviewer) + Agent(bp:wireframer) 새 spawn
               → 명세 결함이면 /bp:plan 회송 안내, 아니면 생성 파일 보고
 ```
 
 **규약 SSOT** — 이 흐름의 알고리즘·프롬프트·기획자 UX 원칙·α 프로토콜은 오케스트레이션 스킬 본문:
 
-- `skills/plan-harness/SKILL.md` + `references/` (인터뷰·확인 게이트·수렴 루프·α 재진입·Task/SendMessage 템플릿·재진입 복기)
+- `skills/plan-harness/SKILL.md` + `references/` (인터뷰·확인 게이트·수렴 루프·α 재진입·Agent 호출 템플릿)
 - `skills/wireframe-harness/SKILL.md` + `references/`
 
-Anthropic 공식 제약상 subagent 는 Task tool 이 없으므로 `Task(bp:reviewer)` 는 **오케스트레이터만** 호출 가능. planner/wireframer 재진입은 SendMessage (Agent Teams `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 활성 필요).
+공식 제약(subagent 는 Agent tool 이 없음)상 `Agent(bp:reviewer)` 는 **오케스트레이터만** 호출 가능. producer 재진입은 체이닝 모델 — **매 라운드 새 `Agent(bp:planner|wireframer)` spawn** 으로 처리하며 상태는 intake.md + 생성된 명세·HTML 파일에서 복원. SendMessage 기반 세션 재진입은 사용하지 않는다 (experimental Agent Teams 의존성 제거).
+
+> `Task` tool 은 v2.1.63 공식 리네임으로 `Agent` 가 됐고 `Task(...)` 는 하위호환 alias. 본 문서는 공식 이름 `Agent` 로 표기.
 
 ## 6개 스킬·3개 에이전트·2개 명령
 
@@ -70,7 +72,7 @@ Anthropic 공식 제약상 subagent 는 Task tool 이 없으므로 `Task(bp:revi
 - **agents** = 고유 워크플로 수행 (명세/HTML 생성·수렴 루프·검증)
 - **skills — 두 종류**:
   - **산출물 규약** (`intake`, `feature-spec`, `screen-spec`, `wireframe`) = "결과물이 어떻게 생겨야 하는가" (SSOT)
-  - **오케스트레이션** (`plan-harness`, `wireframe-harness`) = "실행 흐름이 어떻게 이어져야 하는가" — Producer-Reviewer 수렴 루프·컨펌 게이트·Task 호출·기획자 UX 원칙. `user-invocable: false` 로 사용자 메뉴에서 숨김, command 와 agent `skills:` frontmatter 로 preload
+  - **오케스트레이션** (`plan-harness`, `wireframe-harness`) = "실행 흐름이 어떻게 이어져야 하는가" — Producer-Reviewer 수렴 루프·컨펌 게이트·Agent 호출·기획자 UX 원칙. `user-invocable: false` 로 사용자 메뉴에서 숨김, command 와 agent `skills:` frontmatter 로 preload
 
 ## 핵심 설계 원칙
 
@@ -106,10 +108,13 @@ Anthropic 공식 제약상 subagent 는 Task tool 이 없으므로 `Task(bp:revi
 | 0.2.0 | 1.0.0 | 1.0.0 | 0.2.0 | 1.4.2 | 1.6.1 | 4.1.2 |
 | 1.0.0 | 2.0.0 | 1.0.1 | 0.3.0 | 1.4.2 | 1.6.2 | 4.1.3 |
 | 2.0.0 | 3.0.0 | 2.0.0 | 0.3.0 | 1.4.2 | 1.6.2 | 4.1.3 |
+| **3.0.0** | **4.0.0** | **3.0.0** | **0.3.1** | 1.4.2 | 1.6.2 | **4.5.0** |
 
 > 0.1.0 의 `harness` 스킬은 0.2.0 에서 `plan-harness` + `wireframe-harness` 로 분리됐다. 0.2.0 은 BREAKING — agents 의 `skills:` frontmatter 도 함께 바뀌었다.
 >
-> 2.0.0 은 BREAKING — Anthropic 공식 제약(subagent 는 Task tool 없음, https://code.claude.com/docs/en/sub-agents) 에 맞춰 **Producer-Reviewer 수렴 루프를 subagent 주도 → 오케스트레이터 주도로 이관**. Task(bp:reviewer) 호출은 오케스트레이터만 가능하고, planner/wireframer 재진입은 SendMessage 로 처리 (Agent Teams `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 활성 필요). 이전 설계의 "planner→reviewer Task 호출" / "wireframer→reviewer Task 호출" 은 플랫폼 단에서 작동하지 않던 것이었다. plan-harness 2.0.0 → 3.0.0, wireframe-harness 1.0.1 → 2.0.0 으로 동반 MAJOR. 산출물 규약 스킬(intake, feature-spec, screen-spec, wireframe)은 영향 없음.
+> 2.0.0 은 BREAKING — 공식 제약(subagent 는 Task tool 없음)에 맞춰 **Producer-Reviewer 수렴 루프를 subagent 주도 → 오케스트레이터 주도로 이관**. Task(bp:reviewer) 호출은 오케스트레이터만 가능하고, planner/wireframer 재진입은 SendMessage 로 처리 (Agent Teams `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 활성 필요). 이전 설계의 "planner→reviewer Task 호출" 은 플랫폼 단에서 작동하지 않던 것이었다.
+>
+> 3.0.0 은 BREAKING — 수렴 루프를 **SendMessage 세션 재진입 → Agent 체이닝 (매 라운드 새 spawn)** 으로 전환. 근거: (1) 공식 문서 권고 "chain subagents from the main conversation", (2) Agent Teams (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`) 가 experimental 로 사용자 환경 의존성, (3) 상태가 전부 intake.md + 명세 파일(durable truth)에 있어 세션 연속성 불필요. plan-harness 3.0.0 → 4.0.0, wireframe-harness 2.0.0 → 3.0.0 으로 동반 MAJOR. agent 본문 단일 진입점으로 재작성, α 프로토콜 α-5 단계(SendMessage 로 planner 재호출) 삭제 — α-4 에 흡수 (다음 라운드 새 Agent 호출 + "α 결정 반영" 템플릿). `Task` → `Agent` 표기 일원화 (v2.1.63 공식 리네임). 동반으로 wireframe 스킬은 **커스텀 엘리먼트 self-closing 금지 규칙**을 reviewer 검증 카테고리·visual-review 체크항목·auto-fix-policy 에 추가 (MINOR 4.5.0). intake 는 문서 내 SendMessage 언급 제거 (PATCH 0.3.1). 구 SendMessage 기반 경로로 생성된 intake.md 는 payload 스키마 무변화라 그대로 호환. 트레이드오프: α 결정 적용 시 spawn 1회 추가 — 세션 재진입 비용 제거와 상쇄.
 >
 > 1.0.0 은 BREAKING — α 재진입 프로토콜이 **옵션 B** 로 전환됐다. planner subagent 는 `## _pending_decisions` 에 payload 6필드(`planner_context`, `user_facing_why`, `source_slots`, `conversation_hint`, `priority`, 객체화된 `alternatives`) 만 기록하고 기획자-facing 질문을 **최종 출력에 담지 않는다**. 질문 번역·수집은 **오케스트레이터**가 `plan-harness/references/α-pending-to-question.md` 규약으로 수행한다. 기존 `awaiting_decision` 출력 포맷에 의존하던 통합은 모두 업데이트 필요. intake 는 payload 스키마 확장으로 MINOR bump (0.3.0), screen-spec/wireframe 은 overlay viewport 독립 규약·suffix 파일명 명시화로 PATCH bump.
 

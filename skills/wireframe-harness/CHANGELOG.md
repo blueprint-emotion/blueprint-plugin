@@ -1,5 +1,38 @@
 # Changelog — wireframe-harness skill
 
+## 3.0.0 — 2026-04-22
+
+### BREAKING — SendMessage 세션 재진입 → Agent 체이닝 전환
+
+plan-harness 4.0.0 과 동반 MAJOR. 동일한 체이닝 모델 전환을 wireframe 워크플로에 적용.
+
+- **wireframer 재진입을 매 라운드 새 `Agent(bp:wireframer)` spawn 으로** — SendMessage 기반 세션 재진입 폐기
+- 생성된 HTML 파일이 durable state 역할 — 새 wireframer 인스턴스가 기존 HTML 을 Read 해 맥락 복원
+- agentId 라운드 간 보관 불필요
+- `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` 의존성 제거
+- **`Task` → `Agent` 표기 일원화** (v2.1.63 공식 리네임)
+- **불변 규칙 8 추가** — 모든 Agent prompt 에 `round: N` 필수
+
+### Added — 커스텀 엘리먼트 self-closing 금지 규칙
+
+reviewer 검증 카테고리 + auto-fix-policy + visual-review 체크항목 신설:
+
+- **reviewer 위반 카테고리 `[HTML-CLOSING]`** — 커스텀 엘리먼트(`bp-*` 포함) self-closing(`<bp-input ... />`) 발견 시 감지
+- **자동 수정 가능** 으로 분류 (기계적 치환, 기획 의사결정 불필요)
+- **visual-review 자기점검** 에 "커스텀 엘리먼트 self-closing 없음" 체크 추가
+- **auto-fix-policy** 에 치환 지침 추가 — `<bp-xxx ... />` → `<bp-xxx ...></bp-xxx>`
+- **불변 규칙 9 추가** — 커스텀 엘리먼트 self-closing 금지
+
+**근거**: HTML 은 void 요소(`img`/`input`/`br`/`hr`/`meta`/`link`/`area`/`base`/`col`/`embed`/`source`/`track`/`wbr`)만 self-closing 허용. 커스텀 엘리먼트의 `/>` 는 브라우저가 **무시**하고 뒤의 형제 요소를 자식으로 삼켜 레이아웃을 파괴한다 (예: `<bp-input />` 뒤의 `<bp-input-group-button>` 이 bp-input 자식으로 흡수됨). 규칙 상세는 `wireframe` 스킬 4.5.0 참조.
+
+### Removed
+
+- `references/task-tool-invocation.md` — prompt 템플릿은 `convergence-loop.md` 에 통합
+
+### Migration
+
+- 기존 생성된 HTML 은 그대로 호환. reviewer 가 구 HTML 에서 `[HTML-CLOSING]` 위반을 새로 감지할 수 있으나 자동 수정 가능 분류라 다음 `/bp:wireframe` 라운드에서 반영됨
+
 ## 2.1.0 — 2026-04-22
 
 ### Changed — 시트·다이얼로그 와이어 분리 정책 뒤집음
