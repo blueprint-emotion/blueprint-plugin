@@ -1,5 +1,16 @@
 # Changelog — wireframe-harness skill
 
+## 3.0.1 — 2026-04-23
+
+### Added
+
+- `references/convergence-loop.md` 에 "기존 HTML 수정 모드 (/bp:edit 진입점)" 섹션 추가. Route B (와이어만) / Route C (둘 다 의 와이어부) 가 wireframer producer + reviewer 체이닝을 재사용해 타겟 블록만 수정하는 규약 명시
+- "Route B 자동 수정 불가 회송 규칙" 서브섹션 — reviewer 가 "자동 수정 불가" 를 반환하면 루프 지속 금지(reviewer 분류 신뢰 원칙), 위반 성격별 **회송 경로만** 분기: 명세-HTML 드리프트 → `/bp:plan` 회송으로 Route C 승격, 그 외(와이어 규약·외부 의존성) → 기획자 facing 회송 메시지 + 루프 종료
+
+### Fixed
+
+- /bp:edit 3.1.0 설계가 Route B 를 "HTML 직접 Edit + reviewer 만 호출" 로 기술했던 부분을 이 섹션이 SSOT 로 대체. 체이닝 모델·루프 한계·자동 수정 분기가 일반 /bp:wireframe 경로와 일관되도록 규약 복원
+
 ## 3.0.0 — 2026-04-22
 
 ### BREAKING — SendMessage 세션 재진입 → Agent 체이닝 전환

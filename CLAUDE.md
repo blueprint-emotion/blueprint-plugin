@@ -21,7 +21,8 @@ blueprint-plugin/
 │   └── marketplace.json         ← GitHub 마켓 메타
 ├── commands/                    ← /bp:* 슬래시 명령
 │   ├── plan.md                  ← /bp:plan
-│   └── wireframe.md             ← /bp:wireframe
+│   ├── wireframe.md             ← /bp:wireframe
+│   └── edit.md                  ← /bp:edit (플랫폼 편집 요청 라우팅)
 ├── agents/                      ← bp:* 서브에이전트 (skills: frontmatter 로 스킬 preload)
 │   ├── planner.md               ← 요구사항 → 명세 (와이어 X)
 │   ├── wireframer.md            ← screen.md → 와이어 HTML
@@ -48,6 +49,10 @@ blueprint-plugin/
 /bp:wireframe → 인자 검증 → [오케스트레이터] viewport 예고·덮어쓰기 분기 → Agent(bp:wireframer, round=1) HTML 생성
               → [오케스트레이터] 수렴 루프 (체이닝): 매 라운드 Agent(bp:reviewer) + Agent(bp:wireframer) 새 spawn
               → 명세 결함이면 /bp:plan 회송 안내, 아니면 생성 파일 보고
+
+/bp:edit → 플랫폼 편집 요청 본문 파싱 → 파일 경로 → 명세 폴더 매핑 → 컨텍스트 수집(.md + .html + area_*.md)
+         → [오케스트레이터] 변경 유형 판단(A 명세만 / B 와이어만 / C 둘다) → 기획자 컨펌 게이트
+         → Route A/C 는 /bp:plan 흐름 호출, Route B/C 는 /bp:wireframe 흐름(또는 직접 Edit) → Agent(bp:reviewer) 검증 → diff 요약
 ```
 
 **규약 SSOT** — 이 흐름의 알고리즘·프롬프트·기획자 UX 원칙·α 프로토콜은 오케스트레이션 스킬 본문:
@@ -59,12 +64,13 @@ blueprint-plugin/
 
 > `Task` tool 은 v2.1.63 공식 리네임으로 `Agent` 가 됐고 `Task(...)` 는 하위호환 alias. 본 문서는 공식 이름 `Agent` 로 표기.
 
-## 6개 스킬·3개 에이전트·2개 명령
+## 6개 스킬·3개 에이전트·3개 명령
 
 | 명령 | 수행 주체 | 사용 skill | 산출물 |
 |---|---|---|---|
 | `/bp:plan {요구사항.md}` | 오케스트레이터(인터뷰·확정) → `bp:planner`(명세 작성·수렴) → `bp:reviewer` | plan-harness, intake, feature-spec, screen-spec | intake.md, features/*.md, screens/**/*.md |
 | `/bp:wireframe {screen.md}` | 오케스트레이터(viewport 예고) → `bp:wireframer`(HTML 생성·수렴) → `bp:reviewer` | wireframe-harness, wireframe, screen-spec | screens/**/*.html |
+| `/bp:edit {편집 요청 본문}` | 오케스트레이터(파싱·Route 판단·컨펌) → Route 에 따라 `/bp:plan` / `/bp:wireframe` 또는 직접 Edit → `bp:reviewer` | (위 스킬 재사용) | 명세 `.md` 및/또는 와이어프레임 `.html` 업데이트 |
 
 **책임 분리**:
 - **commands** = 인자 검증 + 오케스트레이터 규약 진입점 (harness 스킬 로드)
@@ -108,13 +114,19 @@ blueprint-plugin/
 | 0.2.0 | 1.0.0 | 1.0.0 | 0.2.0 | 1.4.2 | 1.6.1 | 4.1.2 |
 | 1.0.0 | 2.0.0 | 1.0.1 | 0.3.0 | 1.4.2 | 1.6.2 | 4.1.3 |
 | 2.0.0 | 3.0.0 | 2.0.0 | 0.3.0 | 1.4.2 | 1.6.2 | 4.1.3 |
-| **3.0.0** | **4.0.0** | **3.0.0** | **0.3.1** | 1.4.2 | 1.6.2 | **4.5.0** |
+| 3.0.0 | 4.0.0 | 3.0.0 | 0.3.1 | 1.4.2 | 1.6.2 | 4.5.0 |
+| 3.1.0 | 4.0.0 | 3.0.0 | 0.3.1 | 1.4.2 | 1.6.2 | 4.5.0 |
+| **3.1.1** | 4.0.1 | 3.0.1 | 0.3.1 | 1.4.2 | 1.6.2 | 4.5.0 |
 
 > 0.1.0 의 `harness` 스킬은 0.2.0 에서 `plan-harness` + `wireframe-harness` 로 분리됐다. 0.2.0 은 BREAKING — agents 의 `skills:` frontmatter 도 함께 바뀌었다.
 >
 > 2.0.0 은 BREAKING — 공식 제약(subagent 는 Task tool 없음)에 맞춰 **Producer-Reviewer 수렴 루프를 subagent 주도 → 오케스트레이터 주도로 이관**. Task(bp:reviewer) 호출은 오케스트레이터만 가능하고, planner/wireframer 재진입은 SendMessage 로 처리 (Agent Teams `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 활성 필요). 이전 설계의 "planner→reviewer Task 호출" 은 플랫폼 단에서 작동하지 않던 것이었다.
 >
 > 3.0.0 은 BREAKING — 수렴 루프를 **SendMessage 세션 재진입 → Agent 체이닝 (매 라운드 새 spawn)** 으로 전환. 근거: (1) 공식 문서 권고 "chain subagents from the main conversation", (2) Agent Teams (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`) 가 experimental 로 사용자 환경 의존성, (3) 상태가 전부 intake.md + 명세 파일(durable truth)에 있어 세션 연속성 불필요. plan-harness 3.0.0 → 4.0.0, wireframe-harness 2.0.0 → 3.0.0 으로 동반 MAJOR. agent 본문 단일 진입점으로 재작성, α 프로토콜 α-5 단계(SendMessage 로 planner 재호출) 삭제 — α-4 에 흡수 (다음 라운드 새 Agent 호출 + "α 결정 반영" 템플릿). `Task` → `Agent` 표기 일원화 (v2.1.63 공식 리네임). 동반으로 wireframe 스킬은 **커스텀 엘리먼트 self-closing 금지 규칙**을 reviewer 검증 카테고리·visual-review 체크항목·auto-fix-policy 에 추가 (MINOR 4.5.0). intake 는 문서 내 SendMessage 언급 제거 (PATCH 0.3.1). 구 SendMessage 기반 경로로 생성된 intake.md 는 payload 스키마 무변화라 그대로 호환. 트레이드오프: α 결정 적용 시 spawn 1회 추가 — 세션 재진입 비용 제거와 상쇄.
+>
+> 3.1.0 은 MINOR — `/bp:edit` 커맨드 추가. 플랫폼(blueprint-platform)의 와이어 뷰어 "우클릭 → 수정" 플로우가 `claude://code/new?q=<prompt>&folder=<path>` 로 띄우는 세션에 대응하는 진입점. 편집 요청 markdown(메타데이터 + 사용자 지시)을 파싱해 화면명세 폴더로 매핑하고, 변경 유형을 3-Route(A 명세만 / B 와이어만 / C 둘다) 로 판단·컨펌한 뒤 기존 `/bp:plan` · `/bp:wireframe` 흐름을 재사용한다. 플랫폼은 긴 "작업 방법" 프롬프트 대신 메타데이터 블록 + `/bp:edit` 호출 한 줄만 넘기면 된다. 다른 스킬 버전 변동 없음 — 신규 command 는 기존 스킬을 그대로 재사용.
+>
+> 3.1.1 은 PATCH — `/bp:edit` 3.1.0 설계 결함 4건 수정. (1) **featureId 규약 오기** 정정: `AUTH.login` → `AUTH__LOGIN`, `{DOMAIN}.{featureId}` → `{DOMAIN}__{ID}` (feature-spec 실제 규약 반영). (2) **수렴 루프 구체화**: plan-harness/references/convergence-loop.md 에 "편집 모드 호출" 섹션, wireframe-harness/references/convergence-loop.md 에 "기존 HTML 수정 모드" 섹션 추가. Route B 가 reviewer "자동 수정 불가" 반환 시 명세-HTML 드리프트면 `/bp:plan` 회송 규칙 포함. edit.md 는 Route↔harness 모드 라우팅 표만 유지 (SSOT 는 harness reference). (3) **시스템 언어 위반** 교정: 기획자-facing 메시지에서 "Route", "컨펌 게이트", "Agent" 등 금지어 제거, 한국어 동사구("명세만 손보는 방향") 로 치환. Route 라벨은 내부 문서·prompt 에만 유지. (4) **dead ref 삭제**: 존재하지 않는 `plan-harness/references/intake-branches.md` 참조 2건 제거. 산출물 포맷 무변화, 기존 3.1.0 기능의 의도된 동작을 바로잡는 수정. plan-harness 4.0.0→4.0.1, wireframe-harness 3.0.0→3.0.1 동반 PATCH.
 >
 > 1.0.0 은 BREAKING — α 재진입 프로토콜이 **옵션 B** 로 전환됐다. planner subagent 는 `## _pending_decisions` 에 payload 6필드(`planner_context`, `user_facing_why`, `source_slots`, `conversation_hint`, `priority`, 객체화된 `alternatives`) 만 기록하고 기획자-facing 질문을 **최종 출력에 담지 않는다**. 질문 번역·수집은 **오케스트레이터**가 `plan-harness/references/α-pending-to-question.md` 규약으로 수행한다. 기존 `awaiting_decision` 출력 포맷에 의존하던 통합은 모두 업데이트 필요. intake 는 payload 스키마 확장으로 MINOR bump (0.3.0), screen-spec/wireframe 은 overlay viewport 독립 규약·suffix 파일명 명시화로 PATCH bump.
 

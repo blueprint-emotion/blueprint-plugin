@@ -1,5 +1,15 @@
 # Changelog — plan-harness skill
 
+## 4.0.1 — 2026-04-23
+
+### Added
+
+- `references/convergence-loop.md` 에 "편집 모드 호출 (/bp:edit 진입점)" 섹션 추가. Route A (명세만) / Route C (둘 다 의 명세부) 가 plan-harness 를 재사용하는 방식·입력 차이·최초 planner spawn prompt 의 `mode: 편집 모드` 컨텍스트 규약 명시
+
+### Fixed
+
+- /bp:edit 3.1.0 설계가 "타겟 업데이트 모드" 라는 미정의 용어로 가리킨 부분을 이 섹션이 SSOT 로 대체. intake-branches.md 가 존재하지 않는 참조였던 문제 해소
+
 ## 4.0.0 — 2026-04-22
 
 ### BREAKING — SendMessage 세션 재진입 → Agent 체이닝 전환
