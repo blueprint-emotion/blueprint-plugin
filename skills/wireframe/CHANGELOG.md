@@ -6,6 +6,14 @@
 - **MINOR**: 새 컴포넌트·새 패턴·새 옵션 추가 (호환성 유지)
 - **PATCH**: 문서 명료화·예제 보강·오타 수정
 
+## [4.7.1] - 2026-04-23
+
+### Changed — overlay 분리 판단 주체·기준 명시
+
+`references/overlay-patterns.md` "메인 wireframe vs 별도 파일" 섹션에 판단 주체 (오케스트레이터 자동 스캔 → 기획자 결정 → wireframer 집행) 와 wireframer 의 "자의적 분리 금지" 원칙을 명시. 기준 상세는 wireframe-harness 3.1.0 `confirm-gates.md` 게이트 2 에 SSOT.
+
+wireframe skill 자체의 표현 규약·bp-* 컴포넌트 사용법 변경 없음. overlay-patterns.md 의 서술만 책임 경계·트리거 조건 기준으로 정렬.
+
 ## [4.7.0] - 2026-04-23
 
 ### Added — 오버레이 `data-element` 판정 기준 (오버레이 전체 vs 내부 위젯)

@@ -1,6 +1,6 @@
 ---
 name: plan-harness
-version: 4.0.1
+version: 4.1.0
 user-invocable: false
 description: >
   /bp:plan 커맨드의 오케스트레이션 규약. 기획자와의 대화형 인터뷰 → intake 확정 →

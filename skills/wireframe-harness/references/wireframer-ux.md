@@ -16,12 +16,12 @@
 좋아요, 그릴게요.
 - PC 버전 (wireframe.html)
 - 모바일 버전 (wireframe_mobile.html)
-- sheet_review, dialog_zoom 도 같이
+- 리뷰 시트, 이미지 확대 다이얼로그 도 같이
 
 1~2분 걸려요.
 ```
 
-viewport 배열, 같은 폴더의 sheet/dialog 파일 자동 감지 후 목록으로 제시. 덮어쓰기 상황이면 추가 한 줄:
+viewport 배열, 같은 폴더의 sheet/dialog 파일 자동 감지 후 목록으로 제시. overlay 명칭은 각 파일 frontmatter `title` 에서 카테고리 접두사(`시트_`, `다이얼로그_`, `알랏_`) 를 떼어 한글로 노출 (파일명 `sheet_review` 를 그대로 쓰지 않음 — 기획자 facing 메시지에서 파일명 노출 금지). 덮어쓰기 상황이면 추가 한 줄:
 
 ```
 (기존 wireframe.html 이 있어요. 덮어쓸게요.)
@@ -72,3 +72,4 @@ screen.md 에 이 부분이 아직 안 잡혀 있어요: {뭐}
 - "LOOP round N entering" 같은 시스템 로그
 - reviewer 의 위반 리포트 원문 그대로 붙여넣기
 - `<bp-section>`, `data-feature-key` 같은 마크업 용어는 기획자 메시지에 피함 (내부 처리로 숨김). 단, "영역 태그", "화면 구성" 같은 자연어로 언급은 허용
+- overlay 파일명(`sheet_review`, `dialog_image_zoom`) 을 기획자 facing 메시지에 노출 — 각 파일 frontmatter `title` 에서 카테고리 접두사(`시트_`, `다이얼로그_`, `알랏_`) 떼어 한글로 (예: "리뷰 시트", "이미지 확대 다이얼로그"). 파일 생성 보고 때 절대 경로 한 줄로 적어주는 건 OK

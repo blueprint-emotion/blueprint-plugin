@@ -1,6 +1,6 @@
 ---
 name: wireframe
-version: 4.7.0
+version: 4.7.1
 user-invocable: false
 description: >
   와이어프레임 HTML을 생성한다. bp-* Web Components(shadcn/ui 포팅 51종 + bp-icon)를 사용.

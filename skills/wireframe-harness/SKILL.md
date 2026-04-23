@@ -1,6 +1,6 @@
 ---
 name: wireframe-harness
-version: 3.0.1
+version: 3.1.0
 user-invocable: false
 description: >
   /bp:wireframe 커맨드의 오케스트레이션 규약. 화면명세(screen.md) 를 입력으로 받아

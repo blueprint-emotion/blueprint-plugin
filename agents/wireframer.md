@@ -78,10 +78,10 @@ frontmatter `screenId`로 화면명세인지 검증.
 - `[mobile]`이면 → `wireframe_mobile.html` 1개
 - `[pc, mobile]`이면 → `wireframe.html` + `wireframe_mobile.html` 2개
 
-**오버레이(`sheet_{name}.md`, `dialog_{name}.md`)** — 두 가지 표현, 기본은 메인 fragment:
+**오버레이(`sheet_{name}.md`, `dialog_{name}.md`, `alert_{name}.md`)** — 기본 표현은 항상 메인 fragment:
 
-1. **메인 와이어 안 `<bp-fragment>` + `<bp-sheet open>` / `<bp-dialog open>` 정적 카드 (기본, 항상 포함)** — 트리거 컨텍스트 + "어디서 어떤 오버레이가 뜨는지" 표현. 모든 `sheet_*.md` / `dialog_*.md` 를 메인 와이어 안에 포함한다.
-2. **별도 파일 (opt-in)** — 오케스트레이터가 Task prompt 에 `extract_overlays: ["sheet_review"]` 같은 이름 목록을 명시한 경우만 추가 생성. 각 오버레이의 frontmatter `viewport` 를 **독립적으로** 따른다:
+1. **메인 와이어 안 `<bp-fragment>` + `<bp-sheet open>` / `<bp-dialog open>` / `<bp-alert-dialog open>` 정적 카드 (기본, 예외 없이 전부 포함)** — 트리거 컨텍스트 + "어디서 어떤 오버레이가 뜨는지" 표현
+2. **별도 파일 (opt-in · 오케스트레이터 결정)** — Task prompt `extract_overlays: ["sheet_review"]` 에 이름이 명시된 경우에만 추가 생성. 그 외 어떤 이유로도 별도 파일을 만들지 않는다 (자의적 분리 금지). 각 오버레이의 frontmatter `viewport` 를 **독립적으로** 따른다:
    - `[pc]` → `wireframe_sheet_{name}.html` (또는 `wireframe_dialog_{name}.html`)
    - `[mobile]` → `wireframe_sheet_{name}_mobile.html`
    - `[pc, mobile]` → 두 파일 모두
@@ -181,12 +181,13 @@ viewport: [pc, mobile]
 
 ### 6단계 — 시트·다이얼로그 처리
 
-폴더에 `sheet_*.md` 또는 `dialog_*.md` 가 있으면:
+폴더에 `sheet_*.md` / `dialog_*.md` / `alert_*.md` 가 있으면 **기본은 전부 메인 와이어 안에 `<bp-fragment>` + 오버레이 정적 카드로 포함**. fragment id 는 `{name}` (예: `sheet_review.md` → `<bp-fragment id="review">`). 각 fragment 의 description 은 트리거 컨텍스트 + 사전조건 등 6 체크리스트 (wireframe 스킬 §"bp-fragment description 자세히 쓰기" 참조).
 
-1. **모두 메인 와이어 안에 `<bp-fragment>` + 오버레이 정적 카드로 포함 (기본)**. fragment id 는 `{name}` (예: `sheet_review.md` → `<bp-fragment id="review">`). 각 fragment 의 description 은 트리거 컨텍스트 + 사전조건 등 6 체크리스트 (wireframe 스킬 §"bp-fragment description 자세히 쓰기" 참조).
-2. **오케스트레이터 Task prompt 에 `extract_overlays: [...]` 가 명시된 경우만** 그 이름들을 별도 와이어 파일로 추가 생성. 메인 fragment 는 유지. 파일명 패턴은 wireframe 스킬 규약대로 (`wireframe_sheet_{name}.html` + viewport suffix).
+별도 와이어 파일 (`wireframe_sheet_{name}.html` 등) 은 **오직 Task prompt 의 `extract_overlays: [...]` 배열에 이름이 명시된 경우만** 추가 생성한다. 그 경우에도 메인 fragment 는 그대로 유지 (트리거 컨텍스트 SSOT). 파일명 패턴은 wireframe 스킬 규약대로 (`wireframe_sheet_{name}.html` + viewport suffix).
 
-`extract_overlays` 가 없으면 별도 파일은 만들지 않는다. 메인 와이어 안 sheet/dialog fragment 는 5 단계 진행 중 해당 feature 그룹 스테이지에서 같이 추가된다 (예: 옵션 시트는 ③ 옵션 그룹).
+**중요 — 자의적 분리 금지**: `extract_overlays` 에 없는 이름은 어떤 이유로도 별도 파일로 만들지 않는다. "상태 변형이 많아 보여서", "폼이 복잡해서" 같은 자가 판단으로 별도 파일을 만드는 순간 기획자가 의도치 않은 산출물이 생성됨. 분리 판단은 오케스트레이터·기획자 소유 (wireframe-harness `confirm-gates.md` 게이트 2). `extract_overlays` 가 빈 배열이면 모든 overlay 를 메인에만 포함한다.
+
+메인 와이어 안 sheet/dialog fragment 는 5 단계 진행 중 해당 feature 그룹 스테이지에서 같이 추가된다 (예: 옵션 시트는 ③ 옵션 그룹).
 
 ### 7단계 — 자기점검 + 반송 (reviewer 호출 없음)
 
