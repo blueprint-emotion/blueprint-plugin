@@ -36,6 +36,14 @@ SKILL.md 의 빠른 체크리스트. 리뷰 전·생성 후 훑어보기용. 자
 | 오버레이 전체 상태를 가리키는 JSON 이름(예: "발송 완료 안내", "네트워크 오류") 을 **안쪽 텍스트 노드**(`<bp-dialog-description>`·`<bp-alert-dialog-title>`) 에 걸기 | eye 버튼이 텍스트 한 줄만 하이라이트하고 다이얼로그 카드 전체가 안 잡힌다. JSON 이름에 "… 안내"/"… 오류"/"… 에러"/"… 확인" 이 들어가면 거의 항상 **바깥 `<bp-dialog open>`·`<bp-alert-dialog open>` wrapper 쪽** 에 붙여야 맞다. 판정 기준과 종합 예제는 [`overlay-patterns.md`](./overlay-patterns.md) 참조 |
 | `data-element` 에 컴포넌트 종류 접미사(" 알랏"/" 다이얼로그"/" 시트") 를 **HTML 에만** 추가 | 반복적으로 가장 많이 나오는 drift. JSON `"이메일 형식 오류"` ↔ HTML `"이메일 형식 오류 알랏"` 같은 패턴. wrapper 가 `<bp-alert-dialog>` 라는 사실이 눈에 보여 자동으로 접미사를 붙이게 되는데, JSON 과 바이트 단위로 동일해야 매칭된다. 접미사는 JSON·HTML 양쪽에 **동일하게** 유지하거나 둘 다 생략 |
 
+## Input group
+
+| 실수 | 왜 문제인가 |
+|------|------------|
+| `<bp-input-group-input>` 안에 `<bp-input>`·`<input>` 중첩 | 이름에 `-input`이 들어있지만 **자체가 input**. 내부 네이티브 input에 속성을 프록시하는 구조라 중첩하면 바깥 래퍼와 안쪽 input이 둘 다 스타일을 가져 박스가 어긋난다. `<bp-input-group-input type="password" placeholder="...">` 처럼 속성을 직접 건다. textarea도 동일 (`bp-input-group-textarea` 자체가 textarea) |
+| `<bp-input-group-button>`·`<bp-icon>`·텍스트를 `<bp-input-group-addon>` 없이 `<bp-input-group>`의 최상위 자식으로 배치 | addon이 `align`으로 input 옆 정렬 슬롯을 만드는 축이다. 건너뛰면 input 옆에 붙지 않고 아래 블록으로 떨어진다. 모든 부착 요소는 **반드시 addon 안**. [`bp-input-group.md`](./components/bp-input-group.md) 참조 |
+| `<bp-input-group-button size="icon">` | `icon`은 `bp-button`의 size 토큰이고, `bp-input-group-button`은 `icon-xs`/`icon-sm`을 쓴다. 토큰 집합이 달라 `size="icon"`은 무효. 아이콘 전용 버튼은 `size="icon-xs"` |
+
 ## HTML·CSS
 
 | 실수 | 왜 문제인가 |

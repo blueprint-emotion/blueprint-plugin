@@ -6,6 +6,24 @@
 - **MINOR**: 새 컴포넌트·새 패턴·새 옵션 추가 (호환성 유지)
 - **PATCH**: 문서 명료화·예제 보강·오타 수정
 
+## [4.7.2] - 2026-04-23
+
+### Changed — `bp-input-group` composition 규약 명시화
+
+실제 로그인 화면 와이어프레임에서 와이어프레이머가 password 토글을 두 지점에서 틀림:
+1. `<bp-input-group-input>` 안에 `<bp-input>`을 또 중첩 (바깥 래퍼·안쪽 input 이중 스타일로 박스 어긋남)
+2. `<bp-input-group-button>`을 `<bp-input-group-addon>` 없이 `<bp-input-group>` 최상위 자식으로 배치 (정렬 슬롯을 못 잡아 input 밖 하단 블록으로 떨어짐)
+
+**원인**: composition 트리 그림이 "시사" 수준에 머물러 LLM에게 **강제 규칙**으로 안 읽힘. 표의 "내부 네이티브 input에 프록시" 힌트도 `<bp-input>` 중첩 습관을 끊기엔 약함. `size="icon"` (bp-button 토큰) 을 `size="icon-xs"` (bp-input-group-button 토큰) 로 드리프트하는 것도 비슷한 구조적 혼동.
+
+**반영 위치**:
+- `references/components/bp-input-group.md` — 속성표의 `bp-input-group-input`/`-textarea` 행에 "**자체가 input/textarea 다. 중첩 금지**" 명시, `bp-input-group-addon` 행에 "모든 text·button·아이콘은 반드시 이 안에" 명시, `bp-input-group-button` `size` 행에 "`size="icon"`은 무효 (bp-button 토큰)" 명시. Composition 트리에 "강제 규칙" 블록 추가. 함정 섹션 맨 앞에 "`-input`이 이름에 있으니 wrapper겠지 오해 금지" / "버튼/아이콘을 addon 밖에 두지 말 것" / "`size="icon"`은 bp-button 토큰" 3가지 한 줄 경고 추가. 트리의 `bp-input-group-addon (1개 이상)` 오기를 `0개 이상`으로 정정. **Password + 가시성 토글 예제 신설** — input 자체 + addon 안 button + icon-size 토큰 3규칙을 동시에 강제하는 테스트 케이스
+- `references/common-mistakes.md` — "Input group" 섹션 신설(HTML·CSS 위), 3가지 실수 (input 중첩 / addon 건너뛰기 / size="icon") 각각 행으로 정리
+
+**근거**: 하나의 실제 화면에서 3규칙이 동시에 깨졌고, 토큰 집합이 비슷한 다른 bp-* 컴포넌트로 드리프트 재발 가능성이 높다. "트리 그림 + 시사" → "명시적 금지문 + 테스트 케이스 예제" 로 전환.
+
+호환성: 기존 와이어프레임에 영향 없음(추가 가이드만). 기존 파일 중 위 3실수가 있는 경우는 다음 `/bp:wireframe` 실행 시 리뷰어가 감지 후 갱신.
+
 ## [4.7.1] - 2026-04-23
 
 ### Changed — overlay 분리 판단 주체·기준 명시
