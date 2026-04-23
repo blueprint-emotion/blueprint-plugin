@@ -17,27 +17,33 @@
 ```
 blueprint-plugin/
 ├── .claude-plugin/
-│   ├── plugin.json              ← 플러그인 메타 (name: "bp")
-│   └── marketplace.json         ← GitHub 마켓 메타
-├── commands/                    ← /bp:* 슬래시 명령
-│   ├── plan.md                  ← /bp:plan
-│   ├── wireframe.md             ← /bp:wireframe
-│   └── edit.md                  ← /bp:edit (플랫폼 편집 요청 라우팅)
-├── agents/                      ← bp:* 서브에이전트 (skills: frontmatter 로 스킬 preload)
-│   ├── planner.md               ← 요구사항 → 명세 (와이어 X)
-│   ├── wireframer.md            ← screen.md → 와이어 HTML
-│   └── reviewer.md              ← 산출물 검증 (오케스트레이터가 Task 로 호출, 공식 제약상 subagent 는 Task 없음)
-└── skills/                      ← 플러그인 스킬
-    ├── CLAUDE.md                ← 스킬 폴더 가이드
-    ├── plan-harness/            ← /bp:plan 오케스트레이션 + 기획자 UX 원칙 (user-invocable: false)
-    ├── wireframe-harness/       ← /bp:wireframe 오케스트레이션 (user-invocable: false)
-    ├── intake/                  ← intake.md 형식·슬롯·_pending_decisions 메타 섹션
-    ├── feature-spec/            ← 기능명세 SSOT
-    ├── screen-spec/             ← 화면명세
-    └── wireframe/               ← 와이어프레임 HTML + bp-* 컴포넌트
+│   └── marketplace.json         ← GitHub 마켓 메타 (source: "./bp")
+├── README.md · CLAUDE.md · LICENSE   ← 저장소용 문서. 배포 대상 아님
+└── bp/                          ← ★ 마켓플레이스 배포 단위 (plugin root)
+    ├── .claude-plugin/
+    │   └── plugin.json          ← 플러그인 메타 (name: "bp")
+    ├── commands/                ← /bp:* 슬래시 명령
+    │   ├── plan.md              ← /bp:plan
+    │   ├── wireframe.md         ← /bp:wireframe
+    │   └── edit.md              ← /bp:edit (플랫폼 편집 요청 라우팅)
+    ├── agents/                  ← bp:* 서브에이전트 (skills: frontmatter 로 스킬 preload)
+    │   ├── planner.md           ← 요구사항 → 명세 (와이어 X)
+    │   ├── wireframer.md        ← screen.md → 와이어 HTML
+    │   └── reviewer.md          ← 산출물 검증 (오케스트레이터가 Task 로 호출, 공식 제약상 subagent 는 Task 없음)
+    └── skills/                  ← 플러그인 스킬
+        ├── CLAUDE.md            ← 스킬 폴더 가이드
+        ├── plan-harness/        ← /bp:plan 오케스트레이션 + 기획자 UX 원칙 (user-invocable: false)
+        ├── wireframe-harness/   ← /bp:wireframe 오케스트레이션 (user-invocable: false)
+        ├── intake/              ← intake.md 형식·슬롯·_pending_decisions 메타 섹션
+        ├── feature-spec/        ← 기능명세 SSOT
+        ├── screen-spec/         ← 화면명세
+        └── wireframe/           ← 와이어프레임 HTML + bp-* 컴포넌트
 ```
 
-> 참고: 플러그인 내부에서 `.claude/` 디렉터리는 사용하지 않는다 (이전 구조의 `.claude/skills/` 도그푸딩 심링크는 제거됨). 모노레포 루트(`blueprint-emotion/`)에 `.claude/` 를 두고 루트 `.claude/{skills,agents,commands}` 를 `blueprint-plugin/{skills,agents,commands}` 로 심링크하는 구조.
+> **왜 `bp/` 하위에?** 마켓플레이스 install 은 `source` 경로를 cache 로 **복사**하므로, 도그푸딩 중 소스 수정이 반영되지 않는다. `bp/` 를 배포 단위로 분리해두면:
+> - 마켓 설치 사용자: `bp/` 안의 내용을 그대로 받아 `/bp:*` 사용
+> - 개발자: `~/.claude/plugins/cache/blueprint-emotion/bp/{ver}` 를 `blueprint-plugin/bp` 심링크로 치환하면 즉시 반영 (레이아웃이 동일하므로 어긋날 일 없음)
+> - 모노레포 루트 `.claude/{skills,agents,commands}` → `../blueprint-plugin/bp/{...}` 로 심링크되어, 루트에서 기동하면 `/bp:*` 활성화
 
 ## 호출 흐름
 
@@ -173,12 +179,24 @@ blueprint-plugin/
 명령·에이전트의 namespace 동작을 격리 검증하려면:
 
 ```bash
-claude --plugin-dir .
+claude --plugin-dir ./bp
 ```
 
-이 디렉터리(`blueprint-plugin/`)를 플러그인으로 로드해 `/bp:plan`, `/bp:wireframe` 명령이 활성화된다. 테스트용 화면을 만들고 싶으면 `docs/screens/test/` 같은 임시 폴더를 만들어 돌려보고, 결과 산출물은 git에 커밋하지 않고 정리.
+`bp/` 를 플러그인으로 로드해 `/bp:plan`, `/bp:wireframe` 명령이 활성화된다. 테스트용 화면을 만들고 싶으면 `docs/screens/test/` 같은 임시 폴더를 만들어 돌려보고, 결과 산출물은 git에 커밋하지 않고 정리.
 
-> 과거에는 `blueprint-plugin/.claude/skills/` 가 `blueprint-plugin/skills/` 로 심링크되어 있었으나, 모노레포 루트 `.claude/` 로 통합하면서 플러그인 내부 `.claude/` 는 제거됨.
+**cache 심링크 방식** (권장): `/plugin marketplace add` 로 설치한 뒤 cache 폴더를 소스 `bp/` 심링크로 치환하면, 이후 소스 수정이 Claude Code 재시작 시 바로 반영된다.
+
+```bash
+# 1. /plugin marketplace add /path/to/blueprint-plugin  (Claude Code 안에서)
+# 2. /plugin 으로 bp 설치
+# 3. 터미널에서 cache 심링크화:
+rm -rf ~/.claude/plugins/cache/blueprint-emotion/bp/{버전}
+ln -s /path/to/blueprint-plugin/bp ~/.claude/plugins/cache/blueprint-emotion/bp/{버전}
+```
+
+`bp/` 하위 구조가 cache 레이아웃과 동일하므로 심링크가 그대로 작동한다.
+
+> 과거에는 `blueprint-plugin/.claude/skills/` 가 `blueprint-plugin/skills/` 로 심링크되어 있었으나, 모노레포 루트 `.claude/` 로 통합하면서 플러그인 내부 `.claude/` 는 제거됨. 이후 4.x 에서 배포 단위를 `bp/` 로 이동하며 cache ↔ 소스 대응이 1:1 이 됨.
 
 ## 사용자 프로젝트와 이 저장소의 차이
 

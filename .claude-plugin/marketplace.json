@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "bp",
-      "source": "./",
+      "source": "./bp",
       "description": "Blueprint by 이모션 — 기획자가 Claude Code에서 기능명세·화면명세·와이어프레임을 생성하는 플러그인"
     }
   ]
