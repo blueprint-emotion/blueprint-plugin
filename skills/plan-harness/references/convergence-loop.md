@@ -468,3 +468,45 @@ Agent prompt 에 `round: N` 을 안 넣으면 planner 가 `## _pending_decisions
 ## 자동 수정 분류 기준
 
 각 위반의 "자동 수정 가능/불가" 분류는 [auto-fix-policy.md](auto-fix-policy.md) 참조. 오케스트레이터는 reviewer 리포트의 분류를 그대로 신뢰 (재분류 X) 하고 planner 에게 전달.
+
+## 편집 모드 호출 (/bp:edit 진입점)
+
+`/bp:edit` 가 Route A (명세만) 또는 Route C (둘 다 의 명세부) 를 실행할 때 이 수렴 루프를 그대로 재사용한다. **새 워크플로가 아니라 입력만 다른 재진입**이다.
+
+### 입력 차이
+
+| 항목 | 일반 `/bp:plan` | 편집 모드 |
+|---|---|---|
+| 진입 트리거 | 요구사항 md 또는 자연어 | 플랫폼 편집 요청 markdown (파일 경로 + 앵커 + 사용자 지시) |
+| intake 상태 | 신규 생성 (or 기존 재검토) | 기존 intake.md 가 있으면 **부분 수정**, 없으면 수정 대상 화면·기능 국한 **제한 범위 intake** 생성 |
+| planner 컨텍스트 | 요구사항 + 화면 후보 | 기존 명세 (screen.md, area_*.md, sheet_*.md, dialog_*.md, 관련 features/*.md) + 사용자 지시 + 앵커 |
+| 출력 제약 | HTML 은 만들지 않음 (일반) | 동일 — HTML 은 절대 손대지 않음 (Route C 는 수렴 완료 후 wireframe-harness "기존 HTML 수정 모드" 로 체인) |
+
+### 알고리즘 차이
+
+알고리즘 본체 ([위 "알고리즘" 섹션](#알고리즘-오케스트레이터-실행)) 를 그대로 쓰되, **최초 planner spawn 에 "편집 모드" 컨텍스트를 prompt 에 명시**한다:
+
+```
+mode: 편집 모드 (부분 수정)
+target_files:
+  - docs/screens/.../screen.md  (또는 area_*, sheet_*, dialog_*)
+  - docs/features/{DOMAIN}.md
+anchor: data-feature="{DOMAIN}__{ID}" data-feature-key="{slot}"  (있을 때만)
+user_instruction: {기획자가 적은 자연어}
+
+규칙:
+- 기존 명세의 다른 섹션은 건드리지 않는다. anchor 로 지정된 영역만 수정.
+- intake.md 가 있으면 새 슬롯을 추가하지 말고 기존 슬롯에 반영한다.
+- 규칙 변경이면 해당 featureId 의 rules 만, 요소 수정이면 area_*.md 의 elements·인수조건만.
+```
+
+체이닝·reviewer 검증·α 프로토콜·루프 한계(3회)는 [일반 루프](#알고리즘-오케스트레이터-실행) 와 동일.
+
+### 수렴 완료 후
+
+- Route A: 명세 수렴 → 오케스트레이터가 기획자 언어로 diff 요약 → 종료
+- Route C: 명세 수렴 → **오케스트레이터가 wireframe-harness "기존 HTML 수정 모드" 로 체이닝** (convergence-loop.md[wireframe-harness] 의 "기존 HTML 수정 모드" 섹션 참조)
+
+### 관련 회송
+
+수정 대상이 실은 명세 결함이 아니라 HTML 디테일(색·여백·카피) 뿐으로 판정되면 오케스트레이터가 **Route B 로 격하**해 wireframe-harness 로 넘긴다. 이 판정은 `/bp:edit` 의 "변경 유형 판단" 단계에서 먼저 걸러지지만, 편집 중 planner 가 "명세 변경 불필요" 를 반환하면 오케스트레이터가 즉시 회송.

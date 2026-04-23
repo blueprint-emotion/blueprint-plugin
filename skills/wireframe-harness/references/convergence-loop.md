@@ -281,3 +281,55 @@ plan-harness 와 동일. subagent 의 Agent 호출 시도, namespace 누락, sel
 ### reviewer 의 반송
 
 위반 리포트 (각 항목 "자동 수정 가능" / "자동 수정 불가" 분류) 또는 "위반 0건, 수렴". 파일 수정 없음.
+
+## 기존 HTML 수정 모드 (/bp:edit 진입점)
+
+`/bp:edit` 가 Route B (와이어만) 또는 Route C (둘 다 의 와이어부) 를 실행할 때 이 수렴 루프를 재사용한다. **새 워크플로가 아니라 입력만 다른 재진입** — 전면 재생성이 아닌 **기존 HTML 타겟 수정**.
+
+### 입력 차이
+
+| 항목 | 일반 `/bp:wireframe` | 기존 HTML 수정 모드 |
+|---|---|---|
+| 진입 트리거 | screen.md 경로 | 플랫폼 편집 요청 markdown (HTML 경로 + 앵커 + 사용자 지시) |
+| 생성 범위 | viewport 배열대로 전체 파일 재생성 | 앵커가 있으면 해당 `<bp-section data-feature=... data-feature-key=...>` 블록만 타겟 수정. 앵커 없으면 전체 재생성 (일반 경로와 동일) |
+| 입력 명세 | screen.md + area_*.md 등 전체 | 기존 HTML + 대응 명세 (Route C 는 방금 수렴한 최신 명세) |
+| flavor | viewport 전체 (pc, mobile) | 편집 요청 파일 경로로 결정 (`_mobile` 포함 시 mobile 만) |
+
+### 알고리즘 차이
+
+본체 ([위 "알고리즘" 섹션](#알고리즘-오케스트레이터-실행)) 그대로 쓰되, **최초 wireframer spawn prompt 에 "기존 HTML 수정 모드" 컨텍스트 명시**:
+
+```
+mode: 기존 HTML 수정 모드 (타겟 수정)
+target_file: docs/screens/.../wireframe(_mobile)?.html
+anchor: data-feature="{DOMAIN}__{ID}" data-feature-key="{slot}"  (있을 때만)
+user_instruction: {기획자가 적은 자연어}
+spec_reference:
+  - docs/screens/.../screen.md  (또는 area_*, sheet_*, dialog_*)
+  - docs/features/{DOMAIN}.md
+
+규칙:
+- 앵커 블록 외의 기존 HTML 은 보존. 전면 재생성 금지.
+- bp-* 컴포넌트 사용법 준수 (self-closing 금지 등 기존 규칙).
+- viewport 는 타겟 파일 하나만. 다른 flavor 재생성 금지.
+```
+
+체이닝·reviewer 검증·루프 한계(3회) 는 [일반 루프](#알고리즘-오케스트레이터-실행) 와 동일.
+
+### Route B 자동 수정 불가 회송 규칙
+
+reviewer 가 "자동 수정 불가" 라벨을 반환하면 **루프 지속 금지** — 오케스트레이터는 reviewer 분류를 그대로 신뢰하며 (재분류 X, 자동 반영 루프로 되돌리지 않음), 위반 성격별로 회송 경로만 분기한다:
+
+| 위반 성격 | 회송 |
+|---|---|
+| **명세-HTML 드리프트** — HTML 에 있는 요소가 대응 screen.md/area.md 에 없음, `data-feature` 가 feature-spec 에 정의되지 않은 ID, 사용자 지시가 명세 rules 와 충돌 | **`/bp:plan` 회송** — Route B 를 Route C 로 승격. 기획자에게 "이 편집은 명세도 같이 손봐야 해요, 전환할까요?" 확인 후 plan-harness "편집 모드 호출" 로 체인. 명세 수렴 완료 후 이 모드로 복귀. |
+| **와이어 규약 / 외부 의존성 결함** — self-closing·bp-* 컴포넌트 오사용·data-feature-key 충돌 등 (reviewer 판정상 자동 수정 불가로 분류된 경우), 또는 명세 자체 모순·여러 화면 영향 | **기획자 facing 회송 메시지 + 루프 종료** — "이 위반은 자동으로 반영하기 어려워요" 로 상황 설명. 기획자가 수동 편집 후 `/bp:edit` 재호출하거나 `/bp:plan` 으로 재검토 결정. |
+
+"자동 수정 가능" 라벨 위반은 일반 루프 경로 ([위 "알고리즘" 섹션](#알고리즘-오케스트레이터-실행))로 처리되며, 여기서는 "자동 수정 불가" 만 다룬다.
+
+회송 판단은 **오케스트레이터** 가 한다. wireframer · reviewer 는 회송 결정을 내리지 않는다 (역방향 호출 금지 원칙). "자동 수정 가능" 인데 실제로는 불가로 보이는 판정 오류 의심 시에도 오케스트레이터가 reviewer 분류를 임의로 뒤집지 않는다 — 기획자에게 분류 이견을 알리고 판단을 맡긴다.
+
+### 수렴 완료 후
+
+- Route B: 와이어 수렴 → 오케스트레이터가 기획자 언어로 diff 요약 → 종료
+- Route C: 명세 수렴 → 이 모드 진입 → 와이어 수렴 → 통합 diff 요약 → 종료
