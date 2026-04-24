@@ -23,13 +23,14 @@ Blueprint 플랫폼(와이어 뷰어)에서 "우클릭 → 수정" 으로 전달
 플랫폼이 보내는 본문은 Claude Desktop `claude://` deep link 의 제약(줄바꿈 stripping · 마크다운 non-render)에 맞춰 **단일 라인 `::` 구분자 포맷**이다:
 
 ```
-/bp:edit {repo} :: {파일경로} :: {기능명|page} :: {사용자 지시}
+/bp:edit {repo} :: {파일경로} :: {앵커토큰} :: {사용자 지시}
 ```
 
 실제 예:
 
 ```
 /bp:edit furia0928/test :: docs/screens/인증/login/screen.pc.html :: AUTH__LOGIN :: 전체적으로 와이어프레임 스킬로 점검, 모바일 버전도 같이 해줘
+/bp:edit furia0928/test :: docs/screens/인증/login/screen.md :: overview/error-cases :: "3회 실패 시 계정 잠금" 규칙 추가해줘
 ```
 
 이 커맨드는 `$ARGUMENTS` 를 ` :: ` (공백-콜론콜론-공백) 으로 split 해서 다음을 추출한다:
@@ -37,13 +38,13 @@ Blueprint 플랫폼(와이어 뷰어)에서 "우클릭 → 수정" 으로 전달
 | 조각 | 필드 | 의미 |
 |---|---|---|
 | 0 | **저장소** | `owner/name` 형식. 현재 작업 저장소 식별 용도 |
-| 1 | **파일 경로** | `docs/screens/.../*.html` 형태 저장소 경로. `_mobile` 포함 여부로 **flavor** (pc/mobile) 를 자동 판단 |
-| 2 | **기능명** | `data-feature` 값(`{DOMAIN}__{ID}` 형식) 또는 `page`(페이지 전체 앵커). 슬롯 구분(`data-feature-key`) 은 플랫폼이 보내지 않으므로, 같은 feature 가 페이지에 여러 번 있으면 사용자 지시에서 자연어로 식별 |
+| 1 | **파일 경로** | `docs/screens/.../*.html` 또는 `docs/screens/.../*.md` 형태 저장소 경로. HTML 이면 `_mobile` 포함 여부로 **flavor** (pc/mobile) 자동 판단 |
+| 2 | **앵커토큰** | 파일 종류에 따라 의미가 다르다: <br>• `.html` → `data-feature` 값(`{DOMAIN}__{ID}`) 또는 `page`(페이지 전체 앵커) <br>• `.md`   → heading 기준 **section_path** (예: `overview/error-cases`, rehype-slug 규칙) 또는 `page`(문서 전체) <br>슬롯 구분(HTML `data-feature-key`) 은 플랫폼이 보내지 않으므로 같은 feature 가 여러 번 있으면 자연어로 식별 |
 | 3+ | **사용자 지시** | 나머지 전부 (지시 안에 ` :: ` 가 등장하면 3 번째 이후 조각을 전부 다시 ` :: ` 로 join) |
 
 파싱 실패 판별:
-- split 결과 4 조각 미만 → 포맷 오류. "편집 요청 포맷이 맞지 않아요 — `/bp:edit {repo} :: {파일} :: {기능} :: {지시}` 로 다시 보내주세요" 출력 후 종료
-- 파일 경로가 `.html` 로 끝나지 않음 → 동일 오류 처리
+- split 결과 4 조각 미만 → 포맷 오류. "편집 요청 포맷이 맞지 않아요 — `/bp:edit {repo} :: {파일} :: {앵커} :: {지시}` 로 다시 보내주세요" 출력 후 종료
+- 파일 경로가 `.html` · `.md` 어느 쪽으로도 끝나지 않음 → 동일 오류 처리
 
 **버전**: 플랫폼은 항상 latest 를 전제로 편집 요청을 보내므로 파싱 대상이 아니다. 과거 버전을 고치고 싶으면 기획자가 git 으로 해당 태그를 checkout 후 자연어로 직접 `/bp:edit` 를 호출한다.
 
@@ -52,6 +53,8 @@ Blueprint 플랫폼(와이어 뷰어)에서 "우클릭 → 수정" 으로 전달
 ## 파일 경로 → 명세 매핑
 
 이 커맨드는 수정 대상이 되는 **화면명세 파일 (`.md`)** 과 **와이어프레임 파일 (`.html`)** 을 함께 파악해야 한다.
+
+### HTML 파일이 입력으로 들어온 경우 (기존)
 
 | html 파일명 | 대응 화면명세 | 비고 |
 |---|---|---|
@@ -63,14 +66,47 @@ Blueprint 플랫폼(와이어 뷰어)에서 "우클릭 → 수정" 으로 전달
 
 **매핑 실패 시**: "와이어프레임 파일명 규약에 맞지 않아 대응 명세를 찾을 수 없어요: {경로}" 출력 후 종료.
 
+### MD 파일이 입력으로 들어온 경우 (MD 뷰어의 "수정" 진입)
+
+입력 파일 자체가 편집 대상 명세다. 경로 패턴별 취급:
+
+| md 파일 | 대응 와이어프레임 후보 | 비고 |
+|---|---|---|
+| `screen.md` | 같은 폴더의 `wireframe.html` / `wireframe_mobile.html` (있으면) | 페이지 명세 |
+| `sheet_{name}.md` | `wireframe_sheet_{name}.html` / `wireframe_sheet_{name}_mobile.html` | 시트 명세 |
+| `dialog_{name}.md` | `wireframe_dialog_{name}.html` / `wireframe_dialog_{name}_mobile.html` | 다이얼로그 명세 |
+| `area_{name}.md` | (독립 와이어프레임 없음) — 부모 `screen.md` 의 wireframe 를 참조 | 영역 명세 |
+| `docs/features/*.md` | 없음 (도메인 기능명세) | feature-spec |
+
+### 앵커 토큰 해석
+
+- **HTML 파일 + `{DOMAIN}__{ID}`**: `data-feature` 속성으로 HTML 내 위치를 Grep.
+- **HTML 파일 + `page`**: 페이지 전체 앵커. 특정 요소 지정 없음.
+- **MD 파일 + section_path** (예: `overview/error-cases`): rehype-slug 규칙으로 h1~h6 heading slug 를 `/` 로 연결한 경로. 파일 안에서 아래 알고리즘으로 해당 heading 을 찾는다:
+  1. section_path 를 `/` 로 split → 각 세그먼트가 heading slug
+  2. 문서 첫 heading 부터 순회하면서 slug (GitHub 스타일: 소문자·공백→`-`·특수문자 제거) 매칭. 단, **n 번째 세그먼트는 그 앞 세그먼트들의 계층 안에서만 매칭** (부모 heading 아래의 자식 heading)
+  3. 매칭된 heading 부터 같은 레벨 이상의 다음 heading 직전까지가 "섹션 범위"
+- **MD 파일 + `page`**: 문서 전체 앵커. 특정 섹션 지정 없음.
+- **MD 파일 + section_path 매칭 실패**: "지정한 섹션(`{path}`)을 `{파일}` 에서 찾지 못했어요. heading 이 변경되었을 수 있습니다. 어느 섹션을 손볼지 다시 알려주세요." 인터뷰로 전환.
+
 ## 실행 흐름
 
 ### 1. 컨텍스트 수집
 
-- 대응 화면명세(`.md`) 와 와이어프레임(`.html`) 을 Read
-- `area_*.md` (있으면 전부) Read
-- 앵커가 지정돼 있으면 `data-feature` / `data-feature-key` 속성으로 HTML 안 해당 블록 Grep → 주변 컨텍스트 파악
-- `data-feature` 가 기능명세 ID(`{DOMAIN}__{ID}`) 형식이면 해당 `docs/features/{DOMAIN}.md` 에서 해당 섹션 Read. 구분자는 더블 언더스코어(`__`)로 계층, 단일 언더스코어(`_`)로 단어 — 대문자만 사용한다 (feature-spec 규약)
+**공통**:
+- 입력 파일을 Read
+- 같은 폴더의 `area_*.md` (있으면 전부) Read
+- `docs/features/*.md` 중 연관 도메인은 frontmatter `toc` 로 구조만 훑고 필요한 섹션만 Read
+
+**HTML 입력일 때**:
+- 대응 화면명세(`.md`) 를 같은 폴더에서 찾아 Read
+- 앵커가 `{DOMAIN}__{ID}` 면 `data-feature` / `data-feature-key` 속성으로 HTML 안 해당 블록 Grep → 주변 컨텍스트 파악
+- 해당 feature 의 도메인 파일 `docs/features/{DOMAIN}.md` 의 해당 섹션 Read. 구분자는 더블 언더스코어(`__`)로 계층, 단일 언더스코어(`_`)로 단어 — 대문자만 사용한다 (feature-spec 규약)
+
+**MD 입력일 때**:
+- 대응 와이어프레임(`.html`) 후보가 같은 폴더에 있으면 Read (위 "MD 파일이 입력으로 들어온 경우" 표 참조)
+- section_path 앵커가 있으면 위 "앵커 토큰 해석" 의 섹션 범위 알고리즘으로 해당 heading + 본문을 Read (파일 전체가 아니라 해당 섹션만 우선)
+- 해당 섹션 안에서 `featureId` 참조나 `[...](../features/X.md#anchor)` 링크가 보이면 타겟 기능명세도 함께 Read
 
 ### 2. 변경 유형 판단
 
@@ -86,6 +122,10 @@ Blueprint 플랫폼(와이어 뷰어)에서 "우클릭 → 수정" 으로 전달
 - 지시에 **"추가"·"삭제"·"바꾸자"(구조적)·"조건"·"규칙"** 같은 단어 있고 기존 명세에 해당 개념이 없으면 → A 또는 C
 - 지시가 **"색"·"여백"·"순서"·"카피"·"문구"·"아이콘"** 같은 표현 수정이면 → B
 - 지시에 **새 화면·새 기능** 암시가 있으면 → C (plan 으로 시작)
+
+**입력 파일 종류에 따른 제약**:
+- **MD 입력** (명세 뷰어의 "수정"): Route 는 **A 또는 C** 만 가능. Route B (와이어만) 는 MD 파일을 건드리지 않으므로 선택지에서 제외한다. 대응 와이어프레임도 같이 손봐야 하면 C.
+- **HTML 입력** (와이어 뷰어의 "수정"): 세 Route 모두 가능. 표현 수정만이면 B, 명세까지 가야 하면 A/C.
 
 ### 3. 기획자 확인
 
@@ -142,7 +182,8 @@ Blueprint 플랫폼(와이어 뷰어)에서 "우클릭 → 수정" 으로 전달
 |---|---|
 | 파일 경로가 저장소 기준(`docs/...`) 이지만 현재 작업폴더에 없음 | "이 폴더에는 해당 파일이 없어요. 저장소를 clone 한 위치에서 실행해주세요" 출력 후 종료 |
 | 앵커가 있는데 HTML 에서 찾을 수 없음 | 기획자에게 알리고 "어떤 요소를 말하는지 다시 알려주세요" 인터뷰로 전환 |
-| 앵커 없음(anchorType 만) | 화면 전체를 컨텍스트로 삼아 처리. Route 판단 시 "요소 식별이 모호하다" 경고 표시 |
+| MD 입력에서 section_path 가 지정됐는데 파일에서 매칭 실패 | heading 이 바뀌었을 수 있음. "지정한 섹션을 찾지 못했어요" 출력 후 어느 섹션을 고칠지 인터뷰로 전환 |
+| 앵커 없음(`page`) | 화면/문서 전체를 컨텍스트로 삼아 처리. Route 판단 시 "요소 식별이 모호하다" 경고 표시 |
 | 기존 harness(`claude/` worktree) 로 자동 띄워진 경우 | 최종 보고에 **"worktree 가 아닌 메인 브랜치에서 작업해주세요 — 커밋/푸시 시 혼선됩니다"** 경고 추가 |
 | 기획자가 Route 판단 뒤 "다 취소" | 수정사항 없음 보고 후 종료. 파일은 절대 건드리지 않는다 |
 | 여러 번 연속으로 `/bp:edit` 호출 | 각 호출은 독립. intake.md 상태는 plan-harness 의 기존 분기(신규/부분수정/재검토) 규칙을 그대로 따름 |
