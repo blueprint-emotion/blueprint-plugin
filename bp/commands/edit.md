@@ -30,6 +30,8 @@ Blueprint 플랫폼(와이어 뷰어)에서 "우클릭 → 수정" 으로 전달
 
 ```
 /bp:edit furia0928/test :: docs/screens/인증/login/screen.pc.html :: AUTH__LOGIN :: 전체적으로 와이어프레임 스킬로 점검, 모바일 버전도 같이 해줘
+/bp:edit furia0928/test :: docs/screens/인증/login/screen.pc.html :: feature=AUTH__LOGIN;key=form;element=submit-button :: 로그인 버튼 문구를 "계속하기"로 바꿔줘
+/bp:edit furia0928/test :: docs/screens/인증/login/screen.pc.html :: fragment=empty-state :: 빈 상태 안내 문구를 더 짧게 바꿔줘
 /bp:edit furia0928/test :: docs/screens/인증/login/screen.md :: overview/error-cases :: "3회 실패 시 계정 잠금" 규칙 추가해줘
 ```
 
@@ -39,7 +41,7 @@ Blueprint 플랫폼(와이어 뷰어)에서 "우클릭 → 수정" 으로 전달
 |---|---|---|
 | 0 | **저장소** | `owner/name` 형식. 현재 작업 저장소 식별 용도 |
 | 1 | **파일 경로** | `docs/screens/.../*.html` 또는 `docs/screens/.../*.md` 형태 저장소 경로. HTML 이면 `_mobile` 포함 여부로 **flavor** (pc/mobile) 자동 판단 |
-| 2 | **앵커토큰** | 파일 종류에 따라 의미가 다르다: <br>• `.html` → `data-feature` 값(`{DOMAIN}__{ID}`) 또는 `page`(페이지 전체 앵커) <br>• `.md`   → heading 기준 **section_path** (예: `overview/error-cases`, rehype-slug 규칙) 또는 `page`(문서 전체) <br>슬롯 구분(HTML `data-feature-key`) 은 플랫폼이 보내지 않으므로 같은 feature 가 여러 번 있으면 자연어로 식별 |
+| 2 | **앵커토큰** | 파일 종류에 따라 의미가 다르다: <br>• `.html` → 구조화 토큰 `feature={DOMAIN}__{ID};key={data-feature-key};element={data-element}` 또는 `fragment={id}` 또는 `page` <br>• `.html` 하위호환 → 기존 단순 `data-feature` 값(`{DOMAIN}__{ID}`)도 허용 <br>• `.md` → heading 기준 **section_path** (예: `overview/error-cases`, rehype-slug 규칙) 또는 `page`(문서 전체) |
 | 3+ | **사용자 지시** | 나머지 전부 (지시 안에 ` :: ` 가 등장하면 3 번째 이후 조각을 전부 다시 ` :: ` 로 join) |
 
 파싱 실패 판별:
@@ -80,7 +82,9 @@ Blueprint 플랫폼(와이어 뷰어)에서 "우클릭 → 수정" 으로 전달
 
 ### 앵커 토큰 해석
 
-- **HTML 파일 + `{DOMAIN}__{ID}`**: `data-feature` 속성으로 HTML 내 위치를 Grep.
+- **HTML 파일 + `feature={DOMAIN}__{ID};key={slot};element={name}`**: `data-feature`와 `data-feature-key` 조합으로 HTML 내 `<bp-section>` 위치를 찾고, `element`가 있으면 해당 블록 안의 `[data-element="{name}"]`을 우선 타겟으로 삼는다. `key`와 `element`는 optional이다.
+- **HTML 파일 + `{DOMAIN}__{ID}`**: 하위호환 단순 토큰. `data-feature` 속성으로 HTML 내 위치를 Grep한다. 같은 feature가 여러 번 있으면 사용자 지시 문맥으로 식별하거나 기획자에게 확인한다.
+- **HTML 파일 + `fragment={id}`**: `bp-fragment#id`를 타겟으로 삼는다. fragment 내부의 상태/대체 UI 수정에 사용한다.
 - **HTML 파일 + `page`**: 페이지 전체 앵커. 특정 요소 지정 없음.
 - **MD 파일 + section_path** (예: `overview/error-cases`): rehype-slug 규칙으로 h1~h6 heading slug 를 `/` 로 연결한 경로. 파일 안에서 아래 알고리즘으로 해당 heading 을 찾는다:
   1. section_path 를 `/` 로 split → 각 세그먼트가 heading slug
@@ -100,7 +104,9 @@ Blueprint 플랫폼(와이어 뷰어)에서 "우클릭 → 수정" 으로 전달
 
 **HTML 입력일 때**:
 - 대응 화면명세(`.md`) 를 같은 폴더에서 찾아 Read
-- 앵커가 `{DOMAIN}__{ID}` 면 `data-feature` / `data-feature-key` 속성으로 HTML 안 해당 블록 Grep → 주변 컨텍스트 파악
+- 앵커가 `feature=...` 면 `data-feature` + optional `data-feature-key` 로 HTML 안 해당 블록 Grep → 주변 컨텍스트 파악. `element=...` 가 있으면 해당 블록 안 `[data-element]` 를 추가로 Grep
+- 앵커가 하위호환 `{DOMAIN}__{ID}` 면 `data-feature` 속성으로 HTML 안 해당 블록 Grep → 주변 컨텍스트 파악
+- 앵커가 `fragment=...` 면 `bp-fragment#...` 를 Grep → 주변 컨텍스트 파악
 - 해당 feature 의 도메인 파일 `docs/features/{DOMAIN}.md` 의 해당 섹션 Read. 구분자는 더블 언더스코어(`__`)로 계층, 단일 언더스코어(`_`)로 단어 — 대문자만 사용한다 (feature-spec 규약)
 
 **MD 입력일 때**:
