@@ -122,7 +122,9 @@ blueprint-plugin/
 | 2.0.0 | 3.0.0 | 2.0.0 | 0.3.0 | 1.4.2 | 1.6.2 | 4.1.3 |
 | 3.0.0 | 4.0.0 | 3.0.0 | 0.3.1 | 1.4.2 | 1.6.2 | 4.5.0 |
 | 3.1.0 | 4.0.0 | 3.0.0 | 0.3.1 | 1.4.2 | 1.6.2 | 4.5.0 |
-| **3.1.1** | 4.0.1 | 3.0.1 | 0.3.1 | 1.4.2 | 1.6.2 | 4.5.0 |
+| 3.1.1 | 4.0.1 | 3.0.1 | 0.3.1 | 1.4.2 | 1.6.2 | 4.5.0 |
+| 3.2.0 | 4.1.0 | 3.1.0 | 0.3.1 | 1.4.2 | 1.6.2 | 4.7.2 |
+| **3.3.0** | 4.1.0 | 3.1.0 | 0.3.1 | 1.4.2 | 1.6.2 | 4.7.2 |
 
 > 0.1.0 의 `harness` 스킬은 0.2.0 에서 `plan-harness` + `wireframe-harness` 로 분리됐다. 0.2.0 은 BREAKING — agents 의 `skills:` frontmatter 도 함께 바뀌었다.
 >
@@ -131,6 +133,10 @@ blueprint-plugin/
 > 3.0.0 은 BREAKING — 수렴 루프를 **SendMessage 세션 재진입 → Agent 체이닝 (매 라운드 새 spawn)** 으로 전환. 근거: (1) 공식 문서 권고 "chain subagents from the main conversation", (2) Agent Teams (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`) 가 experimental 로 사용자 환경 의존성, (3) 상태가 전부 intake.md + 명세 파일(durable truth)에 있어 세션 연속성 불필요. plan-harness 3.0.0 → 4.0.0, wireframe-harness 2.0.0 → 3.0.0 으로 동반 MAJOR. agent 본문 단일 진입점으로 재작성, α 프로토콜 α-5 단계(SendMessage 로 planner 재호출) 삭제 — α-4 에 흡수 (다음 라운드 새 Agent 호출 + "α 결정 반영" 템플릿). `Task` → `Agent` 표기 일원화 (v2.1.63 공식 리네임). 동반으로 wireframe 스킬은 **커스텀 엘리먼트 self-closing 금지 규칙**을 reviewer 검증 카테고리·visual-review 체크항목·auto-fix-policy 에 추가 (MINOR 4.5.0). intake 는 문서 내 SendMessage 언급 제거 (PATCH 0.3.1). 구 SendMessage 기반 경로로 생성된 intake.md 는 payload 스키마 무변화라 그대로 호환. 트레이드오프: α 결정 적용 시 spawn 1회 추가 — 세션 재진입 비용 제거와 상쇄.
 >
 > 3.1.0 은 MINOR — `/bp:edit` 커맨드 추가. 플랫폼(blueprint-platform)의 와이어 뷰어 "우클릭 → 수정" 플로우가 `claude://code/new?q=<prompt>&folder=<path>` 로 띄우는 세션에 대응하는 진입점. 편집 요청 markdown(메타데이터 + 사용자 지시)을 파싱해 화면명세 폴더로 매핑하고, 변경 유형을 3-Route(A 명세만 / B 와이어만 / C 둘다) 로 판단·컨펌한 뒤 기존 `/bp:plan` · `/bp:wireframe` 흐름을 재사용한다. 플랫폼은 긴 "작업 방법" 프롬프트 대신 메타데이터 블록 + `/bp:edit` 호출 한 줄만 넘기면 된다. 다른 스킬 버전 변동 없음 — 신규 command 는 기존 스킬을 그대로 재사용.
+>
+> 3.2.0 은 MINOR — `/bp:edit` 가 `.md` 파일 + section_path 앵커를 지원. heading slug 기반 path (예: `overview/error-cases`) 로 markdown 화면명세 안 특정 heading 섹션을 직접 타겟할 수 있다. 동반: plan-harness/wireframe-harness 인터뷰 카피·overlay-split 게이트 정리 (4.0.1→4.1.0 / 3.0.1→3.1.0 MINOR), wireframe 의 overlay data-element 규칙·input-group composition rule 정리 (4.5.0→4.7.0→4.7.2). 배포 단위 재구조화로 모든 산출물이 `bp/` 하위로 이동 (사용자 영향 없음 — 마켓 cache 레이아웃과 1:1).
+>
+> 3.3.0 은 MINOR — `/bp:edit` 가 플랫폼이 보내는 새 HTML 구조화 앵커 토큰을 지원. `feature={DOMAIN}__{ID};key={data-feature-key};element={data-element}` 조합으로 우클릭한 정확한 슬롯·요소까지 식별, 또는 `fragment={id}` 로 bp-fragment 직접 타겟. 기존 단순 `{DOMAIN}__{ID}` 토큰은 fallback 으로 계속 허용 (하위호환). command 만 갱신, 스킬 버전 변동 없음.
 >
 > 3.1.1 은 PATCH — `/bp:edit` 3.1.0 설계 결함 4건 수정. (1) **featureId 규약 오기** 정정: `AUTH.login` → `AUTH__LOGIN`, `{DOMAIN}.{featureId}` → `{DOMAIN}__{ID}` (feature-spec 실제 규약 반영). (2) **수렴 루프 구체화**: plan-harness/references/convergence-loop.md 에 "편집 모드 호출" 섹션, wireframe-harness/references/convergence-loop.md 에 "기존 HTML 수정 모드" 섹션 추가. Route B 가 reviewer "자동 수정 불가" 반환 시 명세-HTML 드리프트면 `/bp:plan` 회송 규칙 포함. edit.md 는 Route↔harness 모드 라우팅 표만 유지 (SSOT 는 harness reference). (3) **시스템 언어 위반** 교정: 기획자-facing 메시지에서 "Route", "컨펌 게이트", "Agent" 등 금지어 제거, 한국어 동사구("명세만 손보는 방향") 로 치환. Route 라벨은 내부 문서·prompt 에만 유지. (4) **dead ref 삭제**: 존재하지 않는 `plan-harness/references/intake-branches.md` 참조 2건 제거. 산출물 포맷 무변화, 기존 3.1.0 기능의 의도된 동작을 바로잡는 수정. plan-harness 4.0.0→4.0.1, wireframe-harness 3.0.0→3.0.1 동반 PATCH.
 >
